@@ -1,0 +1,170 @@
+import React, { useState } from 'react';
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
+import { 
+  LayoutDashboard, QrCode, Boxes, Inbox, ArrowUpRight, 
+  LogOut, Warehouse, Menu, X
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useGlobalState } from '../context/GlobalStateContext';
+import UserRoleDropdown from '../components/UserRoleDropdown';
+import './WarehouseLayout.css';
+
+export default function WarehouseLayout() {
+  const { logout } = useAuth();
+  const { warehouseRequests, releaseRequests } = useGlobalState();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const pendingStorageCount = warehouseRequests.filter(r => r.status === 'Pending').length;
+  const pendingReleaseCount = releaseRequests.filter(r => r.status === 'Pending').length;
+
+  const navItems = [
+    { name: 'Dashboard', path: '/storage', icon: <LayoutDashboard size={18} />, end: true },
+    { name: 'Check-in & scan', path: '/storage/check-in', icon: <QrCode size={18} /> },
+    { name: 'Capacity & slots', path: '/storage/inventory', icon: <Boxes size={18} /> },
+    { 
+      name: 'Storage Requests', 
+      path: '/storage/requests',
+      icon: <Inbox size={18} />, 
+      badge: pendingStorageCount > 0 ? pendingStorageCount : null 
+    },
+    { 
+      name: 'Release Requests', 
+      path: '/storage/releases',
+      icon: <ArrowUpRight size={18} />, 
+      badge: pendingReleaseCount > 0 ? pendingReleaseCount : null 
+    },
+  ];
+
+  return (
+    <div className="warehouse-layout">
+      {/* Sidebar */}
+      <aside className="warehouse-sidebar">
+        <div className="warehouse-sidebar-header">
+          <Link to="/storage" className="warehouse-logo">
+            KHET<span>SETU</span>
+          </Link>
+          <div className="warehouse-role-tag">
+            Storage partner workspace
+          </div>
+        </div>
+
+        <nav className="warehouse-nav">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.path}
+              end={item.end}
+              className={({ isActive }) => `warehouse-nav-item ${isActive ? 'active' : ''}`}
+            >
+              {item.icon}
+              <span style={{ flex: 1 }}>{item.name}</span>
+              {item.badge && (
+                <span style={{
+                  background: '#DDFF86',
+                  color: '#0B120D',
+                  padding: '2px 8px',
+                  borderRadius: '100px',
+                  fontSize: '11px',
+                  fontWeight: '800'
+                }}>
+                  {item.badge}
+                </span>
+              )}
+            </NavLink>
+          ))}
+
+          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '16px', borderTop: '1px solid rgba(11,18,13,0.08)' }}>
+            <button
+              onClick={() => { logout(); }}
+              className="warehouse-nav-item"
+              style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', color: '#DC2626' }}
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </div>
+        </nav>
+      </aside>
+
+      {/* Mobile Navigation Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-nav-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="mobile-nav-content" onClick={e => e.stopPropagation()}>
+            <div className="mobile-nav-header">
+              <Link to="/storage" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
+                KHET<span>SETU</span>
+              </Link>
+              <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
+                <X size={24} color="#0B120D" />
+              </button>
+            </div>
+            <nav className="mobile-nav-links">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.path}
+                  end={item.end}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                >
+                  {item.icon}
+                  <span style={{ flex: 1 }}>{item.name}</span>
+                  {item.badge && (
+                    <span style={{
+                      background: '#DDFF86',
+                      color: '#0B120D',
+                      padding: '2px 8px',
+                      borderRadius: '100px',
+                      fontSize: '11px',
+                      fontWeight: '800'
+                    }}>
+                      {item.badge}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+
+              <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '16px', borderTop: '1px solid #E5E5E5' }}>
+                <button
+                  onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                  className="nav-item"
+                  style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', color: '#DC2626' }}
+                >
+                  <LogOut size={18} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Main Area */}
+      <div className="warehouse-main">
+        <header className="warehouse-top-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button 
+              className="mobile-menu-toggle"
+              onClick={() => setIsMobileMenuOpen(true)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'none', padding: '4px' }}
+            >
+              <Menu size={24} color="#0B120D" />
+            </button>
+            <div className="warehouse-hub-name">
+              <Warehouse size={20} color="#0B120D" />
+              <span className="hub-name-text">Mysuru Wool Storage Centre (WH-01)</span>
+            </div>
+          </div>
+
+          <div className="warehouse-header-actions">
+            <UserRoleDropdown />
+          </div>
+        </header>
+
+        <main className="warehouse-content-area">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}

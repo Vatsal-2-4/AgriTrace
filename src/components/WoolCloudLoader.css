@@ -1,0 +1,113 @@
+/* Quiet, minimal loader */
+
+.minimal-loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Satoshi', sans-serif;
+  z-index: 99999;
+}
+
+.minimal-loader-wrapper.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Very clean, slightly translucent dark overlay */
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: minimalFadeIn 0.4s ease-out;
+}
+
+.minimal-loader-wrapper.inline-loader {
+  padding: 32px 40px;
+  background: #fff;
+  border-radius: 14px;
+  color: #14291e;
+}
+
+.minimal-loader-wrapper.inline-loader .minimal-brand {
+  color: #000;
+}
+
+.minimal-loader-wrapper.fullscreen-overlay .minimal-spinner {
+  border-color: rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+}
+
+.minimal-loader-wrapper.fullscreen-overlay .minimal-brand span {
+  color: #fff;
+}
+
+@keyframes minimalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.minimal-loader-container {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.minimal-spinner {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.14);
+  border-top-color: #000;
+  animation: minimalSpin 0.9s linear infinite;
+}
+
+@keyframes minimalSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Minimalist center logo */
+.minimal-center-logo {
+  font-size: 14px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.05em;
+  z-index: 2;
+  animation: subtlePulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes subtlePulse {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Clean typography */
+.minimal-loader-text {
+  text-align: center;
+}
+
+.minimal-brand {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #14291e;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.minimal-brand span {
+  color: inherit;
+}
+
+.minimal-status {
+  font-size: 13px;
+  font-weight: 400;
+  color: #666;
+  letter-spacing: 0.02em;
+}
