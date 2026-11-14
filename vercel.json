@@ -22,6 +22,7 @@
     { "source": "/api/processing/:route*", "destination": "/api/processing?route=:route*" },
     { "source": "/api/qa/:route*",      "destination": "/api/qa?route=:route*"      },
     { "source": "/api/ai/mandi-forecast", "destination": "/api/ai/mandi-forecast.py" },
+    { "source": "/api/ai/intelligence/:kind", "destination": "/api/ai/intelligence?kind=:kind" },
     { "source": "/api/transport/:route*", "destination": "/api/transport?route=:route*" },
     { "source": "/api/warehouse/:route*", "destination": "/api/warehouse?route=:route*" },
     { "source": "/api/notifications/:route*", "destination": "/api/notifications?route=:route*" }

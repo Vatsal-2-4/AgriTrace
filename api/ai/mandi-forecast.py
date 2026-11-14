@@ -1,4 +1,5 @@
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 
@@ -68,7 +69,7 @@ def handler(request):
         body = request.get_json(silent=True) or {}
         observations = body.get("observations") or []
         if not isinstance(observations, list) or len(observations) < 31:
-            return json_response(400, {"success": False, "message": "At least 31 historical observations are required"})
+            return json_response(400, {"success": False, "message": "At least 31 historical observations are required", "code": "INSUFFICIENT_HISTORY", "modelVersion": MODEL_VERSION})
         prep = joblib.load(MODEL_DIR / "preprocessing.joblib")
         model = xgb.XGBRegressor()
         model.load_model(str(MODEL_DIR / "khetsetu_mandi_xgb_v2_delta.json"))
@@ -78,7 +79,10 @@ def handler(request):
         numeric = sparse.csr_matrix(latest[prep["numeric_features"]].to_numpy(dtype=np.float32))
         predicted_delta = float(model.predict(sparse.hstack([numeric, categories], format="csr"))[0])
         current = float(latest.iloc[0]["modal_price"])
+        if not math.isfinite(predicted_delta) or not math.isfinite(current) or current <= 0:
+            return json_response(422, {"success": False, "message": "The latest usable mandi observation or model output is invalid", "code": "INVALID_FORECAST_INPUT", "modelVersion": MODEL_VERSION})
         next_price = current + predicted_delta
-        return json_response(200, {"success": True, "modelVersion": MODEL_VERSION, "currentModalPrice": current, "predictedDelta": round(predicted_delta, 2), "predictedNextModalPrice": round(next_price, 2), "predictionDate": datetime.utcnow().date().isoformat(), "units": "Rs./quintal"})
+        latest_date = pd.to_datetime(latest.iloc[0]["price_date"]).date().isoformat()
+        return json_response(200, {"success": True, "status": "READY", "method": "MODEL", "modelVersion": MODEL_VERSION, "currentModalPrice": current, "predictedDelta": round(predicted_delta, 2), "predictedNextModalPrice": round(next_price, 2), "latestObservationDate": latest_date, "predictionDate": datetime.utcnow().date().isoformat(), "units": "INR/quintal", "limitations": ["Predicts the next reported mandi observation, which is not necessarily the next calendar day.", "Historical test directional accuracy is 39.1%; treat the point estimate as uncertain."], "evaluation": {"mae": 208.82, "mapePercent": 5.53, "directionalAccuracyPercent": 39.11, "testPeriod": "2025-08-01 through 2025-08-13"}})
     except Exception as error:
         return json_response(500, {"success": False, "message": str(error), "modelVersion": MODEL_VERSION})
