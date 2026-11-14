@@ -40,6 +40,7 @@ const Certificates = React.lazy(() => import('./pages/inspector/Certificates'));
 const InspectionDetail = React.lazy(() => import('./pages/inspector/InspectionDetail'));
 const NotificationsSettings = React.lazy(() => import('./pages/settings/NotificationsSettings'));
 const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
 
 function RoleHomeRedirect() {
   const { user } = useAuth();
@@ -48,13 +49,19 @@ function RoleHomeRedirect() {
 
 const secure = (roles, element) => <ProtectedRoute allowedRoles={roles}>{element}</ProtectedRoute>;
 
+function AdminOnly({ children }) {
+  const { user } = useAuth();
+  return user?.role === 'ADMIN' ? children : <Navigate to="/admin/login" replace />;
+}
+
 function App() {
   return <AuthProvider><GlobalStateProvider><Router><Suspense fallback={<WoolCloudLoader text="Loading your AgriTrace workspace..." fullScreen />}><Routes>
     <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/platform" element={<RoleHomeRedirect />} />
-    <Route path="/admin" element={secure(['FARMER', 'SELLER', 'BUYER', 'RETAILER', 'WHOLESALER', 'PROCESSOR', 'QUALITY_INSPECTOR', 'WAREHOUSE', 'TRANSPORT', 'EDUCATOR', 'ADMIN'], <AdminDashboard />)} />
+    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/admin" element={<AdminOnly><AdminDashboard /></AdminOnly>} />
     <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
     <Route path="/track/:batchId" element={<PublicTrackBatch />} />
     <Route path="/track" element={<PublicTrackBatch />} />

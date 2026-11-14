@@ -190,14 +190,14 @@ export default function UserRoleDropdown() {
               title={hasAdminAccess ? 'Open the admin portal' : 'Open a sample admin portal preview'}
               onClick={() => {
                 setIsOpen(false);
-                navigate(ADMIN_PORTAL.path);
+                navigate(hasAdminAccess ? ADMIN_PORTAL.path : '/admin/login');
               }}
             >
               <span className="admin-portal-icon" style={{ background: ADMIN_PORTAL.badgeBg, color: ADMIN_PORTAL.badgeColor }}>
                 <ADMIN_PORTAL.icon size={16} />
               </span>
-              <span className="admin-portal-copy"><b>{ADMIN_PORTAL.label}</b><small>{hasAdminAccess ? ADMIN_PORTAL.sub : 'Open interactive demo preview'}</small></span>
-              {!hasAdminAccess && <span className="admin-portal-demo-tag">DEMO</span>}
+              <span className="admin-portal-copy"><b>{ADMIN_PORTAL.label}</b><small>{hasAdminAccess ? ADMIN_PORTAL.sub : 'Administrator sign in required'}</small></span>
+              {!hasAdminAccess && <span className="admin-portal-demo-tag">SECURE</span>}
             </button>
           </div>
 
