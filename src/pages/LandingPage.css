@@ -160,3 +160,13 @@
 @media (prefers-reduced-motion: reduce) {
   .al-button { transition: none; }
 }
+
+/* One continuous field of colour keeps the green-to-lavender transition seamless. */
+.agri-landing main {
+  background: linear-gradient(180deg, #eff9e8 0%, #eff9e8 22%, #e7eee8 40%, #e7e6ed 58%, #eee5f2 78%, #f0e9f3 100%);
+}
+.agri-landing .al-hero,
+.agri-landing .al-stats,
+.agri-landing .al-how,
+.agri-landing .al-network,
+.agri-landing .al-trust { background: transparent; }
