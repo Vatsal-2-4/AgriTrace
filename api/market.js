@@ -382,7 +382,7 @@ export default async function handler(req, res) {
   if (handleCors(req, res)) return;
   try {
     const url = getMarketPath(req);
-    if (/^\/(lots|demands|bids|quality-assessments|demand-forecast|price-recommendation|price-observations)(\/|$)/.test(url)) {
+    if (/^\/(lots|demands|bids|contact-consent|quality-assessments|demand-forecast|price-recommendation|price-observations)(\/|$)/.test(url)) {
       await dbConnect();
       return await handleMarketplace(req, res);
     }
@@ -403,7 +403,7 @@ export default async function handler(req, res) {
     }
     return res.status(404).json({ error: 'Not found' });
   } catch (error) {
-    if (/\/(lots|demands|bids|quality-assessments|forecast|recommendation|price-observations)/.test(getMarketPath(req))) {
+    if (/\/(lots|demands|bids|contact-consent|quality-assessments|forecast|recommendation|price-observations)/.test(getMarketPath(req))) {
       console.error('marketplace error', error);
       return sendError(res, 500, 'MARKETPLACE_ERROR', 'The marketplace request could not be completed');
     }
