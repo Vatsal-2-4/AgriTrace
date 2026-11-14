@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { BrowserQRCodeReader } from '@zxing/browser';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   QrCode, Search, CheckCircle2, ArrowRight, AlertCircle, Check
@@ -58,6 +57,7 @@ export default function WarehouseCheckIn() {
   const handleCameraScan = async () => {
     setScanError('');
     try {
+      const { BrowserQRCodeReader } = await import('@zxing/browser');
       setIsScanning(true);
       await new Promise(resolve => requestAnimationFrame(resolve));
       if (!videoRef.current) throw new Error('Scanner preview is unavailable');
