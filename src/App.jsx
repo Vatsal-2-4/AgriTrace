@@ -48,7 +48,7 @@ function RoleHomeRedirect() {
 const secure = (roles, element) => <ProtectedRoute allowedRoles={roles}>{element}</ProtectedRoute>;
 
 function App() {
-  return <AuthProvider><GlobalStateProvider><Router><Suspense fallback={<WoolCloudLoader text="Loading your KhetSetu workspace..." fullScreen />}><Routes>
+  return <AuthProvider><GlobalStateProvider><Router><Suspense fallback={<WoolCloudLoader text="Loading your AgriTrace workspace..." fullScreen />}><Routes>
     <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />

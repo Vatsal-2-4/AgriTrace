@@ -6,7 +6,7 @@ function makeOfflineIntent(transaction) {
   const transactionReference = reference();
   const amount = Number(transaction.grossValue);
   const merchantVpa = import.meta.env.VITE_UPI_ID || 'khetsetu@upi';
-  const merchantName = import.meta.env.VITE_UPI_NAME || 'KhetSetu Trade Payment';
+  const merchantName = import.meta.env.VITE_UPI_NAME || 'AgriTrace Trade Payment';
   const upiUri = `upi://pay?pa=${encodeURIComponent(merchantVpa)}&pn=${encodeURIComponent(merchantName)}&am=${amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(`Payment for ${transaction.transactionNumber || transaction.id}`)}&tr=${transactionReference}`;
   const payment = { id, transactionId: transaction.id, amount, method: 'UPI', reference: transactionReference, merchantVpa, upiUri, gateway: 'DIRECT_UPI', status: 'PENDING', offline: true };
   localPayments.set(id, payment);

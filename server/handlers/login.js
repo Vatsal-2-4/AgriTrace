@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       return 'FARMER';
     };
 
-    // Demo profiles are provisioned on demand for each KhetSetu workspace.
+    // Demo profiles are provisioned on demand for each AgriTrace workspace.
     const isDemoProfile = identifier.endsWith('@khetsetu.in');
     const demoRole = inferDemoRole(identifier);
     if (!user && isDemoProfile) {

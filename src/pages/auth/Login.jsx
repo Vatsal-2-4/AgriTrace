@@ -72,10 +72,10 @@ const Login = () => {
 
         <div className="login-header">
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="logo">KHET<span>SETU</span></div>
+            <div className="logo">AGRI<span>TRACE</span></div>
           </Link>
           <h2 style={{marginTop: '8px', fontSize: '20px'}}>One market. Every decision connected.</h2>
-          <p>Sign in to your KhetSetu market workspace.</p>
+          <p>Sign in to your AgriTrace market workspace.</p>
         </div>
 
         {errorMessage && (

@@ -1,8 +1,8 @@
-# KhetSetu — Market Intelligence to Market Action
+# AgriTrace — Market Intelligence to Market Action
 
 ## One-line pitch
 
-KhetSetu helps farmers and FPOs decide when and where to sell, connect with the right buyer, and complete a transparent, payment-ready trade from one mobile-first workflow.
+AgriTrace helps farmers and FPOs decide when and where to sell, connect with the right buyer, and complete a transparent, payment-ready trade from one mobile-first workflow.
 
 ## The problem
 
@@ -20,7 +20,7 @@ Buyers face the reverse problem: they cannot easily find consistent farmer/FPO v
 
 ## The solution
 
-KhetSetu turns fragmented market signals into a guided transaction workflow:
+AgriTrace turns fragmented market signals into a guided transaction workflow:
 
 1. Compare nearby mandi, direct buyer and institutional signals.
 2. See price direction, arrivals, buyer demand and estimated net realisation.
@@ -64,7 +64,7 @@ Legacy `?tab=` links are automatically redirected to the equivalent focused rout
 
 ### 3. Price discovery and sale timing
 
-For a selected commodity and grade, KhetSetu compares:
+For a selected commodity and grade, AgriTrace compares:
 
 - regulated mandi benchmark;
 - direct buyer / processor quote;
@@ -106,7 +106,7 @@ Every transaction records:
 - payment status, method, reference and timestamp;
 - dispute status.
 
-The **Pay by UPI** action creates a UPI deep link and renders a QR code. It works even when the optional local API bridge is unavailable: the browser creates a test-mode intent locally, so a 404 cannot prevent a QR from appearing. When the API is available, `/api/payments` creates and confirms the intent server-side. After confirmation, the transaction is updated to `PAID` with a KhetSetu payment reference.
+The **Pay by UPI** action creates a UPI deep link and renders a QR code. It works even when the optional local API bridge is unavailable: the browser creates a test-mode intent locally, so a 404 cannot prevent a QR from appearing. When the API is available, `/api/payments` creates and confirms the intent server-side. After confirmation, the transaction is updated to `PAID` with a AgriTrace payment reference.
 
 The current build uses `TEST_UPI` and `khetsetu@upi` as a safe demonstration configuration. A live merchant gateway must be configured with deployment-only credentials before real funds are accepted.
 
@@ -116,7 +116,7 @@ Quality grade, certificate, origin and QR verification remain attached to the lo
 
 ## AI-assisted experience
 
-KhetSetu is AI-first at the decision layer, not AI as decoration.
+AgriTrace is AI-first at the decision layer, not AI as decoration.
 
 - **Market advisor:** turns current prices, arrivals, demand, storage and transport context into a plain-language recommendation.
 - **Sale-window reasoning:** explains the trade-off between selling today and carrying produce for a better window.
@@ -141,7 +141,7 @@ The Gemini integration is server-side through the market-advisor API. Mandi/arri
 
 ### 0:00–0:45 — Open with the farmer decision
 
-“A farmer is not just looking for a price. They need to know which market will leave them with the best net realisation after transport and storage, whether a buyer can take their grade and volume, and whether payment will actually be recorded. Today those answers are fragmented. KhetSetu brings them into one guided trade workflow.”
+“A farmer is not just looking for a price. They need to know which market will leave them with the best net realisation after transport and storage, whether a buyer can take their grade and volume, and whether payment will actually be recorded. Today those answers are fragmented. AgriTrace brings them into one guided trade workflow.”
 
 Show the landing page briefly, then sign in as **Farmer / FPO**.
 
@@ -155,7 +155,7 @@ Sign out or use the role preview and sign in as **Buyer**. Show that the buyer l
 
 Return to the farmer workspace and open **Market intelligence**. Select Wheat, Mustard or another crop. Explain the channel cards: “Here the farmer sees the mandi benchmark, direct buyer quote and institutional channel side by side, including distance, reliability and payment terms.”
 
-Open **Price & sale timing**. Enter the intended quantity, grade, distance and storage months. Say: “The important number is not the headline price. KhetSetu estimates net farm-gate realisation after the costs that usually remain invisible.”
+Open **Price & sale timing**. Enter the intended quantity, grade, distance and storage months. Say: “The important number is not the headline price. AgriTrace estimates net farm-gate realisation after the costs that usually remain invisible.”
 
 Open the AI advisor and read the recommendation: “The recommendation is grounded in the selected crop, price movement, arrivals, demand and carry cost. It tells the farmer what action to take and why.”
 
@@ -177,7 +177,7 @@ Open **Aggregate FPO lots** and explain: “Small volumes can be pooled into one
 
 Open **Offers & negotiation** as the farmer. Show the buyer, quantity, price and terms. Demonstrate **Counter-offer**, change the price, and submit.
 
-Say: “Negotiation is recorded as a structured history. When the farmer accepts, KhetSetu creates the transaction instead of leaving the agreement in chat messages.”
+Say: “Negotiation is recorded as a structured history. When the farmer accepts, AgriTrace creates the transaction instead of leaving the agreement in chat messages.”
 
 Accept an offer and navigate to **Trade & payments**.
 
@@ -185,7 +185,7 @@ Accept an offer and navigate to **Trade & payments**.
 
 Choose a transaction with a pending payment and click **Pay by UPI**.
 
-“This is the point where market intelligence becomes transaction enablement. KhetSetu creates a UPI payment request for the agreed gross value and renders a QR that any UPI app can scan.”
+“This is the point where market intelligence becomes transaction enablement. AgriTrace creates a UPI payment request for the agreed gross value and renders a QR that any UPI app can scan.”
 
 Show the amount, transaction reference and **Open UPI app** link. Click **I completed the UPI payment**. Point to the updated `PAID` state and payment reference.
 
@@ -197,7 +197,7 @@ Click **Confirm delivery**. Show the delivery state update. Open **Quality & tru
 
 ### 7:35–8:00 — Close on outcomes
 
-“KhetSetu reduces information asymmetry before the sale, transaction cost during the sale and uncertainty after the sale. Farmers get a better-informed sale window and stronger bargaining power. FPOs unlock aggregation. Buyers get consistent, verifiable supply. Every decision, offer, payment and grievance leaves a transparent record. That is the journey from market signal to trusted settlement.”
+“AgriTrace reduces information asymmetry before the sale, transaction cost during the sale and uncertainty after the sale. Farmers get a better-informed sale window and stronger bargaining power. FPOs unlock aggregation. Buyers get consistent, verifiable supply. Every decision, offer, payment and grievance leaves a transparent record. That is the journey from market signal to trusted settlement.”
 
 ## Demo checklist
 

@@ -12,8 +12,8 @@ const Footer = () => {
           
           {/* Brand Column */}
           <div className="footer-col brand-col">
-            <h3 className="footer-logo">KhetSetu</h3>
-            <p>KhetSetu is an agricultural market intelligence and transaction platform connecting farmers, FPOs, and buyers across India.</p>
+            <h3 className="footer-logo">AgriTrace</h3>
+            <p>AgriTrace is an agricultural market intelligence and transaction platform connecting farmers, FPOs, and buyers across India.</p>
             <div className="social-links">
               <a href="#" className="social-icon">FB</a>
               <a href="#" className="social-icon">IG</a>
@@ -64,13 +64,13 @@ const Footer = () => {
 
         {/* Watermark Section */}
         <div className="footer-watermark">
-          KhetSetu
+          AgriTrace
         </div>
 
         {/* Bottom Section */}
         <div className="footer-bottom">
           <div className="copyright">
-            &copy; 2026 All Rights Reserved by KhetSetu
+            &copy; 2026 All Rights Reserved by AgriTrace
           </div>
           <div className="legal-links">
             <a href="#">Privacy Policy</a>

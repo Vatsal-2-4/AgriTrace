@@ -36,9 +36,9 @@ async function requestUser(req) {
 }
 
 const commandText = (command, user) => {
-  if (command === '/status') return `🌾 KhetSetu account status\n\nName: ${user.name}\nRole: ${user.role}\nTelegram notifications: ${user.notifications?.telegram?.enabled ? 'Enabled' : 'Paused'}`;
-  if (command === '/notifications') return 'Notification settings:\n\n✅ Important updates\n✅ Payments\n✅ Logistics\n✅ Quality\n✅ Offers\n\nManage detailed preferences on the KhetSetu website.';
-  return 'KhetSetu bot commands:\n/status — account connection\n/notifications — notification settings\n/stop — pause notifications\n/help — show this help';
+  if (command === '/status') return `🌾 AgriTrace account status\n\nName: ${user.name}\nRole: ${user.role}\nTelegram notifications: ${user.notifications?.telegram?.enabled ? 'Enabled' : 'Paused'}`;
+  if (command === '/notifications') return 'Notification settings:\n\n✅ Important updates\n✅ Payments\n✅ Logistics\n✅ Quality\n✅ Offers\n\nManage detailed preferences on the AgriTrace website.';
+  return 'AgriTrace bot commands:\n/status — account connection\n/notifications — notification settings\n/stop — pause notifications\n/help — show this help';
 };
 
 export default async function handler(req, res) {
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
         const token = text.split(/\s+/)[1];
         const user = token ? await User.findOne({ telegramLinkToken: token, telegramLinkExpiresAt: { $gt: new Date() } }).select('+telegramLinkToken +telegramLinkExpiresAt') : null;
         if (!user) {
-          await sendTelegram(chatId, 'This KhetSetu connection link is invalid or expired. Generate a new link from Settings → Notifications.');
+          await sendTelegram(chatId, 'This AgriTrace connection link is invalid or expired. Generate a new link from Settings → Notifications.');
           return res.status(200).json({ ok: true });
         }
         user.notifications = user.notifications || {};
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
         user.telegramLinkToken = undefined;
         user.telegramLinkExpiresAt = undefined;
         await user.save();
-        await sendTelegram(chatId, `🌾 Welcome to KhetSetu, ${user.name}.\n\nTelegram connected successfully. You will now receive important trade, payment, quality, storage and logistics updates here.`);
+        await sendTelegram(chatId, `🌾 Welcome to AgriTrace, ${user.name}.\n\nTelegram connected successfully. You will now receive important trade, payment, quality, storage and logistics updates here.`);
         return res.status(200).json({ ok: true });
       }
 
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       if (command === '/stop') {
         user.notifications.telegram.enabled = false;
         await user.save();
-        await sendTelegram(chatId, 'Telegram notifications paused.\n\nYou can reconnect them anytime from KhetSetu Settings.');
+        await sendTelegram(chatId, 'Telegram notifications paused.\n\nYou can reconnect them anytime from AgriTrace Settings.');
       } else if (['/status', '/notifications', '/help'].includes(command)) {
         await sendTelegram(chatId, commandText(command, user));
       }
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
     }
 
     const user = await requestUser(req);
-    if (!user) return res.status(401).json({ message: 'Sign in with a server-backed KhetSetu account to manage notifications.' });
+    if (!user) return res.status(401).json({ message: 'Sign in with a server-backed AgriTrace account to manage notifications.' });
     ensureNotifications(user);
 
     if (url.includes('/preferences')) {
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
       const sent = await notifyUser(user, {
         eventType: 'TELEGRAM_TEST',
         title: 'Telegram test',
-        message: `✅ Telegram is connected to KhetSetu, ${user.name}.\n\nImportant account updates will arrive here.`,
+        message: `✅ Telegram is connected to AgriTrace, ${user.name}.\n\nImportant account updates will arrive here.`,
         idempotencyKey: `telegram:test:${user._id}:${Date.now()}`,
         force: true,
       });

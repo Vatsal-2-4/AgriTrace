@@ -63,16 +63,16 @@ export default function NotificationsSettings() {
 
   return <main className="notifications-page">
     <button className="notifications-back" onClick={() => navigate(getRoleHome(user?.role))}><ArrowLeft size={17}/> Workspace</button>
-    <header><div className="notifications-icon"><Bell size={24}/></div><div><p>Settings</p><h1>Notifications</h1><span>Choose where KhetSetu sends important trade and logistics updates.</span></div></header>
+    <header><div className="notifications-icon"><Bell size={24}/></div><div><p>Settings</p><h1>Notifications</h1><span>Choose where AgriTrace sends important trade and logistics updates.</span></div></header>
     {message && <div className="notifications-message">{message}</div>}
     <section className="notification-card telegram-card">
-      <div><div className="channel-heading"><Send size={20}/><h2>Telegram</h2>{preferences.telegram.connected && <span><CheckCircle2 size={14}/> {preferences.telegram.fixedDemoChat ? 'Demo chat ready' : 'Connected'}</span>}</div><p>Offers, payments, quality, storage and shipment updates delivered by the KhetSetu bot.</p></div>
+      <div><div className="channel-heading"><Send size={20}/><h2>Telegram</h2>{preferences.telegram.connected && <span><CheckCircle2 size={14}/> {preferences.telegram.fixedDemoChat ? 'Demo chat ready' : 'Connected'}</span>}</div><p>Offers, payments, quality, storage and shipment updates delivered by the AgriTrace bot.</p></div>
       <div className="channel-actions">
         {preferences.telegram.connected ? <><label className="switch-row"><span>Notifications</span><input type="checkbox" checked={preferences.telegram.enabled} onChange={e => toggle('telegram', e.target.checked)}/></label><button className="primary" onClick={sendTest}><Send size={16}/> Send test</button><button className="secondary danger" onClick={disconnect}><Unplug size={16}/> Disconnect</button></> : <button className="primary" onClick={connect}><ExternalLink size={16}/> Connect Telegram</button>}
         <button className="secondary" onClick={refresh}>Refresh status</button>
       </div>
     </section>
-    <section className="notification-card"><div><h2>In-app notifications</h2><p>Keep a record inside KhetSetu if Telegram is disabled or unavailable.</p></div><label className="switch-row"><span>{preferences.inApp.enabled ? 'Enabled' : 'Disabled'}</span><input type="checkbox" checked={preferences.inApp.enabled} onChange={e => toggle('inApp', e.target.checked)}/></label></section>
+    <section className="notification-card"><div><h2>In-app notifications</h2><p>Keep a record inside AgriTrace if Telegram is disabled or unavailable.</p></div><label className="switch-row"><span>{preferences.inApp.enabled ? 'Enabled' : 'Disabled'}</span><input type="checkbox" checked={preferences.inApp.enabled} onChange={e => toggle('inApp', e.target.checked)}/></label></section>
     <section className="history-card"><div className="history-title"><div><h2>Notification history</h2><p>Recent delivery attempts and in-app records.</p></div>{busy && <LoaderCircle className="spin" size={20}/>}</div>
       {history.length ? <div className="history-list">{history.map(item => <article key={item._id}><div><strong>{item.title || item.eventType.replaceAll('_', ' ')}</strong><p>{item.message}</p><time>{new Date(item.createdAt).toLocaleString()}</time></div><span className={`delivery ${item.status.toLowerCase()}`}>{item.channel} · {item.status}</span></article>)}</div> : <div className="empty-history">No notifications sent yet.</div>}
     </section>

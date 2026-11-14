@@ -1,5 +1,5 @@
 /**
- * KHETSETU - Market Intelligence & CROP50 National Crop Market Index
+ * AGRITRACE - Market Intelligence & CROP50 National Crop Market Index
  * SIH 2026 Problem Statement 26132 Solution
  * 
  * Includes CROP50 National Agricultural Commodity Index, Sub-Indices, Movers & Farmer Decision Layer.
@@ -33,7 +33,7 @@ import {
 
 const TRANSLATIONS = {
   en: {
-    brandTitle: 'KHETSETU',
+    brandTitle: 'AGRITRACE',
     brandSubtitle: 'Field Bridge',
     headerTitle: 'Market Intelligence & Direct Price Discovery',
     backToHome: 'Back to Landing Page',
@@ -65,7 +65,7 @@ const TRANSLATIONS = {
     nearbySub: 'Spot rates across neighboring district markets',
     netIntroEyebrow: 'NET REALIZATION CALCULATOR',
     netIntroTitle: "Don't look at headline prices alone - compare NET earnings",
-    netIntroDesc: 'KhetSetu automatically deducts transport freight, storage fees, and mandatory mandi cess to show what you actually take home.',
+    netIntroDesc: 'AgriTrace automatically deducts transport freight, storage fees, and mandatory mandi cess to show what you actually take home.',
     bestNetBadge: 'HIGHEST NET REALIZATION',
     bestNetHigher: 'HIGHER than selling at local APMC Mandi',
     grossOffered: 'Gross Offered Price',
@@ -89,7 +89,7 @@ const TRANSLATIONS = {
     sendOfferBtn: 'Send Offer to Buyer',
     dynamicQualityTitle: 'DYNAMIC QUALITY SPECIFICATIONS',
     demandByQualityTitle: 'Demand by Crop & Quality',
-    demandByQualitySub: 'Quality specifications dynamically generated from KhetSetu Commodity Registry',
+    demandByQualitySub: 'Quality specifications dynamically generated from AgriTrace Commodity Registry',
     qualitySchemaHead: 'Dynamic Quality Schema for',
     demandVolumeByGrade: 'Demand Volume by Quality Grade',
     myLotsHead: 'My Active Sell Lots',
@@ -723,7 +723,7 @@ export default function MarketIntelligence() {
             marketName: latest.market_name || (selectedDistrict + ' Mandi'),
             history: records
           });
-          setDataSource(records.source === 'ceda' ? 'CEDA / Agmarknet API' : 'KhetSetu demo dataset');
+          setDataSource(records.source === 'ceda' ? 'CEDA / Agmarknet API' : 'AgriTrace demo dataset');
         }
       } catch (err) {
         console.warn('Live price fetch fallback:', err);
@@ -939,7 +939,7 @@ export default function MarketIntelligence() {
         quantity: request.quantity,
         woolType: request.woolType,
         preferredDate: new Date().toISOString(),
-        message: 'Inspection opened from KhetSetu Quality Partner workspace'
+        message: 'Inspection opened from AgriTrace Quality Partner workspace'
       });
       if (created?.success && created.data) {
         activeRequest = created.data;
@@ -1134,14 +1134,14 @@ export default function MarketIntelligence() {
   }, [marketChannels]);
 
   const buildAiEvidence = useCallback(() => {
-    const sourceLabel = livePriceData ? dataSource : 'KhetSetu demo data';
+    const sourceLabel = livePriceData ? dataSource : 'AgriTrace demo data';
     const evidence = [
       {
         id: 'commodity-selected',
         type: 'commodity',
         label: 'Selected commodity',
         value: `${commodity.name} in ${selectedDistrict}, ${selectedState}`,
-        source: 'KhetSetu UI selection'
+        source: 'AgriTrace UI selection'
       },
       {
         id: 'market-reference-price',
@@ -1162,28 +1162,28 @@ export default function MarketIntelligence() {
         type: 'supply',
         label: 'Arrival volume',
         value: `${(livePriceData?.arrivals || 1240).toLocaleString('en-IN')} tonnes`,
-        source: livePriceData ? sourceLabel : 'KhetSetu demo data'
+        source: livePriceData ? sourceLabel : 'AgriTrace demo data'
       },
       {
         id: 'forecast-recommendation',
         type: 'forecast',
         label: 'Sale-window recommendation',
         value: forecast.recommendation,
-        source: 'KhetSetu forecast service'
+        source: 'AgriTrace forecast service'
       },
       {
         id: 'forecast-range',
         type: 'forecast',
         label: 'Expected price range',
         value: forecast.expectedPriceRange,
-        source: 'KhetSetu forecast service'
+        source: 'AgriTrace forecast service'
       },
       {
         id: 'forecast-confidence',
         type: 'forecast',
         label: 'Forecast confidence',
         value: forecast.confidence,
-        source: 'KhetSetu forecast service'
+        source: 'AgriTrace forecast service'
       }
     ];
 
@@ -1193,7 +1193,7 @@ export default function MarketIntelligence() {
         type: 'net_realization',
         label: 'Best net realization channel',
         value: `${bestChannel.name || bestChannel.channelName || bestChannel.channelId}: Rs ${(bestChannel.netRealizationPerQtl || 0).toLocaleString('en-IN')} per quintal`,
-        source: 'KhetSetu net realization calculation'
+        source: 'AgriTrace net realization calculation'
       });
     }
 
@@ -1203,7 +1203,7 @@ export default function MarketIntelligence() {
         type: 'buyer_offer',
         label: `${buyer.companyName} offer signal`,
         value: `Rs ${(buyer.offeredPricePerQtl || 0).toLocaleString('en-IN')} per quintal; match ${buyer.matchScore}%; required grade ${buyer.requiredGrade}`,
-        source: 'KhetSetu buyer demand/demo data'
+        source: 'AgriTrace buyer demand/demo data'
       });
       if (buyer.qualityReference) {
         evidence.push({
@@ -1211,7 +1211,7 @@ export default function MarketIntelligence() {
           type: 'quality_offer_comparison',
           label: `${buyer.companyName} quality reference comparison`,
           value: `${buyer.qualityReference.label}; difference Rs ${(buyer.qualityReference.diff * 100).toLocaleString('en-IN')} per quintal`,
-          source: 'KhetSetu quality-aware offer comparison'
+          source: 'AgriTrace quality-aware offer comparison'
         });
       }
     });
@@ -1222,7 +1222,7 @@ export default function MarketIntelligence() {
         type: 'wool_quality_price',
         label: 'Verified wool quality-adjusted reference',
         value: `Certificate ${woolQualityPrice.certificateId}; base Rs ${woolQualityPrice.basePrice.toLocaleString('en-IN')}/kg; adjustments ${woolQualityPrice.totalAdjustment >= 0 ? '+' : ''}Rs ${woolQualityPrice.totalAdjustment.toLocaleString('en-IN')}/kg; adjusted Rs ${woolQualityPrice.adjustedPrice.toLocaleString('en-IN')}/kg; fair range Rs ${woolQualityPrice.fairPriceRange.low.toLocaleString('en-IN')}-${woolQualityPrice.fairPriceRange.high.toLocaleString('en-IN')}/kg`,
-        source: 'Verified QualityCertificate and KhetSetu wool quality pricing rules'
+        source: 'Verified QualityCertificate and AgriTrace wool quality pricing rules'
       });
     } else if (isWoolCommodity) {
       evidence.push({
@@ -1230,7 +1230,7 @@ export default function MarketIntelligence() {
         type: 'wool_quality_status',
         label: 'Wool quality verification status',
         value: 'Quality verification required for quality-adjusted estimate.',
-        source: 'KhetSetu quality status'
+        source: 'AgriTrace quality status'
       });
     }
 
@@ -1271,7 +1271,7 @@ export default function MarketIntelligence() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           context: {
-            assistantName: 'KhetSetu AI Market Assistant',
+            assistantName: 'AgriTrace AI Market Assistant',
             commodityId: selectedCrop,
             commodityName: commodity.name,
             district: selectedDistrict,
@@ -1288,7 +1288,7 @@ export default function MarketIntelligence() {
       setAiAssistantResult(payload.data);
       setAiAssistantEvidence(payload.evidence || evidence);
     } catch (error) {
-      setAiAssistantError(error.message || 'KhetSetu AI Market Assistant is unavailable.');
+      setAiAssistantError(error.message || 'AgriTrace AI Market Assistant is unavailable.');
     } finally {
       setAiAssistantLoading(false);
     }
@@ -1330,7 +1330,7 @@ export default function MarketIntelligence() {
       <header className="ks-platform-header">
         <div className="ks-header-top-row">
           <div className="ks-header-left">
-            <Link to="/" className="ks-brand-pill" title="KhetSetu Home">
+            <Link to="/" className="ks-brand-pill" title="AgriTrace Home">
               <span className="ks-brand-title">{t.brandTitle}</span>
               <span className="ks-brand-sub">{t.brandSubtitle}</span>
             </Link>
@@ -1338,7 +1338,7 @@ export default function MarketIntelligence() {
           </div>
 
           <div className="ks-header-right-actions">
-            <Link to="/" className="ks-home-redirect-btn" title="Back to KhetSetu Landing Page">
+            <Link to="/" className="ks-home-redirect-btn" title="Back to AgriTrace Landing Page">
               <ArrowLeft size={14} />
               <span>{t.backToHome}</span>
             </Link>
@@ -1635,7 +1635,7 @@ export default function MarketIntelligence() {
                     <b>Impact on your crop ({commodity.name}):</b>
                   </div>
                   <p className="ks-farmer-conn-text">
-                    {commodity.name} is up <b>+3.8%</b>, contributing positively to CROP50. KhetSetu recommends: <strong className="ks-recommend-tag">HOLD 3-5 DAYS</strong> for optimal net price realization.
+                    {commodity.name} is up <b>+3.8%</b>, contributing positively to CROP50. AgriTrace recommends: <strong className="ks-recommend-tag">HOLD 3-5 DAYS</strong> for optimal net price realization.
                   </p>
                   <div className="ks-farmer-conn-action">
                     <button 
@@ -2080,9 +2080,9 @@ export default function MarketIntelligence() {
                   <div className="ks-eyebrow">
                     <Sparkles size={14} /> ANALYTICAL HELPER
                   </div>
-                  <h2>KhetSetu AI Market Assistant</h2>
+                  <h2>AgriTrace AI Market Assistant</h2>
                   <p className="ks-mini-hint">
-                    Uses only the KhetSetu evidence listed below; it does not fetch news or invent market data.
+                    Uses only the AgriTrace evidence listed below; it does not fetch news or invent market data.
                   </p>
                 </div>
                 <button
@@ -2168,7 +2168,7 @@ export default function MarketIntelligence() {
               </div>
 
               <p className="ks-disclaimer">
-                <Info size={13} /> AI-generated analytical assistance based on available KhetSetu data. Not financial advice. Verify current market conditions before making a sale decision.
+                <Info size={13} /> AI-generated analytical assistance based on available AgriTrace data. Not financial advice. Verify current market conditions before making a sale decision.
               </p>
             </section>
 
@@ -2871,7 +2871,7 @@ export default function MarketIntelligence() {
             </div>
             <section className="ks-card">
               <h3>Recommended aggregation action</h3>
-              <p>Combine Grade A wheat lots from Kota and Bundi to meet Shree Foods’ 200 qtl tender. KhetSetu predicts a ₹90/qtl premium after shared transport.</p>
+              <p>Combine Grade A wheat lots from Kota and Bundi to meet Shree Foods’ 200 qtl tender. AgriTrace predicts a ₹90/qtl premium after shared transport.</p>
               <button className="ks-button ks-button-dark" onClick={() => selectTab('buyers')}>Review matched buyers <ArrowRight size={15} /></button>
             </section>
           </div>
@@ -3010,7 +3010,7 @@ export default function MarketIntelligence() {
               <div><span>Base Value</span><b>1,000.00 pts</b></div>
               <div><span>Base Date</span><b>08 September 2026</b></div>
               <div><span>Constituents</span><b>50 Major Crops</b></div>
-              <div><span>Weighting Method</span><b>KhetSetu Base Weights</b></div>
+              <div><span>Weighting Method</span><b>AgriTrace Base Weights</b></div>
               <div><span>Rebalancing</span><b>Annual Governance Review</b></div>
               <div><span>Data Source</span><b>CEDA Agmarknet / Ashoka Univ</b></div>
             </div>
@@ -3203,7 +3203,7 @@ export default function MarketIntelligence() {
             <button type="button" className="ks-close" onClick={() => setLotModalOpen(false)}><X /></button>
             <div className="ks-eyebrow"><PackagePlus size={14} /> SELL-READY LOT</div>
             <h2>Create a Sell Lot</h2>
-            <p>Post your produce to KhetSetu matching engine to receive direct buyer offers.</p>
+            <p>Post your produce to AgriTrace matching engine to receive direct buyer offers.</p>
 
             {isWoolCommodity ? (
               <>
@@ -3332,7 +3332,7 @@ export default function MarketIntelligence() {
 
             <div className="ks-modal-note">
               <Sparkles size={16} />
-              <span>KhetSetu will rank verified buyers by Net Realization after logistics and fees.</span>
+              <span>AgriTrace will rank verified buyers by Net Realization after logistics and fees.</span>
             </div>
 
             <button type="submit" className="ks-button ks-button-dark ks-modal-action">
@@ -3388,7 +3388,7 @@ export default function MarketIntelligence() {
             <p>Settlement for Lot #KS-038 (100 qtl {commodity.name})</p>
 
             <div className="ks-qr-container" style={{ margin: '1.5rem 0', textDecoration: 'none' }}>
-              <QRCode value={"upi://pay?pa=khetsetu@okaxis&pn=KhetSetu%20Market&am=" + ((currentModalPrice || 0) * 100) + "&cu=INR"} size={160} />
+              <QRCode value={"upi://pay?pa=khetsetu@okaxis&pn=AgriTrace%20Market&am=" + ((currentModalPrice || 0) * 100) + "&cu=INR"} size={160} />
             </div>
 
             <button 

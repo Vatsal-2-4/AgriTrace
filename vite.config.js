@@ -51,7 +51,7 @@ async function readBody(req) {
 
 function localApiBridge() {
   return {
-    name: 'khetsetu-local-api-bridge',
+    name: 'agritrace-local-api-bridge',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = new URL(req.url || '/', 'http://localhost');

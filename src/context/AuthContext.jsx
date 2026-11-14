@@ -62,7 +62,7 @@ const DEMO_USERS = {
   },
   'facilitator@khetsetu.in': {
     id: 'EDU-01',
-    name: 'KhetSetu Market Facilitator',
+    name: 'AgriTrace Market Facilitator',
     email: 'facilitator@khetsetu.in',
     mobile: '9800011122',
     role: 'EDUCATOR',
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [loadingText, setLoadingText] = useState('Authenticating KhetSetu session...');
+  const [loadingText, setLoadingText] = useState('Authenticating AgriTrace session...');
 
   useEffect(() => {
     if (user) {
@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (identifier, password) => {
     setIsLoading(true);
-    setLoadingText('Authenticating KhetSetu credentials...');
+    setLoadingText('Authenticating AgriTrace credentials...');
     const cleanId = (identifier || '').trim().toLowerCase();
     const accountLanguage = getSavedLanguage(cleanId, 'en');
 
@@ -200,7 +200,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     setIsLoading(true);
-    setLoadingText('Creating KhetSetu market profile...');
+    setLoadingText('Creating AgriTrace market profile...');
     try {
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -252,7 +252,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsLoggingOut(true);
-    setLoadingText('Logging out of KhetSetu...');
+    setLoadingText('Logging out of AgriTrace...');
     setTimeout(() => {
       setUser(null);
       localStorage.removeItem('khetsetu_user');
@@ -296,7 +296,7 @@ export const AuthProvider = ({ children }) => {
     }}>
       {(isLoading || isLoggingOut) && (
         <WoolCloudLoader 
-          text={isLoggingOut ? 'Logging out of KhetSetu...' : loadingText} 
+          text={isLoggingOut ? 'Logging out of AgriTrace...' : loadingText}
           fullScreen={true} 
         />
       )}

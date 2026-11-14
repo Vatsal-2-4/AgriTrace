@@ -58,16 +58,16 @@ const Register = () => {
       {/* Top Left Home Back Button */}
       <Link to="/" className="top-left-brand-link">
         <ArrowLeft size={16} />
-        <span>KHET<span className="logo-badge">SETU</span> Home</span>
+        <span>AGRI<span className="logo-badge">TRACE</span> Home</span>
       </Link>
 
       <div className="login-container" style={{maxWidth: '600px'}}>
         <div className="login-header">
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="logo">KHET<span>SETU</span></div>
+            <div className="logo">AGRI<span>TRACE</span></div>
           </Link>
           <h2>Create Account</h2>
-          <p>Join the KhetSetu market network.</p>
+          <p>Join the AgriTrace market network.</p>
         </div>
 
         {errorMessage && (
@@ -108,7 +108,7 @@ const Register = () => {
 
         {step === 1 ? (
           <div>
-            <h3 style={{marginBottom: '16px', textAlign: 'center'}}>How will you use KhetSetu?</h3>
+            <h3 style={{marginBottom: '16px', textAlign: 'center'}}>How will you use AgriTrace?</h3>
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px'}}>
               {ROLES.map(role => (
                 <div 

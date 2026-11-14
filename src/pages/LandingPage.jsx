@@ -24,7 +24,7 @@ export default function LandingPage() {
 
   return <div className="ks-landing">
     <header className="ks-topbar">
-      <Link to="/" className="ks-brand">KHET<span>SETU</span></Link>
+      <Link to="/" className="ks-brand">AGRI<span>TRACE</span></Link>
       <nav><a href="#how">How it works</a><a href="#network">For FPOs</a><a href="#trust">Trust centre</a></nav>
       <div className="ks-top-actions"><label className="ks-landing-language"><Globe size={15}/><select value={language} onChange={(event) => changeLanguage(event.target.value)} aria-label="Translate page">{SUPPORTED_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}</select></label><Link to="/login" className="ks-login">Sign in</Link><Link to="/platform" className="ks-button ks-button-dark">Open platform <ArrowRight size={16}/></Link></div>
     </header>
@@ -32,8 +32,8 @@ export default function LandingPage() {
       <section className="ks-hero"><div className="ks-hero-copy">
         <div className="ks-eyebrow"><span className="ks-live-dot"/> AI market intelligence for Indian agriculture</div>
         <h1>Know the market.<br/><em>Sell with confidence.</em></h1>
-        <p>KhetSetu helps farmers and FPOs discover the right price, the right buyer, and the right moment to sell - from farm gate to verified payment.</p>
-        <div className="ks-hero-ctas"><Link to="/platform" className="ks-button ks-button-lime">Explore your market <ArrowRight size={17}/></Link><a href="#how" className="ks-watch">See how KhetSetu works <ChevronRight size={17}/></a></div>
+        <p>AgriTrace helps farmers and FPOs discover the right price, the right buyer, and the right moment to sell - from farm gate to verified payment.</p>
+        <div className="ks-hero-ctas"><Link to="/platform" className="ks-button ks-button-lime">Explore your market <ArrowRight size={17}/></Link><a href="#how" className="ks-watch">See how AgriTrace works <ChevronRight size={17}/></a></div>
         <div className="ks-trust-row"><div className="ks-avatars"><span>R</span><span>S</span><span>A</span><span>+</span></div><p>Built for 10,000+ growers, FPOs &amp; buyers</p></div>
       </div><div className="ks-hero-visual"><div className="ks-orbit ks-orbit-one"/><div className="ks-orbit ks-orbit-two"/><div className="ks-pulse-card ks-pulse-top"><div className="ks-mini-icon orange"><BarChart3 size={18}/></div><div><small>Today's price signal</small><b>Hold for 3-5 days</b><span className="up">↑ 4.8% projected</span></div></div><div className="ks-harvest-image"><img src={dashboardImage} alt="Tractor harvesting a field"/><div className="ks-image-overlay"><Sprout size={20}/><span>Crop intelligence, rooted locally</span></div></div><div className="ks-pulse-card ks-pulse-bottom"><div className="ks-mini-icon green"><BadgeCheck size={19}/></div><div><small>Buyer match found</small><b>Shree Foods Pvt. Ltd.</b><span>92% lot-fit score</span></div></div></div></section>
       <section className="ks-stat-band">{stats.map(([value, label]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</section>
