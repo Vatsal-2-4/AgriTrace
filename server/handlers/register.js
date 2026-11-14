@@ -1,6 +1,7 @@
 import connectToDatabase from '../../api/_utils/db.js';
 import User from '../../api/_models/User.js';
 import mongoose from 'mongoose';
+import { ORGANIZATION_TYPES } from '../../api/_utils/market.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -10,10 +11,13 @@ export default async function handler(req, res) {
   try {
     await connectToDatabase();
 
-    const { name, email, mobile, state, password, role, preferredLanguage } = req.body;
+    const { name, email, mobile, state, password, role, preferredLanguage, organizationType } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Missing required fields' });
+    }
+    if (organizationType && !ORGANIZATION_TYPES.has(organizationType)) {
+      return res.status(400).json({ success: false, error: { code: 'INVALID_ORGANIZATION_TYPE', message: 'organizationType must be retailer, wholesaler, processor, or other' } });
     }
 
     // Check if user already exists
@@ -33,8 +37,9 @@ export default async function handler(req, res) {
       name,
       email,
       password,
-      role: role === 'PROCESSING_UNIT' ? 'SELLER' : (role || 'FARMER'),
+      role: organizationType ? (organizationType === 'other' ? 'BUYER' : organizationType.toUpperCase()) : (role === 'PROCESSING_UNIT' ? 'SELLER' : (['FARMER', 'SELLER', 'BUYER', 'RETAILER', 'WHOLESALER', 'PROCESSOR'].includes(String(role || '').toUpperCase()) ? String(role || 'FARMER').toUpperCase() : 'FARMER')),
       preferredLanguage: preferredLanguage || 'en',
+      ...(organizationType ? { organizationType } : {}),
     };
 
     if (mobile) payload.mobile = mobile;

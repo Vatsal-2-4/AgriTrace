@@ -1,5 +1,6 @@
 import connectToDatabase from '../../api/_utils/db.js';
 import User from '../../api/_models/User.js';
+import { issueAccessToken } from '../../api/_utils/market.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -62,12 +63,16 @@ export default async function handler(req, res) {
     const role = user.role === 'PROCESSING_UNIT' ? 'SELLER' : user.role;
     res.status(200).json({
       message: 'Login successful',
+      accessToken: issueAccessToken(user),
+      tokenType: 'Bearer',
+      expiresIn: 43200,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         mobile: user.mobile,
         role,
+        organizationType: user.organizationType || null,
         state: user.state,
         preferredLanguage: user.preferredLanguage || 'en'
       }
