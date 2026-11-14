@@ -9,7 +9,8 @@ export const ROLE_HOME = {
   WAREHOUSE: '/storage',
   TRANSPORT: '/logistics',
   PROCESSING_UNIT: '/buyer',
-  EDUCATOR: '/farmer'
+  EDUCATOR: '/farmer',
+  ADMIN: '/admin'
 };
 
 export function getRoleHome(role) {

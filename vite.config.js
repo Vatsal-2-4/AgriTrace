@@ -15,6 +15,7 @@ import transportHandler from './api/transport.js';
 import warehouseHandler from './api/warehouse.js';
 import coreHandler from './api/core.js';
 import batchesHandler from './api/batches.js';
+import adminHandler from './api/admin.js';
 
 const LOCAL_HANDLERS = [
   ['/api/ai/market-advisor', marketAdvisorHandler],
@@ -31,7 +32,8 @@ const LOCAL_HANDLERS = [
   ['/api/qa', qaHandler],
   ['/api/processing', processingHandler],
   ['/api/transport', transportHandler],
-  ['/api/warehouse', warehouseHandler]
+  ['/api/warehouse', warehouseHandler],
+  ['/api/admin', adminHandler]
 ];
 
 const CORE_ROUTE_ALIASES = new Map([

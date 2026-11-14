@@ -39,6 +39,7 @@ const QualityDashboard = React.lazy(() => import('./pages/inspector/InspectorDas
 const Certificates = React.lazy(() => import('./pages/inspector/Certificates'));
 const InspectionDetail = React.lazy(() => import('./pages/inspector/InspectionDetail'));
 const NotificationsSettings = React.lazy(() => import('./pages/settings/NotificationsSettings'));
+const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
 
 function RoleHomeRedirect() {
   const { user } = useAuth();
@@ -53,6 +54,7 @@ function App() {
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/platform" element={<RoleHomeRedirect />} />
+    <Route path="/admin" element={secure(['ADMIN'], <AdminDashboard />)} />
     <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
     <Route path="/track/:batchId" element={<PublicTrackBatch />} />
     <Route path="/track" element={<PublicTrackBatch />} />
