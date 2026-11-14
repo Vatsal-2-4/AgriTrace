@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   User, ChevronDown, Check, LogOut, Globe,
-  Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell, Gauge, LockKeyhole
+  Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell, Gauge
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './UserRoleDropdown.css';
@@ -174,11 +174,9 @@ export default function UserRoleDropdown() {
           <div className="admin-portal-link-wrap">
             <button
               type="button"
-              className={`admin-portal-link ${hasAdminAccess ? '' : 'requires-admin'}`}
-              aria-disabled={!hasAdminAccess}
-              title={hasAdminAccess ? 'Open the admin portal' : 'Sign in with an administrator account to open the portal'}
+              className="admin-portal-link"
+              title={hasAdminAccess ? 'Open the admin portal' : 'Open a sample admin portal preview'}
               onClick={() => {
-                if (!hasAdminAccess) return;
                 setIsOpen(false);
                 navigate(ADMIN_PORTAL.path);
               }}
@@ -186,8 +184,8 @@ export default function UserRoleDropdown() {
               <span className="admin-portal-icon" style={{ background: ADMIN_PORTAL.badgeBg, color: ADMIN_PORTAL.badgeColor }}>
                 <ADMIN_PORTAL.icon size={16} />
               </span>
-              <span className="admin-portal-copy"><b>{ADMIN_PORTAL.label}</b><small>{hasAdminAccess ? ADMIN_PORTAL.sub : 'Administrator account required'}</small></span>
-              {!hasAdminAccess && <LockKeyhole size={14} className="admin-portal-lock" />}
+              <span className="admin-portal-copy"><b>{ADMIN_PORTAL.label}</b><small>{hasAdminAccess ? ADMIN_PORTAL.sub : 'Open interactive demo preview'}</small></span>
+              {!hasAdminAccess && <span className="admin-portal-demo-tag">DEMO</span>}
             </button>
           </div>
 

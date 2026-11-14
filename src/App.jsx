@@ -54,7 +54,7 @@ function App() {
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/platform" element={<RoleHomeRedirect />} />
-    <Route path="/admin" element={secure(['ADMIN'], <AdminDashboard />)} />
+    <Route path="/admin" element={secure(['FARMER', 'SELLER', 'BUYER', 'RETAILER', 'WHOLESALER', 'PROCESSOR', 'QUALITY_INSPECTOR', 'WAREHOUSE', 'TRANSPORT', 'EDUCATOR', 'ADMIN'], <AdminDashboard />)} />
     <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
     <Route path="/track/:batchId" element={<PublicTrackBatch />} />
     <Route path="/track" element={<PublicTrackBatch />} />
