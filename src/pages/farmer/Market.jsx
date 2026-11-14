@@ -25,6 +25,7 @@ import TransactionsTab from './market_tabs/TransactionsTab';
 import DisputesTab from './market_tabs/DisputesTab';
 import PaymentModal from './market_tabs/PaymentModal';
 import { createUpiPayment } from '../../services/payment/paymentService';
+import { marketplaceApi, marketplaceErrorMessage } from '../../services/market/marketplaceApi';
 
 import {
   LineChart,
@@ -127,6 +128,20 @@ export default function Market() {
   const [lotPhotos, setLotPhotos] = useState([]);
   const [photoError, setPhotoError] = useState('');
   const [photoProgress, setPhotoProgress] = useState(0);
+  const [marketplaceLots, setMarketplaceLots] = useState([]);
+  const [marketplaceDemands, setMarketplaceDemands] = useState([]);
+  const [marketplaceBids, setMarketplaceBids] = useState([]);
+  const refreshMarketplace = async () => {
+    try {
+      const [lots, demands] = await Promise.all([marketplaceApi.listLots(), marketplaceApi.listDemands()]);
+      setMarketplaceLots(lots);
+      setMarketplaceDemands(demands);
+      const ownedLots = lots.filter(lot => lot.sellerId === user?.id);
+      const bidGroups = await Promise.all(ownedLots.map(lot => marketplaceApi.listBids(lot.lotId).catch(() => [])));
+      setMarketplaceBids(bidGroups.flat());
+    } catch (error) { if (error.status !== 401) showToast(marketplaceErrorMessage(error)); }
+  };
+  useEffect(() => { refreshMarketplace(); }, [user?.id]);
   const [lotUnit, setLotUnit] = useState(selectedCommodityId === 'WHEAT' ? 'KG' : getCommodityById(selectedCommodityId).defaultUnit || 'KG');
   const [lotCropId, setLotCropId] = useState(selectedCommodityId);
   const lotCommodity = getCommodityById(lotCropId);
@@ -180,7 +195,7 @@ export default function Market() {
 
   const priceTrendsData = generatePriceTrends(timeframe, selectedCommodityId);
 
-  const matchedDemands = buyerDemands.map(bd => {
+  const matchedDemands = marketplaceDemands.map(bd => {
     const match = calculateMatchScore({
       cropId: selectedCommodityId,
       cropName: selectedCommodity.name,
@@ -189,8 +204,8 @@ export default function Market() {
       askingPrice: selectedCommodity.basePricePerKg,
       origin: 'Regional Farm Hub',
       unit: selectedCommodity.defaultUnit
-    }, bd);
-    return { ...bd, matchResult: match };
+    }, { ...bd, quantityRequired: bd.quantity, minGrade: bd.minimumGrade, deliveryLocation: `${bd.deliveryLocation?.district || ''}, ${bd.deliveryLocation?.state || ''}`, maxPricePerKg: bd.maxPrice, buyerName: `${bd.organizationType || 'Buyer'} organisation` });
+    return { ...bd, buyerName: `${bd.organizationType || 'Buyer'} organisation`, quantityRequired: bd.quantity, minGrade: bd.minimumGrade, deliveryLocation: `${bd.deliveryLocation?.district || ''}, ${bd.deliveryLocation?.state || ''}`, maxPricePerKg: bd.maxPrice, matchResult: match };
   }).sort((a, b) => b.matchResult.score - a.matchResult.score);
 
   const availableCategories = COMMODITIES.filter(c => 
@@ -395,7 +410,7 @@ export default function Market() {
 
         {activeTab === 'lots' && (
           <MyLotsTab
-            woolLots={woolLots}
+            woolLots={marketplaceLots.filter(lot => lot.sellerId === user?.id).map(lot => ({ ...lot, id: lot.lotId, lotNumber: lot.lotId, totalQuantity: lot.quantity, farmerName: user?.name, photoReferences: lot.imageRefs || [], qualityAssessment: { status: lot.verifiedGrade ? 'VERIFIED' : 'REVIEW_REQUIRED', verifiedGrade: lot.verifiedGrade } }))}
             batches={batches}
             onOpenCreateLot={() => setShowCreateLotModal(true)}
             onOpenFpoAggregator={() => setShowFPOModal(true)}
@@ -404,15 +419,12 @@ export default function Market() {
 
         {activeTab === 'offers' && (
           <OffersTab
-            marketOffers={marketOffers}
-            onAcceptOffer={(offer) => {
-              respondOffer(offer.id, 'ACCEPT');
-              showToast(`Offer ${offer.id} accepted. Payment-ready transaction created.`);
-              openTab('transactions');
+            marketOffers={marketplaceBids.map(bid => ({ ...bid, id: bid.bidId, lotNumber: bid.lotId, quantityKg: bid.quantity, offeredPricePerKg: bid.pricePerUnit, totalGrossAmount: bid.totalAmount, closesAt: bid.closingAt, status: bid.status, cropName: marketplaceLots.find(lot => lot.lotId === bid.lotId)?.cropName }))}
+            onAcceptOffer={(offer, fulfilledQuantity) => {
+              marketplaceApi.resolveBid(offer.lotId, offer.id, { status: 'ACCEPTED', fulfilledQuantity }).then(() => { showToast(`Bid ${offer.id} accepted for ${fulfilledQuantity} ${offer.unit}; remaining stock was updated.`); refreshMarketplace(); }).catch(error => showToast(marketplaceErrorMessage(error)));
             }}
             onRejectOffer={(offer) => {
-              respondOffer(offer.id, 'REJECTED');
-              showToast(`Offer ${offer.id} declined.`);
+              marketplaceApi.resolveBid(offer.lotId, offer.id, { status: 'REJECTED' }).then(() => { showToast(`Bid ${offer.id} declined and reserved quantity released.`); refreshMarketplace(); }).catch(error => showToast(marketplaceErrorMessage(error)));
             }}
             onOpenCounter={(offer) => {
               setActiveOfferForCounter(offer);
@@ -456,7 +468,7 @@ export default function Market() {
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>Create produce lot</h3>
               <button type="button" className="btn-close-modal" aria-label="Close lot form" onClick={() => setShowCreateLotModal(false)}><X size={20}/></button>
             </div>
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
               e.preventDefault();
               const form = e.target;
               const crop = getCommodityById(form.cropId.value);
@@ -466,35 +478,28 @@ export default function Market() {
                 showToast('Enter a crop, a quantity above zero, and a valid asking price.');
                 return;
               }
-              createWoolLot({
+              try {
+              const locationParts = String(form.origin.value).split(',').map(part => part.trim());
+              await marketplaceApi.createLot({
                 cropId: crop.id,
                 cropName: crop.name,
                 variety: form.variety.value,
-                totalQuantity: quantity,
-                unit: form.unit.value,
-                harvestDate: form.harvestDate.value || null,
-                photoReferences: lotPhotos.map(photo => photo.name),
+                quantity,
+                unit: form.unit.value.toLowerCase(),
+                harvestedAt: form.harvestDate.value || undefined,
                 availableQuantity: quantity,
                 askingPrice,
+                priceUnit: `INR/${form.unit.value.toLowerCase()}`,
                 origin: form.origin.value,
-                qualityAssessment: {
-                  status: lotPhotos.length ? QUALITY_STATES.REVIEW_REQUIRED : QUALITY_STATES.UNAVAILABLE,
-                  provisionalGrade: null,
-                  verifiedGrade: null,
-                  confidence: null,
-                  attributes: [],
-                  warnings: [lotPhotos.length ? 'Photos are attached for review; no image assessment service is connected.' : 'Add crop photos for a quality review.'],
-                  modelVersion: null,
-                  assessedAt: null,
-                  inspectorVerification: 'NOT_REVIEWED'
-                },
-                farmerName: user?.name || 'Ramesh Kumar'
+                location: { district: locationParts[0], state: locationParts.length > 1 ? locationParts.slice(1).join(', ') : user?.state || locationParts[0] }
               });
+              await refreshMarketplace();
               setLotPhotos([]);
               setPhotoProgress(0);
               setShowCreateLotModal(false);
-              showToast('Produce lot saved in this browser demo; no marketplace API is connected.');
+              showToast('Produce lot published to the marketplace. Buyers can now discover it.');
               openTab('lots');
+              } catch (error) { showToast(marketplaceErrorMessage(error)); }
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>

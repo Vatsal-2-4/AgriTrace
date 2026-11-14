@@ -142,6 +142,18 @@ async function placeBulkBid(req, res, user, lotId) {
   }
 }
 
+async function listBids(req, res, user, lotId) {
+  if (!isBuyer(user) && !isSeller(user)) return sendError(res, 403, 'FORBIDDEN', 'Buyer or seller role is required');
+  const query = lotId ? { lotId } : { $or: [{ buyerId: user.id }, { sellerId: user.id }] };
+  if (lotId) {
+    const lot = await ProduceLot.findOne({ lotId }).select('sellerId').lean();
+    if (!lot) return sendError(res, 404, 'LOT_NOT_FOUND', 'Lot not found');
+    if (lot.sellerId !== user.id) return sendError(res, 403, 'NOT_OWNER', 'Only the lot owner can view its bids');
+  }
+  const items = await BulkBid.find(query).sort({ createdAt: -1 }).limit(100).lean();
+  return sendSuccess(res, { items });
+}
+
 async function resolveBulkBid(req, res, user, lotId, bidId) {
   const lot = await ProduceLot.findOne({ lotId });
   if (!lot) return sendError(res, 404, 'LOT_NOT_FOUND', 'Lot not found');
@@ -251,6 +263,14 @@ async function handleMarketplace(req, res) {
   const matchRoute = route.match(/^\/lots\/([^/]+)\/matches$/);
   if (matchRoute && req.method === 'GET') return listMatches(req, res, decodeURIComponent(matchRoute[1]));
   const bidRoute = route.match(/^\/lots\/([^/]+)\/bids$/);
+  if (route === '/bids' && req.method === 'GET') {
+    if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
+    return listBids(req, res, user);
+  }
+  if (bidRoute && req.method === 'GET') {
+    if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
+    return listBids(req, res, user, decodeURIComponent(bidRoute[1]));
+  }
   if (bidRoute && req.method === 'POST') {
     if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
     return placeBulkBid(req, res, user, decodeURIComponent(bidRoute[1]));

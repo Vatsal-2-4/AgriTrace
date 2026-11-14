@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileText, TrendingUp, Check, X } from 'lucide-react';
 
 export default function OffersTab({
@@ -7,6 +7,7 @@ export default function OffersTab({
   onRejectOffer,
   onOpenCounter
 }) {
+  const [fulfilmentQuantities, setFulfilmentQuantities] = useState({});
   return (
     <div>
       <div className="panel-header-row">
@@ -74,6 +75,12 @@ export default function OffersTab({
             <p style={{ fontSize: 12, color: '#64748B' }}>Offer total: ₹{Number(offer.totalGrossAmount || (offer.offeredPricePerKg || 0) * (offer.quantityKg || 0)).toLocaleString('en-IN')} · Closes: {new Date(offer.closesAt || offer.validUntil || offer.createdAt).toLocaleString('en-IN')}</p>
 
             {offer.status === 'PENDING' && (
+              <label style={{ display: 'block', margin: '10px 0' }}>Quantity to accept ({offer.unit || 'KG'})
+                <input type="number" min="0.01" step="any" max={offer.quantityKg} value={fulfilmentQuantities[offer.id] ?? offer.quantityKg} onChange={event => setFulfilmentQuantities(previous => ({ ...previous, [offer.id]: event.target.value }))} />
+                <small style={{ display: 'block', color: '#64748B' }}>Accept less than the bid quantity to release the remainder back to the lot.</small>
+              </label>
+            )}
+            {offer.status === 'PENDING' && (
               <div className="offer-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button className="btn-secondary" onClick={() => onRejectOffer(offer)}>
                   <X size={16} style={{ marginRight: '4px' }} />
@@ -83,7 +90,7 @@ export default function OffersTab({
                   <TrendingUp size={16} style={{ marginRight: '4px' }} />
                   Counter-Offer
                 </button>
-                <button className="btn-primary" onClick={() => onAcceptOffer(offer)}>
+                <button className="btn-primary" onClick={() => onAcceptOffer(offer, Number(fulfilmentQuantities[offer.id] ?? offer.quantityKg))}>
                   <Check size={16} style={{ marginRight: '4px' }} />
                   Accept & Finalize Deal
                 </button>

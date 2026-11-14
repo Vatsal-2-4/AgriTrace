@@ -115,6 +115,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.user) {
+          if (data.accessToken) localStorage.setItem('agritrace_access_token', data.accessToken);
           data.user.preferredLanguage = accountLanguage || data.user.preferredLanguage || 'en';
           setUser({ ...data.user, role: normalizeRole(data.user.role) });
           setTimeout(() => setIsLoading(false), 400);
@@ -256,6 +257,7 @@ export const AuthProvider = ({ children }) => {
     setTimeout(() => {
       setUser(null);
       localStorage.removeItem('khetsetu_user');
+      localStorage.removeItem('agritrace_access_token');
       const host = window.location.hostname;
       document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${host};`;

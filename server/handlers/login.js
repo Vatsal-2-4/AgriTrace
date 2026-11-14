@@ -21,11 +21,12 @@ export default async function handler(req, res) {
     });
 
     const inferDemoRole = (email) => {
-      if (email.includes('seller') || email.includes('buyer')) return 'SELLER';
+      if (email.includes('seller')) return 'SELLER';
+      if (email.includes('buyer') || email.includes('retailer') || email.includes('wholesaler')) return 'BUYER';
       if (email.includes('inspector') || email.includes('quality')) return 'QUALITY_INSPECTOR';
       if (email.includes('warehouse') || email.includes('storage')) return 'WAREHOUSE';
       if (email.includes('transport') || email.includes('logistics')) return 'TRANSPORT';
-      if (email.includes('processing') || email.includes('processor')) return 'SELLER';
+      if (email.includes('processing') || email.includes('processor')) return 'BUYER';
       if (email.includes('educator') || email.includes('teacher')) return 'EDUCATOR';
       return 'FARMER';
     };
@@ -38,13 +39,18 @@ export default async function handler(req, res) {
         name: identifier.split('@')[0].toUpperCase(),
         email: identifier,
         password: password,
-        role: demoRole
+        role: demoRole,
+        ...(['BUYER'].includes(demoRole) ? { organizationType: identifier.includes('processor') ? 'processor' : identifier.includes('wholesaler') ? 'wholesaler' : 'retailer' } : {})
       });
     }
 
     // Correct locally seeded demo accounts from older role names.
     if (user && isDemoProfile && user.role !== demoRole) {
       user.role = demoRole;
+      await user.save();
+    }
+    if (user && isDemoProfile && demoRole === 'BUYER' && !user.organizationType) {
+      user.organizationType = identifier.includes('processor') ? 'processor' : identifier.includes('wholesaler') ? 'wholesaler' : 'retailer';
       await user.save();
     }
 
