@@ -2,12 +2,6 @@
 .buyer-workspace h1, .buyer-workspace h2, .buyer-workspace strong { color: #172019; }
 .buyer-workspace input, .buyer-workspace select { background: #fff; color: #172019; border: 1px solid #cbd5cc; border-radius: 8px; padding: 11px 12px; margin-top: 7px; width: 100%; box-sizing: border-box; font: inherit; }
 .buyer-workspace label { color: #34443a; font-size: 13px; font-weight: 700; }
-.buyer-workspace label { display: block; margin-top: 12px; }
-.buyer-workspace textarea { display: block; width: 100%; min-height: 76px; box-sizing: border-box; margin-top: 7px; padding: 11px 12px; resize: vertical; border: 1px solid #cbd5cc; border-radius: 8px; background: #fff; color: #172019; font: inherit; line-height: 1.45; }
-.buyer-workspace textarea:focus,.buyer-workspace input:focus,.buyer-workspace select:focus { outline: 2px solid #b8e4c3; outline-offset: 1px; }
-.buyer-workspace > div[style*="repeat(auto-fit"] > div { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
-.buyer-workspace > div[style*="repeat(auto-fit"] > div > strong { display: block; margin: 2px 0; }
-.buyer-workspace > div[style*="repeat(auto-fit"] > div > p { line-height: 1.45; }
 .buyer-workspace button.btn-primary { background: #172019; color: #fff; border: 1px solid #172019; border-radius: 8px; min-height: 42px; justify-content: center; }
 .buyer-workspace button.btn-primary:hover { background: #2c4434; }
 .buyer-workspace > div > div[style*="background: rgb(234, 246, 231)"] { color: #215a27 !important; }
