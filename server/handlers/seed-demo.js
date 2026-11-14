@@ -1,5 +1,7 @@
 import dbConnect from '../../api/_utils/db.js';
 import User from '../../api/_models/User.js';
+import ProduceLot from '../../api/_models/ProduceLot.js';
+import BuyerDemand from '../../api/_models/BuyerDemand.js';
 import WoolBatch from '../../api/_models/WoolBatch.js';
 import BiddingListing from '../../api/_models/BiddingListing.js';
 import Bid from '../../api/_models/Bid.js';
@@ -13,11 +15,11 @@ import Shipment from '../../api/_models/Shipment.js';
 import Vehicle from '../../api/_models/Vehicle.js';
 
 const now = Date.now();
-const upsert = async (Model, key, value) => Model.findOneAndUpdate({ [key]: value[key] }, value, { upsert: true, new: true, setDefaultsOnInsert: true });
+const upsert = async (Model, key, value) => Model.findOneAndUpdate({ [key]: value[key] }, { $setOnInsert: value }, { upsert: true, new: true, setDefaultsOnInsert: true });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Use POST to seed demo data' });
-  if (process.env.DEMO_SEED_ENABLED === 'false') return res.status(403).json({ success: false, message: 'Demo seeding is disabled' });
+  if (process.env.DEMO_SEED_ENABLED !== 'true') return res.status(403).json({ success: false, message: 'Demo seeding is disabled' });
   try {
     await dbConnect();
     const users = [
@@ -46,7 +48,12 @@ export default async function handler(req, res) {
     await upsert(Vehicle, 'vehicleNumber', { transporterId: 'demo', vehicleNumber: 'KA-09-DEMO-01', registrationNumber: 'KA09DEMO01', vehicleType: 'Covered truck', capacity: 1200, status: 'AVAILABLE', insuranceExpiry: new Date(now + 31536000000) });
     await upsert(Shipment, 'shipmentId', { shipmentId: 'SHP-DEMO-001', transportRequestId: 'TR-DEMO-001', orderId: 'ORD-DEMO-001', batchId: 'WT-DEMO-2026-001', transporterId: 'demo', vehicleId: 'KA-09-DEMO-01', status: 'IN_TRANSIT', currentLocation: 'Tumakuru, Karnataka', estimatedArrival: new Date(now + 86400000), transportFee: 1800 });
 
-    return res.status(200).json({ success: true, message: 'Demo data seeded idempotently', seeded: { users: users.length, batches: 2, listings: 1, bids: 1, orders: 1, inspections: 1, certificates: 1, processingRequests: 1, processingRecords: 1, transportRequests: 1, vehicles: 1, shipments: 1 } });
+    await upsert(ProduceLot, 'lotId', { lotId: 'LOT-DEMO-CROP-001', sellerId: 'FARMER-01', sellerType: 'FARMER', cropId: 'WHEAT', cropName: 'Wheat', variety: 'Sharbati', quantity: 1200, availableQuantity: 1200, unit: 'kg', harvestedAt: new Date(now - 86400000 * 3), origin: 'Kota, Rajasthan', location: { district: 'Kota', state: 'Rajasthan' }, askingPrice: 30, priceUnit: 'INR/kg', verifiedGrade: 'A', status: 'OPEN', marketClosesAt: new Date(now + 86400000 * 7) });
+    await upsert(ProduceLot, 'lotId', { lotId: 'LOT-DEMO-CROP-002', sellerId: 'FARMER-01', sellerType: 'FARMER', cropId: 'TOMATO', cropName: 'Tomato', variety: 'Hybrid Roma', quantity: 600, availableQuantity: 600, unit: 'kg', harvestedAt: new Date(now - 86400000), origin: 'Kota, Rajasthan', location: { district: 'Kota', state: 'Rajasthan' }, askingPrice: 36, priceUnit: 'INR/kg', verifiedGrade: 'B', status: 'OPEN', marketClosesAt: new Date(now + 86400000 * 5) });
+    await upsert(BuyerDemand, 'demandId', { demandId: 'DEMAND-DEMO-001', buyerId: 'BUYER-01', organizationType: 'processor', cropId: 'WHEAT', quantity: 2500, unit: 'kg', minimumGrade: 'A', maxPrice: 33, priceUnit: 'INR/kg', deliveryLocation: { district: 'Kota', state: 'Rajasthan' }, deliveryBy: new Date(now + 86400000 * 30), status: 'OPEN' });
+    await upsert(BuyerDemand, 'demandId', { demandId: 'DEMAND-DEMO-002', buyerId: 'BUYER-02', organizationType: 'retailer', cropId: 'TOMATO', quantity: 800, unit: 'kg', minimumGrade: 'B', maxPrice: 38, priceUnit: 'INR/kg', deliveryLocation: { district: 'Kota', state: 'Rajasthan' }, deliveryBy: new Date(now + 86400000 * 14), status: 'OPEN' });
+
+    return res.status(200).json({ success: true, message: 'Demo data seeded idempotently', seeded: { users: users.length, batches: 2, listings: 1, bids: 1, orders: 1, inspections: 1, certificates: 1, processingRequests: 1, processingRecords: 1, transportRequests: 1, vehicles: 1, shipments: 1, produceLots: 2, buyerDemands: 2 } });
   } catch (error) {
     console.error('Demo seed error:', error);
     return res.status(500).json({ success: false, message: 'Demo seed failed', error: error.message });
