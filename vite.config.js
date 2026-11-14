@@ -13,6 +13,8 @@ import qaHandler from './api/qa.js';
 import processingHandler from './api/processing.js';
 import transportHandler from './api/transport.js';
 import warehouseHandler from './api/warehouse.js';
+import coreHandler from './api/core.js';
+import batchesHandler from './api/batches.js';
 
 const LOCAL_HANDLERS = [
   ['/api/ai/market-advisor', marketAdvisorHandler],
@@ -23,12 +25,22 @@ const LOCAL_HANDLERS = [
   ['/api/market', marketHandler]
   ,['/api/market-records', marketRecordsHandler],
   ['/api/notifications', notificationsHandler],
+  ['/api/core', coreHandler],
+  ['/api/batches', batchesHandler],
   ['/api/bidding', biddingHandler],
   ['/api/qa', qaHandler],
   ['/api/processing', processingHandler],
   ['/api/transport', transportHandler],
   ['/api/warehouse', warehouseHandler]
 ];
+
+const CORE_ROUTE_ALIASES = new Map([
+  ['/api/health', 'health'],
+  ['/api/crop50', 'crop50'],
+  ['/api/khetsetu', 'khetsetu'],
+  ['/api/learning-resources', 'learning-resources'],
+  ['/api/seed-demo', 'seed-demo']
+]);
 
 async function readBody(req) {
   const chunks = [];
@@ -43,11 +55,13 @@ function localApiBridge() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = new URL(req.url || '/', 'http://localhost');
-        const match = LOCAL_HANDLERS.find(([path]) => url.pathname === path || url.pathname.startsWith(`${path}/`));
+        const alias = CORE_ROUTE_ALIASES.get(url.pathname);
+        const match = LOCAL_HANDLERS.find(([path]) => url.pathname === path || url.pathname.startsWith(`${path}/`)) || (alias ? ['/api/core', coreHandler] : null);
         if (!match) return next();
 
         try {
           req.query = Object.fromEntries(url.searchParams.entries());
+          if (alias) req.query.handler = alias;
           req.body = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method || '') ? await readBody(req) : {};
           res.status = function status(code) { this.statusCode = code; return this; };
           res.json = function json(data) {
