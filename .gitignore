@@ -7,6 +7,7 @@
 /dist-ssr
 /build
 /out
+/artifacts/
 /.vite
 /.cache
 /.vercel
