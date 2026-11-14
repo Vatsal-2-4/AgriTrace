@@ -29,7 +29,7 @@ export default function TransactionsTab({
                   {txn.transactionNumber}
                 </h4>
                 <span style={{ fontSize: '13px', color: '#64748B' }}>
-                  Lot #{txn.lotNumber} · Buyer: <strong>{txn.buyerName}</strong> · Seller: {txn.farmerName}
+                  {txn.cropName || txn.woolType || 'Produce'} · Lot #{txn.lotNumber} · {txn.quantityKg} {txn.unit || 'KG'} · Buyer: <strong>{txn.buyerName}</strong> · Seller: {txn.farmerName}
                 </span>
               </div>
 
@@ -55,7 +55,7 @@ export default function TransactionsTab({
             }}>
               <div>
                 <div style={{ fontSize: '11px', color: '#64748B' }}>AGREED PRICE</div>
-                <div style={{ fontSize: '18px', fontWeight: '800', color: '#0B120D' }}>₹{txn.agreedPricePerKg}/KG</div>
+                <div style={{ fontSize: '18px', fontWeight: '800', color: '#0B120D' }}>₹{txn.agreedPricePerKg}/{txn.unit || 'KG'}</div>
               </div>
               <div>
                 <div style={{ fontSize: '11px', color: '#64748B' }}>GROSS VALUE</div>
@@ -64,6 +64,7 @@ export default function TransactionsTab({
               <div>
                 <div style={{ fontSize: '11px', color: '#64748B' }}>LOGISTICS & STORAGE DEDUCTION</div>
                 <div style={{ fontSize: '18px', fontWeight: '800', color: '#FFAAA4' }}>- ₹{(txn.transportCost + txn.storageCost + txn.transactionFee)?.toLocaleString('en-IN')}</div>
+                {txn.cropId && <small style={{ color: '#64748B' }}>{txn.transportCost || txn.storageCost ? 'Quoted deductions' : 'Freight/storage quote pending'}</small>}
               </div>
               <div>
                 <div style={{ fontSize: '11px', color: '#64748B' }}>NET REALIZATION PAYOUT</div>

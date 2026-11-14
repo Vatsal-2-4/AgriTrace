@@ -18,6 +18,7 @@ export default function OffersTab({
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {marketOffers.length === 0 && <div className="market-card" role="status">No offers have been received yet.</div>}
         {marketOffers.map(offer => (
           <div key={offer.id} className="market-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
@@ -34,13 +35,13 @@ export default function OffersTab({
                   </span>
                 </div>
                 <div style={{ fontSize: '13px', color: '#475569' }}>
-                  Buyer: <strong>{offer.buyerName}</strong> · Qty: {offer.quantityKg} KG
+                    {offer.cropName || offer.woolType || 'Produce'} · Buyer: <strong>{offer.buyerName}</strong> · Qty: {offer.quantityKg} {offer.unit || 'KG'}
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '24px', fontWeight: '800', color: '#0B120D' }}>
-                  ₹{offer.offeredPricePerKg}/KG
+                  ₹{offer.offeredPricePerKg}/{offer.unit || 'KG'}
                 </div>
                 <div style={{ fontSize: '12px', color: '#64748B' }}>
                   Gross Value: ₹{offer.totalGrossAmount?.toLocaleString('en-IN')}
@@ -53,7 +54,7 @@ export default function OffersTab({
                 Negotiation history & payment terms
               </div>
               <div className="trace-timeline">
-                {offer.history.map((step, idx) => (
+                {(offer.history || []).map((step, idx) => (
                   <div key={idx} className="timeline-step">
                     <div className={`timeline-node-dot ${idx === offer.history.length - 1 ? 'active' : ''}`} />
                     <div className="timeline-content">
@@ -62,13 +63,15 @@ export default function OffersTab({
                         <span>{new Date(step.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                       <div className="timeline-text">
-                        {step.pricePerKg ? `Offered: ₹${step.pricePerKg}/KG · ` : ''}{step.note}
+                        {step.pricePerKg ? `Offered: ₹${step.pricePerKg}/${offer.unit || 'KG'} · ` : ''}{step.note}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            <p style={{ fontSize: 12, color: '#64748B' }}>Offer total: ₹{Number(offer.totalGrossAmount || (offer.offeredPricePerKg || 0) * (offer.quantityKg || 0)).toLocaleString('en-IN')} · Closes: {new Date(offer.closesAt || offer.validUntil || offer.createdAt).toLocaleString('en-IN')}</p>
 
             {offer.status === 'PENDING' && (
               <div className="offer-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>

@@ -1,3 +1,5 @@
+import { quantityInKg, pricePerKg } from './marketContracts.js';
+
 /**
  * Crop-Agnostic Farmer ↔ Buyer Matching Engine
  * SIH 2026 PS 26132 - Multi-Commodity Algorithmic Compatibility with Explainability
@@ -20,10 +22,13 @@ export function calculateMatchScore(lotOrBatch, buyerDemand) {
     warnings.push('Crop type differs from buyer demand specification.');
   }
 
-  const lotGrade = lotOrBatch.qualityGrade || lotOrBatch.grade || 'A';
-  const demandedGrade = buyerDemand.requiredGrade || buyerDemand.grade || 'A';
+  const lotGrade = lotOrBatch.qualityAssessment?.verifiedGrade || lotOrBatch.qualityAssessment?.provisionalGrade || lotOrBatch.qualityGrade || lotOrBatch.grade || null;
+  const demandedGrade = buyerDemand.minGrade || buyerDemand.requiredGrade || buyerDemand.grade || null;
 
-  if (lotGrade === demandedGrade) {
+  if (!lotGrade || !demandedGrade) {
+    qualityPts += 6;
+    warnings.push(!lotGrade ? 'Lot has no provisional or inspector verified grade yet.' : 'Buyer has not specified a minimum grade.');
+  } else if (lotGrade === demandedGrade) {
     qualityPts += 15;
     breakdown.push('Quality grade exactly matches required Grade ' + demandedGrade + ' (100% grade match).');
   } else if ((lotGrade === 'A+' && demandedGrade === 'A') || (lotGrade === 'A' && demandedGrade === 'B')) {
@@ -36,18 +41,21 @@ export function calculateMatchScore(lotOrBatch, buyerDemand) {
   score += qualityPts;
 
   // 2. Quantity & FPO Aggregation (20%)
-  const lotQty = lotOrBatch.quantity || 0;
-  const minRequired = buyerDemand.minQuantity || (buyerDemand.quantityRequired ? buyerDemand.quantityRequired * 0.3 : 100);
-  const maxRequired = buyerDemand.maxQuantity || (buyerDemand.quantityRequired ? buyerDemand.quantityRequired * 1.5 : 10000);
+  const lotQty = Number(lotOrBatch.availableQuantity ?? lotOrBatch.quantity ?? lotOrBatch.quantityKg ?? 0);
+  const lotQtyKg = quantityInKg(lotQty, lotOrBatch.unit);
+  const demandQty = Number(buyerDemand.quantityRequired ?? buyerDemand.minQuantity ?? 0);
+  const demandQtyKg = quantityInKg(demandQty, buyerDemand.unit);
+  const minRequired = buyerDemand.minQuantity ? quantityInKg(buyerDemand.minQuantity, buyerDemand.unit) : (demandQtyKg ? demandQtyKg * 0.3 : 100);
+  const maxRequired = buyerDemand.maxQuantity ? quantityInKg(buyerDemand.maxQuantity, buyerDemand.unit) : (demandQtyKg ? demandQtyKg * 1.5 : 10000);
 
   let quantityPts = 0;
-  if (lotQty >= minRequired && lotQty <= maxRequired) {
+  if (lotQtyKg >= minRequired && lotQtyKg <= maxRequired) {
     quantityPts = 20;
     breakdown.push('Available lot quantity (' + lotQty + ' ' + (lotOrBatch.unit || 'KG') + ') meets buyer procurement lot requirement.');
-  } else if (lotQty < minRequired) {
-    const ratio = Math.max(0.3, lotQty / minRequired);
+  } else if (lotQtyKg < minRequired) {
+    const ratio = Math.max(0.3, lotQtyKg / minRequired);
     quantityPts = Math.round(20 * ratio);
-    warnings.push('Lot (' + lotQty + ' ' + (lotOrBatch.unit || 'KG') + ') is below buyer bulk requirement (' + minRequired + ' ' + (lotOrBatch.unit || 'KG') + '). FPO aggregation recommended to unlock full price premium.');
+    warnings.push('Lot (' + lotQty + ' ' + (lotOrBatch.unit || 'KG') + ') is below the buyer minimum (' + minRequired.toLocaleString('en-IN') + ' kg after unit conversion). Consider FPO aggregation.');
   } else {
     quantityPts = 17;
     breakdown.push('Lot (' + lotQty + ' ' + (lotOrBatch.unit || 'KG') + ') can fulfill buyer demand with partial dispatch.');
@@ -55,7 +63,7 @@ export function calculateMatchScore(lotOrBatch, buyerDemand) {
   score += quantityPts;
 
   // 3. Location & Freight Corridor (15%)
-  const buyerLocation = buyerDemand.location || '';
+  const buyerLocation = buyerDemand.deliveryLocation || buyerDemand.location || '';
   const lotLocation = lotOrBatch.origin || lotOrBatch.location || '';
   const isSameRegion = buyerLocation.toLowerCase().includes('punjab') && lotLocation.toLowerCase().includes('punjab') ||
                        buyerLocation.toLowerCase().includes('karnataka') && lotLocation.toLowerCase().includes('karnataka') ||
@@ -70,19 +78,19 @@ export function calculateMatchScore(lotOrBatch, buyerDemand) {
     breakdown.push('Intra-state logistics corridor minimizes freight lead time and transit expenses.');
   } else {
     locationPts = 10;
-    breakdown.push('Inter-state transit route eligible with WoolTrace Transport network.');
+    breakdown.push('Delivery location differs; confirm freight cost and transit time with the buyer.');
   }
   score += locationPts;
 
   // 4. Price Compatibility (20%)
-  const targetPrice = lotOrBatch.askingPrice || lotOrBatch.targetPrice || 30;
-  const buyerMaxPrice = buyerDemand.maxPrice || buyerDemand.budgetPrice || (targetPrice * 1.1);
-  const buyerMinPrice = buyerDemand.minPrice || buyerMaxPrice * 0.85;
+  const targetPrice = pricePerKg(lotOrBatch.askingPrice || lotOrBatch.targetPrice || 30, lotOrBatch.unit);
+  const buyerMaxPrice = buyerDemand.maxPricePerKg || pricePerKg(buyerDemand.maxPrice || buyerDemand.budgetPrice || (targetPrice * 1.1), buyerDemand.unit);
+  const buyerMinPrice = buyerDemand.minPricePerKg || (buyerDemand.minPrice ? pricePerKg(buyerDemand.minPrice, buyerDemand.unit) : buyerMaxPrice * 0.85);
 
   let pricePts = 0;
   if (targetPrice <= buyerMaxPrice && targetPrice >= buyerMinPrice) {
     pricePts = 20;
-    breakdown.push('Farmer target price (₹' + targetPrice + '/unit) aligns seamlessly with buyer procurement budget (₹' + buyerMinPrice + ' - ₹' + buyerMaxPrice + '/unit).');
+    breakdown.push('Asking price (₹' + targetPrice.toFixed(2) + '/kg) fits the buyer budget (₹' + buyerMinPrice.toFixed(2) + '–₹' + buyerMaxPrice.toFixed(2) + '/kg; both prices converted from their stated units).');
   } else if (targetPrice < buyerMinPrice) {
     pricePts = 20;
     breakdown.push('Farmer asking price is highly competitive for buyer procurement team.');
@@ -93,7 +101,7 @@ export function calculateMatchScore(lotOrBatch, buyerDemand) {
       breakdown.push('Price difference is within negotiable margin (~' + diffPct.toFixed(1) + '%).');
     } else {
       pricePts = 6;
-      warnings.push('Asking price (₹' + targetPrice + '/unit) is ' + diffPct.toFixed(1) + '% above buyer current indicative budget.');
+      warnings.push('Asking price (₹' + targetPrice.toFixed(2) + '/kg after unit conversion) is ' + diffPct.toFixed(1) + '% above buyer indicative budget.');
     }
   }
   score += pricePts;
@@ -113,6 +121,7 @@ export function calculateMatchScore(lotOrBatch, buyerDemand) {
     score: totalScore,
     matchTier: totalScore >= 85 ? 'HIGH_MATCH' : totalScore >= 65 ? 'MEDIUM_MATCH' : 'LOW_MATCH',
     breakdown,
+    components: { cropAndQuality: qualityPts, quantity: quantityPts, location: locationPts, price: pricePts, delivery: timingPts },
     warnings,
     summary: totalScore >= 85
       ? 'Strong commercial compatibility across quality specifications, pricing bracket, and logistics corridor.'

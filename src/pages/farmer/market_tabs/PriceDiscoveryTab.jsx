@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calculator, ArrowRight, ShieldCheck, Truck, Warehouse, CheckCircle2, ChevronRight } from 'lucide-react';
 import { getCommodityById } from '../../../services/market/cropCommodityRegistry';
+import { DEMO_MARKET_CONTEXT } from '../../../services/market/marketContracts';
 
 export default function PriceDiscoveryTab({
   selectedCommodityId = 'WHEAT',
@@ -28,6 +29,9 @@ export default function PriceDiscoveryTab({
 
   return (
     <div>
+      <div role="note" style={{ background: '#FFF7E6', border: '1px solid #E8C77A', borderRadius: 10, padding: 12, marginBottom: 12, fontSize: 12, color: '#684B12' }}>
+        <strong>Demo estimate · not a live mandi quote or forecast.</strong> Source: {DEMO_MARKET_CONTEXT.source}. Data timestamp: {new Date(DEMO_MARKET_CONTEXT.updatedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}. {DEMO_MARKET_CONTEXT.confidenceLabel}.<br />Drivers shown: channel price baseline, estimated freight distance, storage duration and channel fee. Compare each channel’s gross price, deductions and estimated net realization below.
+      </div>
       <div className="discovery-input-panel">
         <div className="panel-header-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
           <h3 className="panel-title">

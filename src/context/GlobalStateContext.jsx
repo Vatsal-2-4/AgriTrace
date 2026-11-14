@@ -1847,7 +1847,7 @@ export const GlobalStateProvider = ({ children }) => {
       lotNumber: 'LOT-2026-' + randomId,
       status: 'AVAILABLE',
       createdAt: new Date().toISOString(),
-      verified: true,
+      verified: Boolean(lotData.qualityAssessment?.verifiedGrade),
       ...(primaryBatch ? {
         batchIds: [getBatchRecordId(primaryBatch)],
         sellerId: primaryBatch.farmerId,
@@ -2057,9 +2057,10 @@ export const GlobalStateProvider = ({ children }) => {
   };
 
   const createTransactionFromOffer = (acceptedOffer) => {
+    const isCropTrade = Boolean(acceptedOffer.cropId && acceptedOffer.cropId !== 'WOOL');
     const gross = (acceptedOffer.offeredPricePerKg || 420) * (acceptedOffer.quantityKg || 100);
-    const transport = Math.round(500 + (acceptedOffer.distanceKm || 35) * 22);
-    const storage = Math.round((acceptedOffer.storageMonths || 1) * 4.5 * acceptedOffer.quantityKg);
+    const transport = isCropTrade ? Number(acceptedOffer.transportCost || 0) : Math.round(500 + (acceptedOffer.distanceKm || 35) * 22);
+    const storage = isCropTrade ? Number(acceptedOffer.storageCost || 0) : Math.round((acceptedOffer.storageMonths || 1) * 4.5 * acceptedOffer.quantityKg);
     const platformFee = Math.round((gross * 1.0) / 100);
     const net = Math.max(0, gross - (transport + storage + platformFee));
     const randomId = Math.floor(1000 + Math.random() * 9000);
@@ -2075,8 +2076,11 @@ export const GlobalStateProvider = ({ children }) => {
       farmerName: acceptedOffer.sellerName,
       buyerId: acceptedOffer.buyerId,
       buyerName: acceptedOffer.buyerName,
+      cropId: acceptedOffer.cropId,
+      cropName: acceptedOffer.cropName,
       woolType: acceptedOffer.woolType,
-      qualityGrade: acceptedOffer.qualityGrade || 'A',
+      qualityGrade: acceptedOffer.qualityGrade || null,
+      unit: acceptedOffer.unit || 'KG',
       quantityKg: acceptedOffer.quantityKg,
       agreedPricePerKg: acceptedOffer.offeredPricePerKg,
       grossValue: gross,

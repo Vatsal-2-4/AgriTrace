@@ -23,7 +23,7 @@ export default function BuyerDiscoveryTab({
             Buyer demand & institutional procurement ({commodity.name})
           </h3>
           <span style={{ fontSize: '12px', color: '#64748B' }}>
-            Direct contracts with organised buyers, retail chains, institutions, and export houses
+            Demo buyer-demand records. Confirm price, quality evidence, delivery and payment terms directly before committing.
           </span>
         </div>
         <span style={{ fontSize: '12px', fontWeight: '800', background: '#DDFF86', padding: '4px 10px', borderRadius: '6px' }}>
@@ -38,8 +38,8 @@ export default function BuyerDiscoveryTab({
           </div>
         ) : (
           filteredDemands.map(buyer => {
-            const matchScore = buyer.matchResult?.score || 92;
-            const matchSummary = buyer.matchResult?.summary || 'High commercial compatibility with active institutional procurement requirements.';
+            const matchScore = buyer.matchResult?.score;
+            const matchSummary = buyer.matchResult?.summary;
 
             return (
               <div key={buyer.id} className="buyer-card">
@@ -54,7 +54,7 @@ export default function BuyerDiscoveryTab({
                     </div>
                     <div className="match-score-badge">
                       <Target size={14} />
-                      <span>{matchScore}% Match</span>
+                      <span>{Number.isFinite(matchScore) ? `${matchScore}% match` : 'Match pending'}</span>
                     </div>
                   </div>
 
@@ -70,17 +70,21 @@ export default function BuyerDiscoveryTab({
                   <div style={{ background: '#F8F8F3', borderRadius: '8px', padding: '10px', margin: '10px 0', fontSize: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <span>Demand Volume:</span>
-                      <strong>{buyer.quantityRequired.toLocaleString('en-IN')} KG</strong>
+                      <strong>{Number(buyer.quantityRequired || 0).toLocaleString('en-IN')} {buyer.unit || 'KG'}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <span>Price Range:</span>
-                      <strong style={{ color: '#0B120D' }}>₹{buyer.minPrice} - ₹{buyer.maxPrice}/KG</strong>
+                      <strong style={{ color: '#0B120D' }}>Up to ₹{buyer.maxPrice ?? buyer.maxPricePerKg ?? '—'}/{buyer.unit || 'KG'}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Escrow Security:</span>
-                      <strong style={{ color: '#0B120D' }}>✓ 100% Escrow Vault</strong>
+                      <span>Payment terms:</span>
+                      <strong style={{ color: '#0B120D' }}>{buyer.paymentTerms || 'Confirm with buyer before accepting an offer'}</strong>
                     </div>
                   </div>
+
+                  {matchSummary && <p style={{ fontSize: 12, color: '#475569' }}>{matchSummary}</p>}
+                  {buyer.matchResult?.breakdown?.length > 0 && <details style={{ fontSize: 12, margin: '8px 0' }}><summary style={{ cursor: 'pointer', fontWeight: 700 }}>Why this match</summary><ul>{buyer.matchResult.breakdown.map((reason, index) => <li key={index}>{reason}</li>)}</ul></details>}
+                  {buyer.matchResult?.warnings?.length > 0 && <div role="note" style={{ fontSize: 12, color: '#8A4B08', background: '#FFF6E5', borderRadius: 8, padding: 9 }}><strong>Check before quoting</strong><ul>{buyer.matchResult.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>}
 
                   <div style={{ fontSize: '11px', color: '#64748B', lineHeight: '1.4', marginBottom: '14px' }}>
                     <strong>Quality Specs:</strong> {buyer.qualityRequirements}

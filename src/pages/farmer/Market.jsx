@@ -13,6 +13,7 @@ import {
   generatePriceTrends
 } from '../../services/market/marketIntelligenceService';
 import { calculateMatchScore } from '../../services/market/matchingEngine';
+import { QUALITY_STATES, unitKgFactor } from '../../services/market/marketContracts';
 
 import MarketOverviewTab from './market_tabs/MarketOverviewTab';
 import PriceDiscoveryTab from './market_tabs/PriceDiscoveryTab';
@@ -123,6 +124,12 @@ export default function Market() {
   const [toastMessage, setToastMessage] = useState(null);
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [paymentTransaction, setPaymentTransaction] = useState(null);
+  const [lotPhotos, setLotPhotos] = useState([]);
+  const [photoError, setPhotoError] = useState('');
+  const [photoProgress, setPhotoProgress] = useState(0);
+  const [lotUnit, setLotUnit] = useState(selectedCommodityId === 'WHEAT' ? 'KG' : getCommodityById(selectedCommodityId).defaultUnit || 'KG');
+  const [lotCropId, setLotCropId] = useState(selectedCommodityId);
+  const lotCommodity = getCommodityById(lotCropId);
 
   const pageCopy = {
     overview: ['Market intelligence', 'Compare nearby mandi signals, direct buyer quotes and price movement for one crop at a time.'],
@@ -177,11 +184,11 @@ export default function Market() {
     const match = calculateMatchScore({
       cropId: selectedCommodityId,
       cropName: selectedCommodity.name,
-      woolType: selectedCommodity.name,
       qualityGrade: selectedGrade,
       quantity: quantityInput,
       askingPrice: selectedCommodity.basePricePerKg,
-      origin: 'Regional Farm Hub'
+      origin: 'Regional Farm Hub',
+      unit: selectedCommodity.defaultUnit
     }, bd);
     return { ...bd, matchResult: match };
   }).sort((a, b) => b.matchResult.score - a.matchResult.score);
@@ -217,7 +224,7 @@ export default function Market() {
           </p>
         </div>
         {activeTab === 'lots' && <div className="header-actions">
-          <button className="btn-primary" onClick={() => setShowCreateLotModal(true)}>
+          <button className="btn-primary" onClick={() => { setLotCropId(selectedCommodityId); setLotUnit(selectedCommodity.defaultUnit || 'KG'); setShowCreateLotModal(true); }}>
             <Plus size={16} />
             <span>Create sell lot</span>
           </button>
@@ -446,8 +453,8 @@ export default function Market() {
         <div className="wt-modal-overlay">
           <div className="wt-modal-card">
             <div className="modal-header-row">
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>Create Verified Produce Lot</h3>
-              <button className="btn-close-modal" onClick={() => setShowCreateLotModal(false)}><X size={20}/></button>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>Create produce lot</h3>
+              <button type="button" className="btn-close-modal" aria-label="Close lot form" onClick={() => setShowCreateLotModal(false)}><X size={20}/></button>
             </div>
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -462,56 +469,97 @@ export default function Market() {
               createWoolLot({
                 cropId: crop.id,
                 cropName: crop.name,
-                woolType: crop.name,
                 variety: form.variety.value,
                 totalQuantity: quantity,
+                unit: form.unit.value,
+                harvestDate: form.harvestDate.value || null,
+                photoReferences: lotPhotos.map(photo => photo.name),
                 availableQuantity: quantity,
                 askingPrice,
                 origin: form.origin.value,
-                qualityGrade: form.qualityGrade.value,
+                qualityAssessment: {
+                  status: lotPhotos.length ? QUALITY_STATES.REVIEW_REQUIRED : QUALITY_STATES.UNAVAILABLE,
+                  provisionalGrade: null,
+                  verifiedGrade: null,
+                  confidence: null,
+                  attributes: [],
+                  warnings: [lotPhotos.length ? 'Photos are attached for review; no image assessment service is connected.' : 'Add crop photos for a quality review.'],
+                  modelVersion: null,
+                  assessedAt: null,
+                  inspectorVerification: 'NOT_REVIEWED'
+                },
                 farmerName: user?.name || 'Ramesh Kumar'
               });
+              setLotPhotos([]);
+              setPhotoProgress(0);
               setShowCreateLotModal(false);
-              showToast('Produce lot published to national buyer marketplace!');
+              showToast('Produce lot saved in this browser demo; no marketplace API is connected.');
               openTab('lots');
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Commodity</label>
-                  <select name="cropId" defaultValue={selectedCommodityId} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }}>
+                  <label htmlFor="lot-crop" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Crop</label>
+                  <select id="lot-crop" name="cropId" value={lotCropId} onChange={event => { setLotCropId(event.target.value); setLotUnit(getCommodityById(event.target.value).defaultUnit || 'KG'); }} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }}>
                     {COMMODITIES.filter(c => c.id !== 'WOOL' && c.category !== 'FIBER').map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Variety</label>
-                  <input name="variety" defaultValue={selectedCommodity.varieties[0] || 'Standard'} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
+                  <label htmlFor="lot-variety" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Variety</label>
+                  <input id="lot-variety" name="variety" defaultValue={selectedCommodity.varieties[0] || 'Standard'} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Quantity (KG)</label>
-                    <input name="quantity" type="number" defaultValue="500" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
+                    <label htmlFor="lot-quantity" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Quantity</label>
+                    <input id="lot-quantity" name="quantity" type="number" min="0.1" step="any" defaultValue="500" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
                   </div>
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Asking Price (₹/KG)</label>
-                    <input name="askingPrice" type="number" step="0.5" defaultValue={selectedCommodity.basePricePerKg} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
+                    <label htmlFor="lot-unit" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Unit</label>
+                    <select id="lot-unit" name="unit" value={lotUnit} onChange={event => setLotUnit(event.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }}>{(lotCommodity.supportedUnits || ['KG']).map(unit => <option key={unit} value={unit}>{unit}</option>)}</select>
+                  </div>
+                  <div>
+                    <label htmlFor="lot-harvest-date" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Harvest date</label>
+                    <input id="lot-harvest-date" name="harvestDate" type="date" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} />
+                  </div>
+                  <div>
+                    <label htmlFor="lot-asking-price" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Asking price (₹/{lotUnit})</label>
+                    <input key={`${lotCropId}-${lotUnit}`} id="lot-asking-price" name="askingPrice" type="number" min="0.01" step="0.01" defaultValue={lotCommodity.basePricePerKg * unitKgFactor(lotUnit)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Quality Grade</label>
-                    <select name="qualityGrade" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }}>
-                      <option value="A+">Grade A+ (Premium)</option>
-                      <option value="A">Grade A (Standard)</option>
-                      <option value="B">Grade B (Fair)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Origin Location</label>
-                    <input name="origin" defaultValue="Punjab / Karnataka Farm" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
+                    <label htmlFor="lot-origin" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Farm location</label>
+                    <input id="lot-origin" name="origin" defaultValue="Punjab / Karnataka Farm" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
                   </div>
                 </div>
+                <section aria-labelledby="lot-photos-title">
+                  <label id="lot-photos-title" htmlFor="lot-photos" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Crop photos (up to 5, 8 MB each)</label>
+                  <p style={{ margin: '4px 0 8px', fontSize: 12, color: '#64748B' }}>Use daylight, show the full produce and a close-up. Photos are previewed locally; demo mode does not upload files.</p>
+                  <input id="lot-photos" type="file" accept="image/*" capture="environment" multiple onChange={(event) => {
+                    const files = Array.from(event.target.files || []);
+                    const invalid = files.find(file => !file.type.startsWith('image/') || file.size > 8 * 1024 * 1024);
+                    if (invalid) { setPhotoError(`${invalid.name}: choose an image under 8 MB.`); event.target.value = ''; return; }
+                    const remaining = Math.max(0, 5 - lotPhotos.length);
+                    const chosen = files.slice(0, remaining);
+                    setPhotoError(files.length > remaining ? 'Only five photos can be attached.' : '');
+                    if (!chosen.length) return;
+                    setPhotoProgress(0);
+                    const previews = chosen.map(file => ({ name: file.name, url: URL.createObjectURL(file) }));
+                    setLotPhotos(previous => [...previous, ...previews]);
+                    setPhotoProgress(100);
+                    event.target.value = '';
+                  }} />
+                  {photoProgress > 0 && <p role="status" style={{ fontSize: 12 }}>Preparing previews: {photoProgress}% (local demo)</p>}
+                  {photoError && <p role="alert" style={{ color: '#B42318', fontSize: 12 }}>{photoError}</p>}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                    {lotPhotos.map((photo, index) => <div key={`${photo.name}-${index}`} style={{ position: 'relative' }}>
+                      <img src={photo.url} alt={`Produce photo ${index + 1}: ${photo.name}`} style={{ width: 82, height: 72, objectFit: 'cover', borderRadius: 8 }} />
+                      <button type="button" aria-label={`Remove ${photo.name}`} onClick={() => { URL.revokeObjectURL(photo.url); setLotPhotos(previous => previous.filter((_, itemIndex) => itemIndex !== index)); }}>Remove</button>
+                    </div>)}
+                  </div>
+                </section>
+                <p style={{ margin: 0, fontSize: 12, color: '#475569' }}>Quality: <strong>{lotPhotos.length ? QUALITY_STATES.REVIEW_REQUIRED : QUALITY_STATES.UNAVAILABLE}</strong>. This demo cannot assess images or verify a grade.</p>
               </div>
               <div className="modal-action-row">
                 <button type="button" className="btn-secondary" onClick={() => setShowCreateLotModal(false)}>Cancel</button>

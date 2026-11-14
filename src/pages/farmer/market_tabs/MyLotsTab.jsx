@@ -1,14 +1,16 @@
 import React from 'react';
 import { Layers, Users, PlusCircle } from 'lucide-react';
+import { normalizeProduceLot } from '../../../services/market/marketContracts';
 
 export default function MyLotsTab({ woolLots, onOpenFpoAggregator, onOpenCreateLot }) {
+  const cropLots = (woolLots || []).filter(lot => lot.cropId && lot.cropId !== 'WOOL').map(normalizeProduceLot);
   return (
     <div>
       <div className="market-card" style={{ marginBottom: '24px' }}>
         <div className="panel-header-row">
           <h3 className="panel-title">
             <Layers size={20} />
-            Sell lots & FPO aggregation
+            Produce lots & FPO aggregation
           </h3>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button className="btn-secondary" onClick={onOpenFpoAggregator}>
@@ -26,19 +28,19 @@ export default function MyLotsTab({ woolLots, onOpenFpoAggregator, onOpenCreateL
           <table className="wt-data-table">
             <thead>
               <tr>
-                <th>Lot Number</th>
-                <th>Type / Seller</th>
-                <th>Produce / variety</th>
-                <th>Grade</th>
-                <th>Total Qty</th>
-                <th>Available Qty</th>
-                <th>Asking Price</th>
-                <th>QA Certificate</th>
+                <th>Lot</th>
+                <th>Seller</th>
+                <th>Crop / variety</th>
+                <th>Quality assessment</th>
+                <th>Total quantity</th>
+                <th>Available</th>
+                <th>Asking price</th>
+                <th>Photos</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {woolLots.map(lot => (
+              {cropLots.map(lot => (
                 <tr key={lot.id}>
                   <td>
                     <strong>{lot.lotNumber}</strong>
@@ -48,22 +50,26 @@ export default function MyLotsTab({ woolLots, onOpenFpoAggregator, onOpenCreateL
                       </span>
                     )}
                   </td>
-                  <td>{lot.sellerName} ({lot.sellerType})</td>
-                  <td>{lot.cropName || lot.woolType}</td>
+                  <td>{lot.sellerName || lot.farmerName || 'You'}{lot.sellerType ? ` (${lot.sellerType})` : ''}</td>
+                  <td>{lot.cropName || lot.cropId}{lot.variety ? ` · ${lot.variety}` : ''}</td>
                   <td>
-                    <span style={{
-                      background: '#EDEDCE', padding: '2px 8px', borderRadius: '4px', fontWeight: '700', fontSize: '11px'
-                    }}>
-                      {lot.qualityGrade}
-                    </span>
+                    {lot.qualityAssessment?.verifiedGrade ? <strong>Inspector verified: {lot.qualityAssessment.verifiedGrade}</strong>
+                      : lot.qualityAssessment?.provisionalGrade ? <strong>Provisional AI grade: {lot.qualityAssessment.provisionalGrade}</strong>
+                        : <strong>{lot.qualityAssessment?.status || 'Unavailable'} · No grade</strong>}
+                    {lot.qualityAssessment?.confidenceCalibrated && Number.isFinite(lot.qualityAssessment.confidence) && <div>{Math.round(lot.qualityAssessment.confidence <= 1 ? lot.qualityAssessment.confidence * 100 : lot.qualityAssessment.confidence)}% confidence</div>}
+                    {lot.qualityAssessment?.inspectorVerification && <div>Inspector: {lot.qualityAssessment.inspectorVerification}</div>}
+                    {(lot.qualityAssessment?.attributes?.length > 0 || lot.qualityAssessment?.warnings?.length > 0 || lot.qualityAssessment?.modelVersion || lot.qualityAssessment?.assessedAt) && <details><summary>Assessment evidence</summary>
+                      {lot.qualityAssessment.attributes?.map((item, index) => <div key={`attribute-${index}`}>{item.label || item.name}: {item.value}</div>)}
+                      {lot.qualityAssessment.warnings?.map((warning, index) => <div key={`warning-${index}`}>Warning: {warning}</div>)}
+                      {lot.qualityAssessment.modelVersion && <div>Model: {lot.qualityAssessment.modelVersion}</div>}
+                      {lot.qualityAssessment.assessedAt && <div>Assessed: {new Date(lot.qualityAssessment.assessedAt).toLocaleString('en-IN')}</div>}
+                    </details>}
                   </td>
-                  <td>{lot.totalQuantity} KG</td>
-                  <td><strong>{lot.availableQuantity} KG</strong></td>
-                  <td style={{ color: '#0B120D', fontWeight: '700' }}>₹{lot.askingPrice}/KG</td>
+                  <td>{lot.totalQuantity} {lot.unit || 'KG'}</td>
+                  <td><strong>{lot.availableQuantity} {lot.unit || 'KG'}</strong></td>
+                  <td style={{ color: '#0B120D', fontWeight: '700' }}>₹{lot.askingPrice}/{lot.unit || 'KG'}</td>
                   <td>
-                    <a href={lot.traceabilityUrl} target="_blank" rel="noreferrer" style={{ color: '#0B120D', fontWeight: '600' }}>
-                      ✓ {lot.certificateId}
-                    </a>
+                    {lot.photoReferences?.length || 0} attached
                   </td>
                   <td>
                     <span style={{
@@ -75,6 +81,7 @@ export default function MyLotsTab({ woolLots, onOpenFpoAggregator, onOpenCreateL
                   </td>
                 </tr>
               ))}
+              {cropLots.length === 0 && <tr><td colSpan="9" style={{ textAlign: 'center', padding: 28, color: '#64748B' }}>No crop lots yet. Create a lot to see quantity, location and assessment details here.</td></tr>}
             </tbody>
           </table>
         </div>
