@@ -8,7 +8,7 @@ The returned prediction is the next reported observation, not necessarily tomorr
 
 ## New demand and price estimates
 
-The current `api/ai/intelligence.js` demand and price outputs are transparent heuristic baselines, not trained ML models. They are labelled with `method: "HEURISTIC"`/heuristic model versions. Demand uses the supplied dated quantities; price uses supplied dated prices and optional supplied quality/demand/cost inputs. Both return explicit insufficient-data states. Confidence is a capped sample-size indicator, not a calibrated probability; the UI must describe it accordingly or avoid showing it as model confidence.
+The current `api/ai/intelligence.js` demand and price outputs are transparent heuristic baselines, not trained ML models. They are labelled with `method: "HEURISTIC"`/heuristic model versions. Demand uses the supplied dated quantities; price uses supplied dated prices and optional supplied quality/demand/cost inputs. Both return explicit insufficient-data states. `confidenceMeaning` is `uncalibrated_sample_size_indicator`; this must not be presented as a probability or calibrated model confidence.
 
 ## Image grading
 

@@ -4,7 +4,7 @@ const DEMAND_MODEL_VERSION = 'regional-demand-heuristic-v1';
 const PRICE_MODEL_VERSION = 'market-price-heuristic-v1';
 const GRADE_ADJUSTMENTS = { 'A+': 0.08, A: 0.04, B: 0, C: -0.08 };
 
-const asFinite = value => Number.isFinite(Number(value)) ? Number(value) : null;
+const asFinite = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
 const nonNegative = value => {
   const parsed = asFinite(value);
   return parsed !== null && parsed >= 0 ? parsed : null;
@@ -34,7 +34,7 @@ function demandForecast(body) {
     } };
   }
 
-  const rows = observations.map(row => ({
+  const rows = observations.filter(row => row && typeof row === 'object').map(row => ({
     quantity: asFinite(row?.quantityKg),
     asOf: isoDate(row?.asOf),
     source: String(row?.source || 'buyer demand')
@@ -46,7 +46,7 @@ function demandForecast(body) {
   const previous = rows.slice(0, rows.length - recent.length);
   const average = values => values.reduce((sum, row) => sum + row.quantity, 0) / values.length;
   const recentAverage = average(recent);
-  const previousAverage = average(previous);
+  const previousAverage = previous.length ? average(previous) : null;
   const changePercent = previousAverage > 0 ? ((recentAverage - previousAverage) / previousAverage) * 100 : null;
   const expectedDemandQuantity = Math.max(0, recentAverage * (1 + (changePercent || 0) / 100 * Math.min(horizonDays / 7, 1)));
   const deviations = recent.map(row => Math.abs(row.quantity - recentAverage));
@@ -62,6 +62,7 @@ function demandForecast(body) {
     pricePressure: pressure,
     interval: { lower: Math.round(interval.lower), upper: Math.round(interval.upper) },
     confidence: Math.min(0.75, Number((rows.length / 20).toFixed(2))),
+    confidenceMeaning: 'uncalibrated_sample_size_indicator',
     drivers: [{ name: 'observed_buyer_demand', effect: pressure, contribution: changePercent === null ? null : Number(changePercent.toFixed(1)) }],
     sourceFreshness: [{ source: latest.source, asOf: latest.asOf }],
     modelVersion: DEMAND_MODEL_VERSION, generatedAt: new Date().toISOString(), status: 'READY'
@@ -89,7 +90,7 @@ function priceRecommendation(body) {
     } };
   }
 
-  const rows = observations.map(row => ({
+  const rows = observations.filter(row => row && typeof row === 'object').map(row => ({
     price: asFinite(row?.price), asOf: isoDate(row?.asOf),
     source: String(row?.source || 'market observation')
   })).filter(row => row.price !== null && row.price > 0 && row.asOf);
@@ -101,13 +102,16 @@ function priceRecommendation(body) {
   const mean = values => values.reduce((sum, row) => sum + row.price, 0) / values.length;
   const current = recent[recent.length - 1].price;
   const recentMean = mean(recent);
-  const previousMean = mean(previous);
+  const previousMean = previous.length ? mean(previous) : null;
   const trendPct = previousMean > 0 ? ((recentMean - previousMean) / previousMean) * 100 : 0;
   const gradeAdjustment = GRADE_ADJUSTMENTS[grade] || 0;
   const transportCost = nonNegative(body.transportCostPerUnit);
   const storageCost = nonNegative(body.storageCostPerUnit);
   if ((body.transportCostPerUnit !== undefined && transportCost === null) || (body.storageCostPerUnit !== undefined && storageCost === null)) {
     return { error: 'transportCostPerUnit and storageCostPerUnit must be non-negative numbers' };
+  }
+  if (body.demandForecast?.pricePressure && !['UP', 'STABLE', 'DOWN', 'UNKNOWN'].includes(body.demandForecast.pricePressure)) {
+    return { error: 'demandForecast.pricePressure must be UP, STABLE, DOWN or UNKNOWN' };
   }
   const demandPressure = body.demandForecast?.pricePressure;
   const demandAdjustment = demandPressure === 'UP' ? 0.03 : demandPressure === 'DOWN' ? -0.03 : 0;
@@ -131,7 +135,7 @@ function priceRecommendation(body) {
     priceRange: { low, high, unit: String(body.priceUnit || 'INR/kg') },
     expectedNetPerUnit: net === null ? null : Number(net.toFixed(2)),
     recommendation: trendPct > 3 ? 'WAIT' : trendPct < -3 ? 'SELL' : 'COMPARE',
-    horizonDays, confidence: Math.min(0.7, Number((rows.length / 20).toFixed(2))),
+    horizonDays, confidence: Math.min(0.7, Number((rows.length / 20).toFixed(2))), confidenceMeaning: 'uncalibrated_sample_size_indicator',
     method: 'HEURISTIC', drivers,
     sourceFreshness: [{ source: latest.source, asOf: latest.asOf }],
     modelVersion: PRICE_MODEL_VERSION, generatedAt: new Date().toISOString()
