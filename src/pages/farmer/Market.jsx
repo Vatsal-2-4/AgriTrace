@@ -134,7 +134,7 @@ export default function Market() {
   const refreshMarketplace = async () => {
     try {
       const [lots, demands] = await Promise.all([marketplaceApi.listLots(), marketplaceApi.listDemands()]);
-      setMarketplaceLots(lots);
+      setMarketplaceLots(lots.filter(lot => lot.lotId && lot.cropId !== 'WOOL'));
       setMarketplaceDemands(demands);
       const ownedLots = lots.filter(lot => lot.sellerId === user?.id);
       const bidGroups = await Promise.all(ownedLots.map(lot => marketplaceApi.listBids(lot.lotId).catch(() => [])));

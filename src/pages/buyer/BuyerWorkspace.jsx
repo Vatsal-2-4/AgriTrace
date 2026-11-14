@@ -27,7 +27,7 @@ export default function BuyerWorkspace() {
   const refresh = useCallback(async () => {
     try {
       const [nextLots, nextDemands, nextBids] = await Promise.all([marketplaceApi.listLots(), marketplaceApi.listDemands(), marketplaceApi.listBids()]);
-      setLots(nextLots);
+      setLots(nextLots.filter(lot => lot.lotId && lot.cropId !== 'WOOL'));
       setDemands(nextDemands);
       setBids(nextBids);
       setMessage('');
