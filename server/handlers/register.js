@@ -1,6 +1,6 @@
 import connectToDatabase from '../../api/_utils/db.js';
 import User from '../../api/_models/User.js';
-import mongoose from 'mongoose';
+
 import { ORGANIZATION_TYPES, issueAccessToken } from '../../api/_utils/market.js';
 
 export default async function handler(req, res) {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     // Drop the mobile_1 index if it exists to fix local DB duplicate null errors
     try {
       await User.collection.dropIndex('mobile_1');
-    } catch (e) {
+    } catch  {
       // Ignore if index doesn't exist
     }
 

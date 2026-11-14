@@ -6,7 +6,7 @@ import ResourceAnalyticsCharts from "./components/ResourceAnalyticsCharts";
 import ResourceAnomaliesAlerts from "./components/ResourceAnomaliesAlerts";
 import ResourceHistoryTable from "./components/ResourceHistoryTable";
 import ResourceLogModal from "./components/ResourceLogModal";
-import { Leaf, PlusCircle, RefreshCw, Layers, BarChart2, AlertTriangle, FileText, CheckCircle } from "lucide-react";
+import { Leaf, PlusCircle, Layers, BarChart2, AlertTriangle, FileText, CheckCircle } from "lucide-react";
 import "./ResourceSustainabilityView.css";
 
 const ResourceSustainabilityView = () => {

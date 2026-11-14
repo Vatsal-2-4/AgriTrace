@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  User, ChevronDown, Check, LogOut, Globe,
-  Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell, Gauge
+  User, ChevronDown, Check, LogOut, Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell, Gauge
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './UserRoleDropdown.css';

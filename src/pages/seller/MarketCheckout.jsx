@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Truck, Lock } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock } from 'lucide-react';
 import { useWoolKart } from '../../context/WoolKartContext';
 import { useGlobalState } from '../../context/GlobalStateContext';
 

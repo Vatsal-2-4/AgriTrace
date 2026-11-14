@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Boxes, Search, Filter, Edit3, ArrowUpRight, CheckCircle2, 
-  MapPin, X, Save, ArrowRight
+  Boxes, Search, Edit3, ArrowUpRight, MapPin, X, Save
 } from 'lucide-react';
 import { useGlobalState } from '../../context/GlobalStateContext';
 

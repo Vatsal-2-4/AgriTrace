@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { X, Award, Download, Printer, Share2, CheckCircle } from 'lucide-react';
+import { X, Award, Printer, Share2, CheckCircle } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import './CertificateModal.css';
 
@@ -50,7 +50,7 @@ const CertificateModal = ({ module, quizResult, lang = 'en', onClose }) => {
           text: `${farmerName} has completed the "${module.title}" course on WoolTrace Academy with a score of ${quizResult?.score}%!`,
           url: verifyUrl,
         });
-      } catch (err) {
+      } catch  {
         // User cancelled share
       }
     } else {

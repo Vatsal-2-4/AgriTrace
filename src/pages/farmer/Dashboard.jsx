@@ -10,11 +10,8 @@ import {
   ArrowRight,
   Warehouse,
   Target,
-  FileText,
   Search,
-  CheckCircle2,
   Users,
-  Activity,
   Layers
 } from 'lucide-react';
 import {
@@ -43,7 +40,7 @@ const Dashboard = () => {
   
   const activeBatches = batches.length;
   const totalProduceQuantity = batches.reduce((acc, b) => acc + (Number(b.quantity) || 0), 0);
-  const pendingOffersCount = marketOffers.filter(o => o.status === 'PENDING').length;
+  
 
   const currentCommodity = getCommodityById(selectedCropId);
 
@@ -60,10 +57,10 @@ const Dashboard = () => {
         }));
         setChartData(transformed);
       }
-    } catch (_err) {
+    } catch  {
       console.warn('Dashboard market overview using fallback series');
     }
-  }, [selectedCropId]);
+  }, [selectedCropId, currentCommodity.basePricePerKg]);
 
   const filteredCommodities = COMMODITIES.filter(c => 
     c.id !== 'WOOL' && c.id !== 'APPLE' && c.category !== 'FIBER' && (

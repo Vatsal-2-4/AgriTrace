@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserQRCodeReader } from '@zxing/browser';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
-  QrCode, Search, CheckCircle2, Box, Truck, ShieldCheck, 
-  Warehouse, ArrowRight, AlertCircle, Sparkles, MapPin, Check
+  QrCode, Search, CheckCircle2, Truck, Warehouse, ArrowRight, AlertCircle, MapPin, Check
 } from 'lucide-react';
 import { useGlobalState } from '../../context/GlobalStateContext';
 import { useAuth } from '../../context/AuthContext';
@@ -36,7 +35,11 @@ export default function WarehouseCheckIn() {
     if (inputBatchId) {
       handleLookup(inputBatchId);
     }
-  }, [inputBatchId, batches]);
+  }, [
+	inputBatchId,
+	batches,
+	handleLookup
+]);
 
   const handleLookup = (id) => {
     const normalizedId = String(id || '').trim().toLowerCase();
@@ -109,7 +112,7 @@ export default function WarehouseCheckIn() {
   };
 
   const cert = activeBatch ? certificates.find(c => c.batchId === activeBatch.id || c.batchId === activeBatch.batchId) : null;
-  const transport = activeBatch ? transportJobs.find(t => t.batchId === activeBatch.id || t.batchId === activeBatch.batchId) : null;
+  
   const booking = activeBatch ? warehouseBookings.find(w => w.batchId === activeBatch.id || w.batchId === activeBatch.batchId) : null;
 
   return (

@@ -7,7 +7,6 @@ import {
   COMMODITIES,
   COMMODITY_CATEGORIES,
   getCommodityById,
-  getCommoditiesByCategory,
   getMarketChannelsForCommodity,
   calculateNetRealization,
   getSaleWindowRecommendation,
@@ -42,7 +41,6 @@ import {
   Users,
   CheckCircle2,
   X,
-  Search,
   Filter
 } from 'lucide-react';
 import './Market.css';
@@ -55,12 +53,10 @@ export default function Market() {
 
   const {
     batches = [],
-    woolLots = [],
     buyerDemands = [],
     marketOffers = [],
     marketTransactions = [],
     disputes = [],
-    createWoolLot = () => {},
     aggregateFpoLot = () => {},
     respondOffer = () => {},
     recordTransactionPayment = () => {},
@@ -97,12 +93,17 @@ export default function Market() {
       const crop = searchParams.get('crop') || 'WHEAT';
       navigate(`/farmer/market/${legacyTab}?crop=${crop}`, { replace: true });
     }
-  }, [navigate, routeTab, searchParams]);
+  }, [
+	navigate,
+	routeTab,
+	searchParams,
+	validViews
+]);
   
   // Commodity & Category Selector State
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedCommodityId, setSelectedCommodityId] = useState(searchParams.get('crop') || 'WHEAT');
-  const [commoditySearch, setCommoditySearch] = useState('');
+  const [commoditySearch] = useState('');
 
   // Price discovery parameters
   const [selectedBatchId, setSelectedBatchId] = useState('');
@@ -117,7 +118,7 @@ export default function Market() {
   const [showCreateLotModal, setShowCreateLotModal] = useState(false);
   const [showFPOModal, setShowFPOModal] = useState(false);
   const [showCounterModal, setShowCounterModal] = useState(false);
-  const [activeOfferForCounter, setActiveOfferForCounter] = useState(null);
+  const [activeOfferForCounter] = useState(null);
   const [counterPrice, setCounterPrice] = useState(30);
   const [counterTerms, setCounterTerms] = useState('');
   const [showDisputeModal, setShowDisputeModal] = useState(false);
@@ -148,7 +149,7 @@ export default function Market() {
     refreshMarketplace();
     const interval = window.setInterval(refreshMarketplace, 15000);
     return () => window.clearInterval(interval);
-  }, [user?.id]);
+  }, [user?.id, refreshMarketplace]);
   const [lotUnit, setLotUnit] = useState(selectedCommodityId === 'WHEAT' ? 'KG' : getCommodityById(selectedCommodityId).defaultUnit || 'KG');
   const [lotCropId, setLotCropId] = useState(selectedCommodityId);
   const lotCommodity = getCommodityById(lotCropId);
@@ -171,7 +172,12 @@ export default function Market() {
     if (selectedCommodity && selectedCommodity.varieties && selectedCommodity.varieties.length > 0) {
       setSelectedVariety(selectedCommodity.varieties[0]);
     }
-  }, [selectedCommodityId]);
+  }, [
+	selectedCommodityId,
+	selectedCommodity,
+	selectedCommodity.varieties,
+	selectedCommodity.varieties.length
+]);
 
   const showToast = (msg) => {
     setToastMessage(msg);

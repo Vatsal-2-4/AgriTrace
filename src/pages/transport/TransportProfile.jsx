@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
-import { User, Shield, MapPin, Truck } from 'lucide-react';
+import { Shield, MapPin, Truck } from 'lucide-react';
 
 const TransportProfile = () => {
   const { user } = useAuth();

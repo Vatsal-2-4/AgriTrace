@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShieldCheck, Filter, ChevronDown, Check, Star, Layers, Send, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Search, ShieldCheck, ChevronDown, Check, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useGlobalState } from '../../context/GlobalStateContext';
 import { useWoolKart } from '../../context/WoolKartContext';
 import { useAuth } from '../../context/AuthContext';

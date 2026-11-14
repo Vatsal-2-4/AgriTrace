@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Filter, Download, Droplets, Zap, Scale, CheckCircle, AlertTriangle, AlertCircle, FileText } from "lucide-react";
+import { Search, Download, Zap, CheckCircle, AlertCircle, FileText } from "lucide-react";
 import "./ResourceHistoryTable.css";
 
 const ResourceHistoryTable = ({ logs = [], onOpenLogModal }) => {

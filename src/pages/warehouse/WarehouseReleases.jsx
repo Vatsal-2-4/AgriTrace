@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  ArrowUpRight, Check, PackageCheck, AlertTriangle, 
-  Boxes, ArrowRight, ShieldCheck, Plus, X, Building2, Truck
+  ArrowUpRight, Check, PackageCheck, Boxes, ShieldCheck, Plus, X, Truck
 } from 'lucide-react';
 import { useGlobalState } from '../../context/GlobalStateContext';
 
@@ -25,7 +24,7 @@ export default function WarehouseReleases() {
   const [destination, setDestination] = useState('Mysuru Spinning Mill No. 2');
 
   const selectedBatch = batches.find(b => b.id === selectedBatchId || b.batchId === selectedBatchId);
-  const storedBatches = batches.filter(b => b.currentStage === 'WAREHOUSE');
+  
 
   const maxStoredQty = selectedBatch ? selectedBatch.quantity : 0;
   const remainingQty = Math.max(0, maxStoredQty - Number(releaseQuantity));

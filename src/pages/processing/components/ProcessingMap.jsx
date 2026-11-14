@@ -134,7 +134,7 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {}
+        } catch  {}
         mapRef.current = null;
       }
       if (mapContainerRef.current) {
@@ -150,12 +150,12 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
     try {
       // Clear existing markers & polylines
       markersRef.current.forEach(m => {
-        try { m.remove(); } catch(e) {}
+        try { m.remove(); } catch {}
       });
       markersRef.current = [];
 
       polylinesRef.current.forEach(p => {
-        try { p.remove(); } catch(e) {}
+        try { p.remove(); } catch {}
       });
       polylinesRef.current = [];
 
@@ -291,12 +291,20 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
     } catch (e) {
       console.warn('Error updating Leaflet markers:', e);
     }
-  }, [layers, requests, facility]);
+  }, [
+	layers,
+	requests,
+	facility,
+	onSelectBatch,
+	incomingBatches,
+	warehousesList,
+	outgoingBatches
+]);
 
   const handleRefresh = () => {
     setLastRefreshed(new Date().toLocaleTimeString());
     if (mapRef.current) {
-      try { mapRef.current.invalidateSize(); } catch(e) {}
+      try { mapRef.current.invalidateSize(); } catch {}
     }
   };
 

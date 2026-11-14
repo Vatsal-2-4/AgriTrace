@@ -98,7 +98,7 @@ export default async function handler(req, res) {
       const statusIndex = parts.indexOf('status');
       const id = parts[statusIndex - 1];
 
-      const { status, location, timestamp, notes, proofOfDelivery } = req.body;
+      const { status, location, timestamp, proofOfDelivery } = req.body;
 
       const shipment = await Shipment.findById(id);
       if (!shipment) return res.status(404).json({ message: 'Shipment not found' });

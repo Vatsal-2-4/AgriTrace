@@ -21,7 +21,7 @@
  */
 import { MarketDataProvider } from './MarketDataProvider.js';
 
-const PROXY_BASE = '/api/market'; // Vercel serverless proxy
+ // Vercel serverless proxy
 
 export class AgmarknetProvider extends MarketDataProvider {
   getMeta() {
@@ -40,12 +40,12 @@ export class AgmarknetProvider extends MarketDataProvider {
     throw new Error('AgmarknetProvider: API key not configured. See AgmarknetProvider.js for setup instructions.');
   }
 
-  async getHistoricalPrices(market, days = 30, variety = 'Medium') {
+  async getHistoricalPrices(_market, _days = 30, _variety = 'Medium') {
     // TODO: implement
     throw new Error('AgmarknetProvider: not yet configured.');
   }
 
-  async getArrivals(market, days = 30) {
+  async getArrivals(_market, _days = 30) {
     // TODO: implement
     throw new Error('AgmarknetProvider: not yet configured.');
   }

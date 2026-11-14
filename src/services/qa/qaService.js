@@ -56,7 +56,7 @@ const readApiJson = async (response) => {
   if (!text) return {};
   try {
     return JSON.parse(text);
-  } catch (error) {
+  } catch  {
     throw new Error('Invalid JSON response from QA API');
   }
 };
@@ -84,7 +84,7 @@ export const qaService = {
           return data.data.map(normalizeBatchRecord);
         }
       }
-    } catch (e) {
+    } catch  {
       console.warn('API getBatches fetch bypassed, reading local state');
     }
 
@@ -95,7 +95,7 @@ export const qaService = {
         const list = JSON.parse(stored);
         return list.map(normalizeBatchRecord);
       }
-    } catch (e) {}
+    } catch  {}
 
     return [];
   },
@@ -107,7 +107,7 @@ export const qaService = {
         const data = await res.json();
         if (data.success && data.data) return normalizeBatchRecord(data.data);
       }
-    } catch (e) {
+    } catch  {
       console.warn('API getBatchById fetch bypassed, reading local state');
     }
 
@@ -118,7 +118,7 @@ export const qaService = {
         const match = list.find(b => b.id === id || b.batchId === id);
         if (match) return normalizeBatchRecord(match);
       }
-    } catch (e) {}
+    } catch  {}
 
     return null;
   },
@@ -228,7 +228,7 @@ export const qaService = {
       const list = stored ? JSON.parse(stored) : [];
       const updated = [newBatch, ...list.map(normalizeBatchRecord).filter(b => b.id !== newBatchId)];
       localStorage.setItem('wt_batches_v2', JSON.stringify(updated));
-    } catch (e) {}
+    } catch  {}
 
     // Also attempt backend API
     try {
@@ -237,7 +237,7 @@ export const qaService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBatch)
       }).catch(() => {});
-    } catch (e) {}
+    } catch  {}
 
     return {
       success: true,
@@ -264,7 +264,7 @@ export const qaService = {
     try {
       const stored = localStorage.getItem('wt_qa_requests_v2');
       return stored ? JSON.parse(stored) : [];
-    } catch (e) {
+    } catch  {
       return [];
     }
   },
@@ -276,13 +276,13 @@ export const qaService = {
         const data = await res.json();
         if (data.success && data.data) return data.data;
       }
-    } catch (e) {}
+    } catch  {}
 
     try {
       const stored = localStorage.getItem('wt_qa_requests_v2');
       const list = stored ? JSON.parse(stored) : [];
       return list.find(req => req.id === id || req.requestId === id) || null;
-    } catch (e) {
+    } catch  {
       return null;
     }
   },
@@ -340,7 +340,7 @@ export const qaService = {
               savedReq,
               ...list.filter(req => req.requestId !== savedReq.requestId && req.id !== savedReq.id)
             ]));
-          } catch (e) {}
+          } catch  {}
           return { success: true, data: savedReq };
         }
       }
@@ -364,7 +364,7 @@ export const qaService = {
       const stored = localStorage.getItem('wt_qa_requests_v2');
       const list = stored ? JSON.parse(stored) : [];
       localStorage.setItem('wt_qa_requests_v2', JSON.stringify([newReq, ...list]));
-    } catch (e) {}
+    } catch  {}
 
     return { success: true, data: newReq, persistedToBackend: false };
   },
@@ -376,7 +376,7 @@ export const qaService = {
         const data = await res.json();
         if (data.success && data.data) return data.data;
       }
-    } catch (e) {}
+    } catch  {}
 
     try {
       const stored = localStorage.getItem('wt_certificates_v2');
@@ -385,7 +385,7 @@ export const qaService = {
         const match = list.find(c => c.batchId === batchId);
         if (match) return match;
       }
-    } catch (e) {}
+    } catch  {}
 
     return null;
   },
@@ -409,7 +409,7 @@ export const qaService = {
     try {
       const stored = localStorage.getItem('wt_certificates_v2');
       return stored ? JSON.parse(stored) : [];
-    } catch (e) {
+    } catch  {
       return [];
     }
   },
@@ -421,7 +421,7 @@ export const qaService = {
         const data = await res.json();
         if (data.success && data.data) return data.data;
       }
-    } catch (e) {}
+    } catch  {}
 
     try {
       const stored = localStorage.getItem('wt_certificates_v2');
@@ -430,7 +430,7 @@ export const qaService = {
         const match = list.find(c => c.id === certificateId || c.certificateId === certificateId);
         if (match) return match;
       }
-    } catch (e) {}
+    } catch  {}
 
     return null;
   },
@@ -495,7 +495,7 @@ export const qaService = {
             savedCert,
             ...list.filter(cert => cert.certificateId !== newCert.certificateId && cert.certificateId !== savedCert.certificateId)
           ]));
-        } catch (e) {}
+        } catch  {}
         try {
           const stored = localStorage.getItem('wt_qa_requests_v2');
           const list = stored ? JSON.parse(stored) : [];
@@ -504,7 +504,7 @@ export const qaService = {
               ? { ...req, status: 'CERTIFICATE_ISSUED' }
               : req
           ))));
-        } catch (e) {}
+        } catch  {}
         try {
           const stored = localStorage.getItem('wt_batches_v2');
           const list = stored ? JSON.parse(stored) : [];
@@ -518,7 +518,7 @@ export const qaService = {
                 })
               : batch
           ))));
-        } catch (e) {}
+        } catch  {}
         return { success: true, data: savedCert, persistedToBackend: true };
       }
       throw new Error('QA API did not return a certificate');
@@ -532,7 +532,7 @@ export const qaService = {
       const stored = localStorage.getItem('wt_certificates_v2');
       const list = stored ? JSON.parse(stored) : [];
       localStorage.setItem('wt_certificates_v2', JSON.stringify([newCert, ...list]));
-    } catch (e) {}
+    } catch  {}
 
     try {
       const stored = localStorage.getItem('wt_qa_requests_v2');
@@ -542,7 +542,7 @@ export const qaService = {
           ? { ...req, status: 'CERTIFICATE_ISSUED' }
           : req
       ))));
-    } catch (e) {}
+    } catch  {}
 
     try {
       const stored = localStorage.getItem('wt_batches_v2');
@@ -557,7 +557,7 @@ export const qaService = {
             })
           : batch
       ))));
-    } catch (e) {}
+    } catch  {}
 
     return { success: true, data: newCert, persistedToBackend: false };
   }

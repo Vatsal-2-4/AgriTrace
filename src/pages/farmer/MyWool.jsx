@@ -7,18 +7,12 @@ import {
   Box, 
   Plus, 
   MapPin, 
-  Clock, 
   CheckCircle2, 
   QrCode, 
-  ArrowRight,
   Printer,
-  Sparkles,
   Layers,
-  Filter,
   Warehouse,
-  Scale,
   Calendar,
-  ShieldCheck,
   Target
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
@@ -43,7 +37,7 @@ const MyWool = () => {
   const [qualityGrade, setQualityGrade] = useState('A');
   const [harvestDate, setHarvestDate] = useState(new Date().toISOString().split('T')[0]);
   const [qualityAttributes, setQualityAttributes] = useState({});
-  const [storageType, setStorageType] = useState('DRY_SILO');
+  const [,setStorageType] = useState('DRY_SILO');
 
   const selectedCommodity = getCommodityById(selectedCropId);
 

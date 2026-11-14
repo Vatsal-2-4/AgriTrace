@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, ShieldCheck, Clock, Check, X, AlertCircle } from 'lucide-react';
+import { Search, Filter, ShieldCheck, Clock, Check, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Bids() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  
   const [searchTerm, setSearchTerm] = useState('');
   
   // Dummy data for the SIH prototype presentation to guarantee it works visually

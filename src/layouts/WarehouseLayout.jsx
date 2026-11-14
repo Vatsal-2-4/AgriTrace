@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, QrCode, Boxes, Inbox, ArrowUpRight, 
   LogOut, Warehouse, Menu, X

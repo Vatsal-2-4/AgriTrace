@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       const errorData = await response.json().catch(() => ({}));
       setIsLoading(false);
       return { success: false, message: errorData.error?.message || errorData.message || 'Account registration failed.' };
-    } catch (error) {
+    } catch  {
       setIsLoading(false);
       return { success: false, message: 'Account registration requires a connection to the AgriTrace account service.' };
     }

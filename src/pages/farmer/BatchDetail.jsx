@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import { 
-  QrCode, ArrowLeft, Download, CheckCircle, Clock, ShieldAlert, 
-  FileText, Plus, MapPin, Warehouse, Sparkles, User, Printer, Eye
+  QrCode, ArrowLeft, CheckCircle, ShieldAlert, 
+  FileText, MapPin, Sparkles, Printer, Eye
 } from 'lucide-react';
 import { useGlobalState } from '../../context/GlobalStateContext';
 import { useAuth } from '../../context/AuthContext';

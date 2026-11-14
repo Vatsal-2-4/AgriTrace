@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, QrCode } from 'lucide-react';
+
 import './MainHero.css';
 
 const MainHero = () => {

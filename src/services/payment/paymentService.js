@@ -21,7 +21,7 @@ export async function createUpiPayment(transaction) {
     });
     const body = await response.json().catch(() => ({}));
     if (response.ok && body.payment) return body.payment;
-  } catch (_error) {
+  } catch  {
     // The QR payment experience must remain usable when a static dev server
     // has not mounted the optional API bridge.
   }

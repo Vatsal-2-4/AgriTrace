@@ -1,7 +1,7 @@
 import connectToDatabase from './_utils/db.js';
 import ProcessingRequest from './_models/ProcessingRequest.js';
 import ProcessingRecord from './_models/ProcessingRecord.js';
-import WoolBatch from './_models/WoolBatch.js';
+
 import { getProcessingCedaData } from './_utils/processingCedaService.js';
 import { getApiRoute, handleCors } from './_utils/http.js';
 

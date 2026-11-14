@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
-  Search, Box, ShieldCheck, MapPin, QrCode, ExternalLink, 
-  ArrowRight, Download, CheckCircle, Clock, Warehouse, X
+  Search, Box, MapPin, QrCode, ExternalLink, 
+  ArrowRight, CheckCircle, Warehouse, X
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import { useGlobalState } from '../../context/GlobalStateContext';
@@ -11,8 +11,8 @@ import './TrackWool.css';
 
 export default function TrackWool() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { batches, certificates } = useGlobalState();
+  
+  const { batches, } = useGlobalState();
 
   const initialQuery = searchParams.get('id') || batches[0]?.id || 'BATCH-001';
   const [searchQuery, setSearchQuery] = useState(initialQuery);

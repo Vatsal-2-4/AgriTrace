@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Truck, MapPin, CheckCircle, Navigation, Camera, Package, Calendar, Phone } from 'lucide-react';
+import { MapPin, CheckCircle, Navigation, Package, Phone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
 import { notificationService } from '../../services/notificationService';
@@ -32,7 +32,11 @@ const ShipmentDetail = () => {
 
   useEffect(() => {
     fetchShipment();
-  }, [id, user]);
+  }, [
+	id,
+	user,
+	fetchShipment
+]);
 
   const updateStatus = async (newStatus, extraData = {}) => {
     setUpdating(true);

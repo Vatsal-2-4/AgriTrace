@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useGlobalState } from '../../context/GlobalStateContext';
-import { ArrowRight, Box, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Box, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 const ListWool = () => {
   const [searchParams] = useSearchParams();

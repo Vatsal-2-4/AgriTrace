@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useGlobalState } from '../../context/GlobalStateContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  ArrowLeft, CheckCircle, Clock, Truck, Package, ShieldCheck, 
+  ArrowLeft, CheckCircle, Truck, Package, ShieldCheck, 
   MapPin, Star, FileText, Download, Building
 } from 'lucide-react';
 

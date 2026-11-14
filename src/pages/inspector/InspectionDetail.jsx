@@ -30,7 +30,7 @@ export default function InspectionDetail() {
 
   useEffect(() => {
     loadRequest();
-  }, [id]);
+  }, [id, loadRequest]);
 
   const loadRequest = async () => {
     try {

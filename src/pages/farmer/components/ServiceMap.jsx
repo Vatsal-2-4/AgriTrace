@@ -97,7 +97,11 @@ const RealServiceMap = forwardRef(({ providers, userLocation, onMarkerClick, sel
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [
+	userLocation.lat,
+	userLocation.lng,
+	userLocation
+]);
 
   // Update user location marker
   useEffect(() => {

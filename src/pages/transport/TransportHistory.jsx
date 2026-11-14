@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
-import { Package, MapPin, CheckCircle, Calendar } from 'lucide-react';
+import { Package, CheckCircle, Calendar } from 'lucide-react';
 
 const TransportHistory = () => {
   const [history, setHistory] = useState([]);

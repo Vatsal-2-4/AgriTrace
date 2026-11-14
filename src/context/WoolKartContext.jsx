@@ -11,7 +11,7 @@ export const WoolKartProvider = ({ children }) => {
     try {
       const stored = localStorage.getItem('woolkart_cart');
       return stored ? JSON.parse(stored) : [];
-    } catch (e) {
+    } catch  {
       return [];
     }
   });
@@ -20,7 +20,7 @@ export const WoolKartProvider = ({ children }) => {
     try {
       const stored = localStorage.getItem('woolkart_orders');
       return stored ? JSON.parse(stored) : [];
-    } catch (e) {
+    } catch  {
       return [];
     }
   });

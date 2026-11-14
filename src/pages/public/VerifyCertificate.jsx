@@ -18,7 +18,7 @@ export default function VerifyCertificate() {
 
   useEffect(() => {
     loadCert();
-  }, [certificateId]);
+  }, [certificateId, loadCert]);
 
   const loadCert = async () => {
     try {

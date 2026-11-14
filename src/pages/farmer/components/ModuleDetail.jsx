@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -12,12 +12,9 @@ import {
   ChevronRight,
   ChevronLeft,
   Star,
-  Download,
   Share2,
   Volume2,
-  Sparkles,
-  FileCheck,
-  HelpCircle
+  FileCheck
 } from 'lucide-react';
 import { moduleData } from './moduleData';
 import QuizModal from './QuizModal';
@@ -113,7 +110,7 @@ const ModuleDetail = () => {
   const totalLessons = module.lessons.length;
   const completedCount = completedLessons.length;
   const progressPct = Math.round((completedCount / totalLessons) * 100);
-  const allDone = completedCount === totalLessons;
+  
 
   const markComplete = (lessonId) => {
     if (!completedLessons.includes(lessonId)) {

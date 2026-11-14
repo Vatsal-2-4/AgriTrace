@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, CheckCircle2, XCircle, Star, RotateCcw, Trophy, ChevronRight } from 'lucide-react';
+import { X, CheckCircle2, XCircle, RotateCcw, Trophy, ChevronRight } from 'lucide-react';
 import './QuizModal.css';
 
 const ui = {
@@ -108,7 +108,7 @@ const QuizModal = ({ module, lang = 'en', onClose, onComplete }) => {
   const score = Math.round((correctCount / questions.length) * 100);
   const passed = score >= PASS_SCORE;
 
-  const progressPct = ((currentQ) / questions.length) * 100;
+  
 
   useEffect(() => {
     if (step === 'result' && !reportedResult) {

@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useGlobalState } from '../../context/GlobalStateContext';
 import TraceabilityTimeline from '../../components/TraceabilityTimeline';
 import { 
-  ArrowLeft, Check, Play, Scissors, ShieldAlert, Award, Info, 
-  Settings, Clock, Sparkles, CheckCircle2, ChevronRight
+  ArrowLeft, Play, ShieldAlert, Info, 
+  Clock, CheckCircle2
 } from 'lucide-react';
 import './ProcessingBatchDetail.css';
 
@@ -33,7 +33,7 @@ const ProcessingBatchDetail = () => {
 
   const [operationType, setOperationType] = useState('Sorting');
   const [inputQty, setInputQty] = useState(request ? request.quantity : 0);
-  const [expectedOutput, setExpectedOutput] = useState(request ? request.quantity * 0.95 : 0);
+  const [,setExpectedOutput] = useState(request ? request.quantity * 0.95 : 0);
   const [operatorName, setOperatorName] = useState('WoolCraft Processing Centre');
   const [equipmentName, setEquipmentName] = useState('');
   const [notes, setNotes] = useState('');

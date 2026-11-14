@@ -1,7 +1,7 @@
 import { crop50Service } from '../../src/services/market/crop50Service.js';
 
 export default async function handler(req, res) {
-  const url = req.url || '';
+  
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });

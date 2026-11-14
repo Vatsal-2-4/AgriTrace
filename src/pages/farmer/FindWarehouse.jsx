@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { 
   Warehouse, MapPin, Star, ShieldCheck, ArrowRight, X, 
-  Check, Phone, Mail, Clock, Sparkles, Navigation, Send, AlertCircle
+  Check, Mail, Sparkles, Navigation, Send
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -103,7 +103,7 @@ export default function FindWarehouse() {
       const match = { lat: Number(results[0].lat), lng: Number(results[0].lon), label: results[0].display_name };
       setSearchedLocation(match);
       setLocationSearchStatus(`Showing nearest storage to ${results[0].display_name.split(',').slice(0, 2).join(',')}`);
-    } catch (_error) {
+    } catch  {
       setLocationSearchStatus('Could not search that location. Check your connection and try again.');
     } finally {
       setIsSearchingLocation(false);

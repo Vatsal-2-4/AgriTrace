@@ -7,13 +7,13 @@ import QuantityDiscrepancyModal from './components/QuantityDiscrepancyModal';
 import DispatchModal from './components/DispatchModal';
 import BatchTimelineModal from './components/BatchTimelineModal';
 import {
-  ClipboardList, Scale, CheckSquare, Factory, Truck, Package, Search, ArrowRight,
-  Clock, AlertCircle, AlertTriangle, MapPin, Zap, Layers, Sparkles
+  Scale, CheckSquare, Factory, Truck, Package, Search, ArrowRight,
+  Clock, AlertCircle, AlertTriangle, MapPin, Zap, Sparkles
 } from 'lucide-react';
 import './ProcessingDashboard.css';
 
 const ProcessingDashboard = () => {
-  const navigate = useNavigate();
+  
   const state = useGlobalState() || {};
 
   const {
@@ -21,9 +21,7 @@ const ProcessingDashboard = () => {
     updateFacilityStatus = () => {},
     processingRequests = [],
     receiveProcessingBatch = () => {},
-    startProcessingOperation = () => {},
     completeProcessingOperation = () => {},
-    markProcessingReadyToShip = () => {},
     dispatchProcessingBatch = () => {}
   } = state;
 

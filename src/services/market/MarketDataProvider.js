@@ -44,10 +44,10 @@ export class MarketDataProvider {
    * @param {number} days
    * @returns {Promise<MarketRecord[]>}
    */
-  async getHistoricalPrices(market, days) { throw new Error('Not implemented'); }
+  async getHistoricalPrices(_market, _days) { throw new Error('Not implemented'); }
 
   /** @returns {Promise<MarketRecord[]>} Arrival quantity data */
-  async getArrivals(market, days) { throw new Error('Not implemented'); }
+  async getArrivals(_market, _days) { throw new Error('Not implemented'); }
 
   /** @returns {Promise<{headline:string,summary:string,source:string,date:string,category:string}[]>} */
   async getNews() { throw new Error('Not implemented'); }

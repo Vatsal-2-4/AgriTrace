@@ -8,7 +8,6 @@ import {
   Gavel,
   Plus,
   ArrowRight,
-  TrendingUp,
   Tag
 } from 'lucide-react';
 import {

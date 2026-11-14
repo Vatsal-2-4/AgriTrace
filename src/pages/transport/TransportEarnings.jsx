@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
-import { Wallet, IndianRupee, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Wallet, IndianRupee, ArrowDownRight } from 'lucide-react';
 
 const TransportEarnings = () => {
   const [earningsData, setEarningsData] = useState(null);

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Warehouse, Boxes, Truck, Inbox, ArrowUpRight, AlertTriangle, 
-  CheckCircle2, ArrowRight, Clock, PlusCircle, QrCode
+  Boxes, Truck, Inbox, AlertTriangle, 
+  ArrowRight, Clock, QrCode
 } from 'lucide-react';
 import { useGlobalState } from '../../context/GlobalStateContext';
 
@@ -16,7 +16,7 @@ export default function WarehouseDashboard() {
   // Batches breakdown
   const incomingBatches = batches.filter(b => b.currentStage === 'TRANSPORT' || b.currentStatus?.includes('In Transit'));
   const storedBatches = batches.filter(b => b.currentStage === 'WAREHOUSE');
-  const outgoingBatches = releaseRequests.filter(r => r.status === 'Approved');
+  
   const pendingRequests = warehouseRequests.filter(r => r.status === 'Pending');
   const expiringStorage = warehouseBookings.filter(b => b.status === 'Active');
 

@@ -3,9 +3,7 @@ import { useGlobalState } from '../../context/GlobalStateContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Wallet as WalletIcon, 
-  ArrowUpRight, 
   ArrowDownRight, 
-  Clock, 
   CheckCircle,
   Building,
   Smartphone,

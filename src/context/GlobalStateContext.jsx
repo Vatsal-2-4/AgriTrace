@@ -787,122 +787,7 @@ const INITIAL_PROCESSING_RECORDS = [
 
 
 // ── Market Linkages & Price Discovery Seed Data (SIH 2026 PS 26132) ────────
-const INITIAL_WOOL_LOTS = [
-  {
-    id: 'LOT-2026-00124',
-    lotNumber: 'LOT-KA-2026-00124',
-    batchIds: ['WT-KA-2026-00124'],
-    sellerId: 'FARMER-01',
-    sellerName: 'Rajesh Gowda',
-    sellerType: 'FARMER',
-    woolType: 'Merino Cross Fleece',
-    qualityGrade: 'A',
-    qualityScore: 88,
-    fiberDiameter: 21.5,
-    origin: 'Mandya, Karnataka',
-    currentLocation: 'Mysuru Wool Storage Centre (Zone A)',
-    totalQuantity: 428,
-    availableQuantity: 428,
-    askingPrice: 450,
-    minAcceptablePrice: 430,
-    storageLocation: 'Mysuru Wool Storage Centre',
-    certificateId: 'WTC-QA-2026-00124',
-    traceabilityUrl: '/track/WT-KA-2026-00124',
-    status: 'AVAILABLE', // AVAILABLE, OFFER_RECEIVED, NEGOTIATING, SOLD, PARTIALLY_SOLD
-    availableFrom: '2026-08-15',
-    verified: true,
-    inspectionStatus: 'Certified Grade A',
-    description: 'Fresh autumn clip Merino cross fleece. Moisture certified 12%, low vegetable matter (<1.2%). Fully traceable.',
-    createdAt: '2026-08-15T12:00:00Z'
-  },
-  {
-    id: 'LOT-2026-00089',
-    lotNumber: 'LOT-RJ-2026-00089',
-    batchIds: ['WT-RJ-2026-00089'],
-    sellerId: 'FARMER-02',
-    sellerName: 'Baldev Singh',
-    sellerType: 'FARMER',
-    woolType: 'Chokla Fine Carpet Wool',
-    qualityGrade: 'A',
-    qualityScore: 91,
-    fiberDiameter: 28.5,
-    origin: 'Bikaner, Rajasthan',
-    currentLocation: 'Bikaner Wool Hub & Cold Storage',
-    totalQuantity: 650,
-    availableQuantity: 650,
-    askingPrice: 395,
-    minAcceptablePrice: 380,
-    storageLocation: 'Bikaner Wool Hub',
-    certificateId: 'WTC-QA-2026-00089',
-    traceabilityUrl: '/track/WT-RJ-2026-00089',
-    status: 'OFFER_RECEIVED',
-    availableFrom: '2026-08-05',
-    verified: true,
-    inspectionStatus: 'Certified Grade A',
-    description: 'High tensile strength Chokla carpet wool with certified clean fleece yield 76%.',
-    createdAt: '2026-08-05T14:00:00Z'
-  },
-  {
-    id: 'LOT-2026-FPO-01',
-    lotNumber: 'LOT-FPO-KA-001',
-    batchIds: ['WT-KA-2026-00124', 'WT-KA-2026-00130', 'WT-TS-2026-00077'],
-    sellerId: 'FPO-KA-01',
-    sellerName: 'Karnataka Southern Wool Growers FPO Apex',
-    sellerType: 'FPO',
-    isFpoAggregate: true,
-    contributingFarmers: [
-      { farmerId: 'FARMER-01', farmerName: 'Rajesh Gowda', quantity: 428, woolType: 'Merino Cross', grade: 'A' },
-      { farmerId: 'FARMER-01', farmerName: 'Rajesh Gowda', quantity: 320, woolType: 'Medium Crossbred', grade: 'B' },
-      { farmerId: 'FARMER-06', farmerName: 'Mallesh Kuruma', quantity: 392, woolType: 'Deccani Fleece', grade: 'B' }
-    ],
-    woolType: 'Consolidated South India Fleece (Grade A/B)',
-    qualityGrade: 'A/B Mix',
-    qualityScore: 82,
-    fiberDiameter: 23.4,
-    origin: 'Mandya & Mahabubnagar Hubs',
-    currentLocation: 'Mysuru Central Logistics Depot',
-    totalQuantity: 1140,
-    availableQuantity: 1140,
-    askingPrice: 425,
-    minAcceptablePrice: 405,
-    storageLocation: 'Mysuru Wool Storage Centre',
-    certificateId: 'WTC-QA-FPO-2026-01',
-    traceabilityUrl: '/track/WT-KA-2026-00124',
-    status: 'NEGOTIATING',
-    availableFrom: '2026-08-16',
-    verified: true,
-    inspectionStatus: 'FPO Quality Aggregated & Verified',
-    description: 'Consolidated commercial bulk lot aggregated by FPO for industrial worsted yarn & spinning mills.',
-    createdAt: '2026-08-16T09:00:00Z'
-  },
-  {
-    id: 'LOT-2026-00045',
-    lotNumber: 'LOT-HP-2026-00045',
-    batchIds: ['WT-HP-2026-00045'],
-    sellerId: 'FARMER-03',
-    sellerName: 'Sunil Thakur',
-    sellerType: 'FARMER',
-    woolType: 'Gaddi Natural White Fleece',
-    qualityGrade: 'A+',
-    qualityScore: 96,
-    fiberDiameter: 22.1,
-    origin: 'Kullu, Himachal Pradesh',
-    currentLocation: 'Kullu Artisans Depot',
-    totalQuantity: 210,
-    availableQuantity: 0,
-    askingPrice: 550,
-    minAcceptablePrice: 520,
-    storageLocation: 'Kullu Artisans Depot',
-    certificateId: 'WTC-QA-2026-00045',
-    traceabilityUrl: '/track/WT-HP-2026-00045',
-    status: 'SOLD',
-    availableFrom: '2026-07-25',
-    verified: true,
-    inspectionStatus: 'Certified Grade A+',
-    description: 'High-altitude organic Gaddi wool for GI-certified Kullu shawls.',
-    createdAt: '2026-07-25T10:00:00Z'
-  }
-];
+
 
 const INITIAL_BUYER_DEMANDS = [
   {
@@ -1045,206 +930,11 @@ const INITIAL_BUYER_DEMANDS = [
   }
 ];
 
-const INITIAL_MARKET_OFFERS = [
-  {
-    id: 'OFF-2026-0081',
-    offerNumber: 'OFF-2026-0081',
-    lotId: 'LOT-2026-00124',
-    lotNumber: 'LOT-KA-2026-00124',
-    sellerId: 'FARMER-01',
-    sellerName: 'Rajesh Gowda',
-    buyerId: 'BUYER-PU-01',
-    buyerName: 'WoolCraft Processing Centre',
-    buyerType: 'PROCESSOR',
-    woolType: 'Merino Cross Fleece',
-    qualityGrade: 'A',
-    offeredPricePerKg: 438,
-    quantityKg: 428,
-    totalGrossAmount: 187464,
-    paymentTerms: '100% WoolTrace Digital Escrow Vault',
-    deliveryTerms: 'Buyer arranges transport from Mysuru Storage Centre',
-    status: 'PENDING', // PENDING, ACCEPTED, REJECTED, COUNTERED, EXPIRED
-    validUntil: '2026-08-25T18:00:00Z',
-    history: [
-      {
-        action: 'OFFER_SUBMITTED',
-        by: 'WoolCraft Processing Centre',
-        pricePerKg: 438,
-        quantityKg: 428,
-        note: 'Initial competitive offer for full 428 KG lot with direct warehouse pickup.',
-        timestamp: '2026-08-16T14:20:00Z'
-      }
-    ],
-    createdAt: '2026-08-16T14:20:00Z'
-  },
-  {
-    id: 'OFF-2026-0082',
-    offerNumber: 'OFF-2026-0082',
-    lotId: 'LOT-2026-00089',
-    lotNumber: 'LOT-RJ-2026-00089',
-    sellerId: 'FARMER-02',
-    sellerName: 'Baldev Singh',
-    buyerId: 'BUYER-CARP-03',
-    buyerName: 'Rajasthan Carpet Mills & Rugs',
-    buyerType: 'MANUFACTURER',
-    woolType: 'Chokla Fine Carpet Wool',
-    qualityGrade: 'A',
-    offeredPricePerKg: 390,
-    quantityKg: 650,
-    totalGrossAmount: 253500,
-    paymentTerms: 'Escrow (T+3 Days)',
-    deliveryTerms: 'Drop-off at Bikaner Terminal',
-    status: 'COUNTERED',
-    validUntil: '2026-08-22T18:00:00Z',
-    history: [
-      {
-        action: 'OFFER_SUBMITTED',
-        by: 'Rajasthan Carpet Mills',
-        pricePerKg: 382,
-        quantityKg: 650,
-        note: 'Procurement offer at ₹382/KG.',
-        timestamp: '2026-08-15T10:00:00Z'
-      },
-      {
-        action: 'COUNTER_OFFER',
-        by: 'Baldev Singh (Farmer)',
-        pricePerKg: 390,
-        quantityKg: 650,
-        note: 'Counter-offered ₹390/KG based on verified Grade A yield certification.',
-        timestamp: '2026-08-15T15:30:00Z'
-      }
-    ],
-    createdAt: '2026-08-15T10:00:00Z'
-  },
-  {
-    id: 'OFF-2026-0083',
-    offerNumber: 'OFF-2026-0083',
-    lotId: 'LOT-2026-FPO-01',
-    lotNumber: 'LOT-FPO-KA-001',
-    sellerId: 'FPO-KA-01',
-    sellerName: 'Karnataka Southern Wool Growers FPO Apex',
-    buyerId: 'BUYER-EXP-04',
-    buyerName: 'Bharat Wool Global Exports',
-    buyerType: 'EXPORTER',
-    woolType: 'Consolidated South India Fleece (Grade A/B)',
-    qualityGrade: 'A/B Mix',
-    offeredPricePerKg: 420,
-    quantityKg: 1140,
-    totalGrossAmount: 478800,
-    paymentTerms: 'Platform Escrow Vault',
-    deliveryTerms: 'FPO manages containerized loading to ICD Hub',
-    status: 'ACCEPTED',
-    validUntil: '2026-08-20T18:00:00Z',
-    history: [
-      {
-        action: 'OFFER_SUBMITTED',
-        by: 'Bharat Wool Global Exports',
-        pricePerKg: 415,
-        quantityKg: 1140,
-        note: 'Bulk purchase offer for aggregated lot.',
-        timestamp: '2026-08-16T09:30:00Z'
-      },
-      {
-        action: 'COUNTER_OFFER',
-        by: 'Karnataka Wool FPO',
-        pricePerKg: 420,
-        quantityKg: 1140,
-        note: 'FPO confirmed rate at ₹420/KG.',
-        timestamp: '2026-08-16T11:00:00Z'
-      },
-      {
-        action: 'OFFER_ACCEPTED',
-        by: 'Bharat Wool Global Exports',
-        pricePerKg: 420,
-        quantityKg: 1140,
-        note: 'Agreement secured. Transaction TXN-2026-00145 initiated.',
-        timestamp: '2026-08-16T11:45:00Z'
-      }
-    ],
-    createdAt: '2026-08-16T09:30:00Z'
-  }
-];
 
-const INITIAL_MARKET_TRANSACTIONS = [
-  {
-    id: 'TXN-2026-00142',
-    transactionNumber: 'TXN-2026-00142',
-    offerId: 'OFF-2026-0065',
-    lotId: 'LOT-2026-00045',
-    lotNumber: 'LOT-HP-2026-00045',
-    batchId: 'WT-HP-2026-00045',
-    farmerId: 'FARMER-03',
-    farmerName: 'Sunil Thakur',
-    buyerId: 'BUYER-INST-02',
-    buyerName: 'Kullu Weavers Guild',
-    woolType: 'Gaddi Natural White Fleece',
-    qualityGrade: 'A+',
-    quantityKg: 210,
-    agreedPricePerKg: 550,
-    grossValue: 115500,
-    transportCost: 2500,
-    storageCost: 1050,
-    transactionFee: 1155,
-    netRealization: 110795,
-    netRealizationPerKg: 527.60,
-    deliveryStatus: 'DELIVERED', // LOGISTICS_PENDING, IN_TRANSIT, DELIVERED
-    paymentStatus: 'PAID', // PAYMENT_PENDING, IN_ESCROW, PARTIALLY_PAID, PAID
-    paidAmount: 115500,
-    outstandingAmount: 0,
-    disputeStatus: 'NONE', // NONE, OPEN, UNDER_REVIEW, RESOLVED
-    transactionDate: '2026-08-05T14:30:00Z',
-    completionDate: '2026-08-12T10:00:00Z',
-    escrowReleasedAt: '2026-08-12T10:15:00Z',
-    notes: 'Heritage batch transaction completed. Contributed to regional historical benchmark rate.'
-  },
-  {
-    id: 'TXN-2026-00145',
-    transactionNumber: 'TXN-2026-00145',
-    offerId: 'OFF-2026-0083',
-    lotId: 'LOT-2026-FPO-01',
-    lotNumber: 'LOT-FPO-KA-001',
-    batchId: 'WT-KA-2026-00124',
-    farmerId: 'FPO-KA-01',
-    farmerName: 'Karnataka Southern Wool Growers FPO Apex',
-    buyerId: 'BUYER-EXP-04',
-    buyerName: 'Bharat Wool Global Exports',
-    woolType: 'Consolidated South India Fleece (Grade A/B)',
-    qualityGrade: 'A/B Mix',
-    quantityKg: 1140,
-    agreedPricePerKg: 420,
-    grossValue: 478800,
-    transportCost: 6500,
-    storageCost: 3200,
-    transactionFee: 4788,
-    netRealization: 464312,
-    netRealizationPerKg: 407.29,
-    deliveryStatus: 'IN_TRANSIT',
-    paymentStatus: 'IN_ESCROW',
-    paidAmount: 478800,
-    outstandingAmount: 0,
-    disputeStatus: 'NONE',
-    transactionDate: '2026-08-16T12:00:00Z',
-    expectedDeliveryDate: '2026-08-22',
-    notes: 'Escrow vault locked. Freight dispatched via Rapid Farm Logistics container fleet.'
-  }
-];
 
-const INITIAL_DISPUTES = [
-  {
-    id: 'DISP-2026-0007',
-    transactionId: 'TXN-2026-00138',
-    lotNumber: 'LOT-KA-2026-00098',
-    raisedBy: 'BUYER',
-    raisedByName: 'Bengaluru Apparel Mill',
-    reasonCategory: 'Moisture Level Discrepancy',
-    description: 'Bales measured 14.8% moisture on arrival versus certified 12.0% in origin QA passport.',
-    claimedAmount: 8500,
-    status: 'RESOLVED', // OPEN, UNDER_REVIEW, RESOLVED, REJECTED, CLOSED
-    resolutionNote: 'Joint lab re-test confirmed ambient transit humidity spike. Transporter covered differential drying allowance ₹4,200.',
-    resolvedAt: '2026-08-14T16:00:00Z',
-    createdAt: '2026-08-11T09:00:00Z'
-  }
-];
+
+
+
 
 const SIH_INITIAL_LOTS = [
   {
@@ -1297,7 +987,7 @@ const loadSihMarketRecords = (key, fallback) => {
     const stored = JSON.parse(localStorage.getItem(key) || '[]');
     const clean = Array.isArray(stored) ? stored.filter(record => !isLegacyWoolRecord(record)) : [];
     return clean.length ? clean : fallback;
-  } catch (_error) {
+  } catch  {
     return fallback;
   }
 };
@@ -1810,7 +1500,7 @@ export const GlobalStateProvider = ({ children }) => {
         if (remote.transactions.length) setMarketTransactions(local => mergeRemote(local, remote.transactions));
         if (remote.disputes.length) setDisputes(local => mergeRemote(local, remote.disputes));
         setMarketSyncStatus('online');
-      } catch (error) {
+      } catch  {
         if (!cancelled) setMarketSyncStatus('offline');
       }
     };

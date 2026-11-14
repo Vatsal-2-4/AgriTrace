@@ -105,7 +105,7 @@ export const agmarknetService = {
         const data = json.output?.data || json.commodities || json;
         if (Array.isArray(data) && data.length > 0) return withSource(data, 'ceda');
       }
-    } catch (_e) {
+    } catch  {
       console.warn('CEDA commodities fetch bypassed, using standard Mandi commodities dataset');
     }
     return MOCK_COMMODITIES;
@@ -119,7 +119,7 @@ export const agmarknetService = {
         const data = json.output?.data || json;
         if (Array.isArray(data) && data.length > 0) return withSource(data, 'ceda');
       }
-    } catch (_e) {
+    } catch  {
       console.warn('CEDA geographies fetch bypassed, using standard Mandi states');
     }
     return MOCK_GEOGRAPHIES;
@@ -137,7 +137,7 @@ export const agmarknetService = {
         const data = json.output?.data || json;
         if (Array.isArray(data) && data.length > 0) return data;
       }
-    } catch (_e) {
+    } catch  {
       console.warn('CEDA markets fetch bypassed, using standard APMC markets list');
     }
 
@@ -171,7 +171,7 @@ export const agmarknetService = {
         const data = json.output?.data || json;
         if (Array.isArray(data) && data.length > 0) return withSource(data, 'ceda');
       }
-    } catch (_e) {
+    } catch  {
       console.warn('CEDA prices fetch bypassed, using high-resolution Mandi price history dataset');
     }
 

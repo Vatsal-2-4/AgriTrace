@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { qaService } from '../../services/qa/qaService';
-import { Award, Search, Eye, Download } from 'lucide-react';
+import { Search, Eye, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Certificates() {
-  const navigate = useNavigate();
+  
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
 

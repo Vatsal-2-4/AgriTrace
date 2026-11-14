@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Package, MapPin, Truck, Calendar, Check, X, FileText, IndianRupee } from 'lucide-react';
+import { Package, Truck, Check, X, FileText, IndianRupee } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
 
