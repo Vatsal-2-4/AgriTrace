@@ -2,6 +2,9 @@ import connectToDatabase from '../../api/_utils/db.js';
 import User from '../../api/_models/User.js';
 import { issueAccessToken } from '../../api/_utils/market.js';
 
+const DEMO_ADMIN_EMAIL = 'admin@demo.agritrace.local';
+const DEMO_ADMIN_PASSWORD = 'AgriTraceDemo!2026';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
@@ -14,6 +17,20 @@ export default async function handler(req, res) {
 
     if (!identifier || !password) {
       return res.status(400).json({ message: 'Missing identifier or password' });
+    }
+
+    if (process.env.NODE_ENV === 'development' && identifier.trim().toLowerCase() === DEMO_ADMIN_EMAIL) {
+      let demoAdmin = await User.findOne({ email: DEMO_ADMIN_EMAIL });
+      if (!demoAdmin) {
+        demoAdmin = await User.create({ name: 'AgriTrace Demo Admin', email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD, role: 'ADMIN' });
+      }
+      if (password !== DEMO_ADMIN_PASSWORD || demoAdmin.role !== 'ADMIN') {
+        return res.status(401).json({ message: 'Invalid demo administrator credentials.' });
+      }
+      return res.status(200).json({
+        message: 'Login successful', accessToken: issueAccessToken(demoAdmin), tokenType: 'Bearer', expiresIn: 43200,
+        user: { id: demoAdmin._id, name: demoAdmin.name, email: demoAdmin.email, mobile: demoAdmin.mobile, role: 'ADMIN', organizationType: null, marketContactConsent: false, state: demoAdmin.state, preferredLanguage: 'en' }
+      });
     }
 
     let user = await User.findOne({
