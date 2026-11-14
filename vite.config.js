@@ -16,6 +16,7 @@ import warehouseHandler from './api/warehouse.js';
 import coreHandler from './api/core.js';
 import batchesHandler from './api/batches.js';
 import adminHandler from './api/admin.js';
+import adminTrackingHandler from './api/admin/tracking.js';
 
 const LOCAL_HANDLERS = [
   ['/api/ai/market-advisor', marketAdvisorHandler],
@@ -33,6 +34,7 @@ const LOCAL_HANDLERS = [
   ['/api/processing', processingHandler],
   ['/api/transport', transportHandler],
   ['/api/warehouse', warehouseHandler],
+  ['/api/admin/tracking', adminTrackingHandler],
   ['/api/admin', adminHandler]
 ];
 
