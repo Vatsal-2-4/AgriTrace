@@ -8,5 +8,6 @@ const marketRecordSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 marketRecordSchema.index({ kind: 1, recordId: 1 }, { unique: true });
+marketRecordSchema.index({ kind: 1, 'payload.cropId': 1, 'payload.status': 1, 'payload.location.state': 1 });
 
 export default mongoose.models.MarketRecord || mongoose.model('MarketRecord', marketRecordSchema);

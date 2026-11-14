@@ -24,6 +24,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: 'FARMER',
   },
+  organizationType: {
+    type: String,
+    enum: ['retailer', 'wholesaler', 'processor', 'other'],
+    default: null,
+  },
   preferredLanguage: {
     type: String,
     default: 'en',
