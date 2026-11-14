@@ -19,9 +19,8 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { useAuth } from '../../context/AuthContext';
-import { useGlobalState } from '../../context/GlobalStateContext';
-
+import { useAuth } from '../../context/useAuth.js';
+import { useGlobalState } from '../../context/useGlobalState.js';
 const salesData = [
   { name: 'Jan', revenue: 15000 },
   { name: 'Feb', revenue: 22000 },

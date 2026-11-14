@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import { COMMODITIES } from '../../services/market/marketIntelligenceService';
 import { marketplaceApi, marketplaceErrorMessage } from '../../services/market/marketplaceApi';
 import MarketplaceContactConsent from '../market/MarketplaceContactConsent';

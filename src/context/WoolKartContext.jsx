@@ -1,10 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-const WoolKartContext = createContext();
-
-export const useWoolKart = () => {
-  return useContext(WoolKartContext);
-};
+import React, { useState, useEffect } from 'react';
+import { WoolKartContext } from './WoolKartContextValue.js';
 
 export const WoolKartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {

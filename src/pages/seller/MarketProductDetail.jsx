@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, Heart, Info, Star, Package, MapPin } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useWoolKart } from '../../context/WoolKartContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useWoolKart } from '../../context/useWoolKart.js';
 import TraceabilityTimeline from '../../components/TraceabilityTimeline';
 
 export default function MarketProductDetail() {

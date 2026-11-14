@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ShieldCheck, CheckCircle2, Box } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
 import TraceabilityTimeline from '../../components/TraceabilityTimeline';
 import { qaService } from '../../services/qa/qaService';
 import './PublicTrackBatch.css';

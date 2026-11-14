@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { qaService } from '../../services/qa/qaService';
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import { notificationService } from '../../services/notificationService';
 
 export default function InspectionDetail() {
@@ -28,11 +28,7 @@ export default function InspectionDetail() {
     remarks: ''
   });
 
-  useEffect(() => {
-    loadRequest();
-  }, [id, loadRequest]);
-
-  const loadRequest = async () => {
+  const loadRequest = useCallback(async () => {
     try {
       const data = await qaService.getRequestById(id);
       setRequest(data);
@@ -41,7 +37,11 @@ export default function InspectionDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadRequest();
+  }, [loadRequest]);
 
   const handleApprove = async () => {
     if (!form.grade || !form.overallScore) {

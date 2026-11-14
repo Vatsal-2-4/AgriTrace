@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { 
   ArrowLeft, CheckCircle, Truck, Package, ShieldCheck, 
   MapPin, Star, FileText, Download, Building

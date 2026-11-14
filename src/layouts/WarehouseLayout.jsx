@@ -4,8 +4,8 @@ import {
   LayoutDashboard, QrCode, Boxes, Inbox, ArrowUpRight, 
   LogOut, Warehouse, Menu, X
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useGlobalState } from '../context/GlobalStateContext';
+import { useAuth } from '../context/useAuth.js';
+import { useGlobalState } from '../context/useGlobalState.js';
 import UserRoleDropdown from '../components/UserRoleDropdown';
 import './WarehouseLayout.css';
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2, MessageCircle, Send, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth.js';
 import './MarketChatbot.css';
 
 const LANGUAGE_NAMES = { en: 'English', hi: 'Hindi', bn: 'Bengali', mr: 'Marathi', te: 'Telugu', ta: 'Tamil', gu: 'Gujarati', kn: 'Kannada', ml: 'Malayalam', pa: 'Punjabi', or: 'Odia' };

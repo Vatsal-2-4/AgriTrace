@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { qaService } from '../../services/qa/qaService';
 import { ShieldCheck, CheckCircle, ShieldAlert, Check } from 'lucide-react';
@@ -16,11 +16,7 @@ export default function VerifyCertificate() {
   const [cert, setCert] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadCert();
-  }, [certificateId, loadCert]);
-
-  const loadCert = async () => {
+  const loadCert = useCallback(async () => {
     try {
       const data = await qaService.getCertificate(certificateId);
       setCert(data);
@@ -29,7 +25,11 @@ export default function VerifyCertificate() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [certificateId]);
+
+  useEffect(() => {
+    loadCert();
+  }, [loadCert]);
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Loading Certificate Details...</div>;
   

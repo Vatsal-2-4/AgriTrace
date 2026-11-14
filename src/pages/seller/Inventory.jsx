@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { Package, Search, Filter, Plus, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

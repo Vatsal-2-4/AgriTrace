@@ -8,8 +8,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { COMMODITIES, getCommodityById } from '../../services/market/cropCommodityRegistry';
 import { calculateNetRealization, getMarketChannelsForCommodity } from '../../services/market/marketIntelligenceService';
 import { calculateMatchScore } from '../../services/market/matchingEngine';

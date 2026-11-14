@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Boxes, Search, Edit3, ArrowUpRight, MapPin, X, Save
+  Boxes, Search, Edit3, ArrowUpRight, X, Save
 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-
+import { useGlobalState } from '../../context/useGlobalState.js';
 export default function WarehouseInventory() {
   const { batches, assignStorageLocation } = useGlobalState();
   const [searchQuery, setSearchQuery] = useState('');

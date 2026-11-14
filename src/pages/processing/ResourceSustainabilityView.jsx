@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useGlobalState } from "../../context/GlobalStateContext";
+import { useGlobalState } from "../../context/useGlobalState.js";
 import ResourceKPIGrid from "./components/ResourceKPIGrid";
 import StageResourceAnalysis from "./components/StageResourceAnalysis";
 import ResourceAnalyticsCharts from "./components/ResourceAnalyticsCharts";

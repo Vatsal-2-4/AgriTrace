@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Bell, CheckCircle2, ExternalLink, LoaderCircle, Send, Unplug } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import { notificationService } from '../../services/notificationService';
 import { getRoleHome } from '../../utils/roleRoutes';
 import './NotificationsSettings.css';

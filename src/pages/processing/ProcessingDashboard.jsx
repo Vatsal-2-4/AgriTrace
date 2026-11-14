@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useGlobalState } from '../../context/GlobalStateContext';
+
+import { useGlobalState } from '../../context/useGlobalState.js';
 import { processingService } from '../../services/processing/processingService';
 import ProcessingMap from './components/ProcessingMap';
 import QuantityDiscrepancyModal from './components/QuantityDiscrepancyModal';
@@ -21,7 +21,6 @@ const ProcessingDashboard = () => {
     updateFacilityStatus = () => {},
     processingRequests = [],
     receiveProcessingBatch = () => {},
-    completeProcessingOperation = () => {},
     dispatchProcessingBatch = () => {}
   } = state;
 

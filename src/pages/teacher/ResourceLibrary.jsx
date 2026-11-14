@@ -15,7 +15,7 @@ import {
   Video,
   X,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import {
   RESOURCE_CATEGORIES,
   RESOURCE_REGIONS,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, MapPin, Truck, ShieldCheck, Heart } from 'lucide-react';
 import { MOCK_PRODUCTS } from './mockData';
-import { useWoolKart } from '../../../context/WoolKartContext';
+import { useWoolKart } from '../../../context/useWoolKart.js';
 import './WoolKartStyles.css';
 
 const ProductDetail = () => {

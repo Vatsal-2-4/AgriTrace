@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, CheckCircle, Navigation, Package, Phone } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
 import { notificationService } from '../../services/notificationService';
 
@@ -15,9 +15,10 @@ const ShipmentDetail = () => {
   const [updating, setUpdating] = useState(false);
   const [deliveryNotes, setDeliveryNotes] = useState('');
 
-  const fetchShipment = async () => {
+  const transporterId = user?._id || user?.id || 'demo';
+  const fetchShipment = useCallback(async () => {
     try {
-      const response = await fetch(`/api/transport/shipments?transporterId=${user?._id || user?.id || 'demo'}`);
+      const response = await fetch(`/api/transport/shipments?transporterId=${transporterId}`);
       if (response.ok) {
         const data = await response.json();
         const found = data.find(s => s._id === id);
@@ -28,15 +29,11 @@ const ShipmentDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, transporterId]);
 
   useEffect(() => {
     fetchShipment();
-  }, [
-	id,
-	user,
-	fetchShipment
-]);
+  }, [fetchShipment]);
 
   const updateStatus = async (newStatus, extraData = {}) => {
     setUpdating(true);

@@ -3,7 +3,7 @@ import { X, Award, Printer, Share2, CheckCircle } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import './CertificateModal.css';
 
-const CertificateModal = ({ module, quizResult, lang = 'en', onClose }) => {
+const CertificateModal = ({ module, quizResult, onClose }) => {
   const certRef = useRef(null);
   const user = (() => {
     try { return JSON.parse(localStorage.getItem('wooltrace_user')) || {}; }

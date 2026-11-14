@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
 import { Package, CheckCircle, Calendar } from 'lucide-react';
 

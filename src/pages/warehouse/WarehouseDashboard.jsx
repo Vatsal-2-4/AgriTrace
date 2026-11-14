@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Boxes, Truck, Inbox, AlertTriangle, 
-  ArrowRight, Clock, QrCode
+  Boxes, Truck, Inbox, Clock, QrCode
 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-
+import { useGlobalState } from '../../context/useGlobalState.js';
 export default function WarehouseDashboard() {
   const { 
-    warehouses, batches, warehouseBookings, warehouseRequests, releaseRequests 
+    warehouses, batches, warehouseBookings, warehouseRequests
   } = useGlobalState();
 
   const currentWh = warehouses.find(w => w.id === 'WH-01') || warehouses[0];

@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/useAuth.js';
 import { GlobalStateProvider } from './context/GlobalStateContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import WoolCloudLoader from './components/WoolCloudLoader';

@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { 
   Warehouse, MapPin, Star, ShieldCheck, ArrowRight, X, 
-  Check, Mail, Sparkles, Navigation, Send
+  Check, Navigation, Send
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useGlobalState } from '../../context/GlobalStateContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
 import './FindWarehouse.css';
 
 // Fix Leaflet Default Marker Icons

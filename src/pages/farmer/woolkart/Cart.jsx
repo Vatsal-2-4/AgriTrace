@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
-import { useWoolKart } from '../../../context/WoolKartContext';
+import { useWoolKart } from '../../../context/useWoolKart.js';
 import './WoolKartStyles.css';
 
 const Cart = () => {

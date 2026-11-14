@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { 
   Wallet as WalletIcon, 
-  ArrowDownRight, 
   CheckCircle,
   Building,
   Smartphone,

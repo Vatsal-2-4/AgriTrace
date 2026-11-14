@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { COMMODITIES, COMMODITY_CATEGORIES, getCommodityById } from '../../services/market/cropCommodityRegistry';
 import { 
   Box, 
   Plus, 
   MapPin, 
   CheckCircle2, 
-  QrCode, 
-  Printer,
-  Layers,
-  Warehouse,
-  Calendar,
+  QrCode,
   Target
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
@@ -37,7 +33,6 @@ const MyWool = () => {
   const [qualityGrade, setQualityGrade] = useState('A');
   const [harvestDate, setHarvestDate] = useState(new Date().toISOString().split('T')[0]);
   const [qualityAttributes, setQualityAttributes] = useState({});
-  const [,setStorageType] = useState('DRY_SILO');
 
   const selectedCommodity = getCommodityById(selectedCropId);
 

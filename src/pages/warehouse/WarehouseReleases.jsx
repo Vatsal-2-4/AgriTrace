@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  ArrowUpRight, Check, PackageCheck, Boxes, ShieldCheck, Plus, X, Truck
+  ArrowUpRight, Check, PackageCheck, ShieldCheck, Plus, X
 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-
+import { useGlobalState } from '../../context/useGlobalState.js';
 export default function WarehouseReleases() {
   const { batches, releaseRequests, requestBatchRelease, approveBatchRelease } = useGlobalState();
   const [apiReleases, setApiReleases] = useState(null);

@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  Inbox, Check, X, AlertCircle, Calendar, User
+  Inbox, Check, X
 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-
+import { useGlobalState } from '../../context/useGlobalState.js';
 export default function WarehouseRequests() {
   const { warehouseRequests, respondStorageRequest } = useGlobalState();
   const [rejectingRequestId, setRejectingRequestId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
-  const [,setSelectedRequestDetails] = useState(null);
-
   const handleAccept = (reqId) => {
     respondStorageRequest(reqId, 'ACCEPT');
   };

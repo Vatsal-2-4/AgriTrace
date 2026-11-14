@@ -34,7 +34,7 @@ import {
   Star,
 } from 'lucide-react';
 import { moduleData } from './components/moduleData';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import {
   RESOURCE_CATEGORIES,
   RESOURCE_REGIONS,

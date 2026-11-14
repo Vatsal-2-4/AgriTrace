@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { qaService } from '../../services/qa/qaService';
-import { Search, Eye, Download } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Eye, Download } from 'lucide-react';
+
 
 export default function Certificates() {
   
@@ -17,9 +16,6 @@ export default function Certificates() {
       const userStr = localStorage.getItem('wooltrace_user');
       const user = userStr ? JSON.parse(userStr) : { id: 'QA-01' };
       
-      const data = await qaService.getRequests(); // We will fetch all and filter, or if there is a getCertificates method in qaService.
-      // Wait, qaService has `getCertificate(id)` and `getCertificateByBatch(batchId)`. 
-      // I should add `getAllCertificates` or just fetch from `/api/qa/certificates`.
       const res = await fetch(`/api/qa/certificates?inspectorId=${user.id}`);
       const result = await res.json();
       if(result.success) {

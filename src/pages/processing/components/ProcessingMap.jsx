@@ -63,6 +63,12 @@ const createCustomIcon = (type, isSelected = false) => {
   });
 };
 
+const WAREHOUSES_LIST = [
+  { id: 'WH-01', name: 'Mysuru Warehouse', lat: 12.3050, lng: 76.6500, distance: '48.2 KM' },
+  { id: 'WH-02', name: 'Mandya Warehouse', lat: 12.5220, lng: 76.8980, distance: '64.5 KM' },
+  { id: 'WH-03', name: 'Hassan Wool Depot', lat: 13.0069, lng: 76.1017, distance: '112.0 KM' }
+];
+
 const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -91,15 +97,11 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
     r && ['READY_TO_SHIP', 'DISPATCHED', 'DELIVERED'].includes(r.status)
   );
 
-  const warehousesList = [
-    { id: 'WH-01', name: 'Mysuru Warehouse', lat: 12.3050, lng: 76.6500, distance: '48.2 KM' },
-    { id: 'WH-02', name: 'Mandya Warehouse', lat: 12.5220, lng: 76.8980, distance: '64.5 KM' },
-    { id: 'WH-03', name: 'Hassan Wool Depot', lat: 13.0069, lng: 76.1017, distance: '112.0 KM' }
-  ];
-
   // Initialize Leaflet Map safely (handling React 18/19 StrictMode double-rendering)
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
+    let mapInstance = null;
 
     try {
       if (mapRef.current) {
@@ -107,16 +109,17 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
         mapRef.current = null;
       }
 
-      if (mapContainerRef.current._leaflet_id) {
-        mapContainerRef.current._leaflet_id = null;
+      if (container._leaflet_id) {
+        container._leaflet_id = null;
       }
 
       const center = [facility?.lat || 12.2958, facility?.lng || 76.6394];
-      const map = L.map(mapContainerRef.current, {
+      const map = L.map(container, {
         center,
         zoom: 11,
         zoomControl: true
       });
+      mapInstance = map;
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors | CEDA Spatial Intelligence',
@@ -131,15 +134,13 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
     }
 
     return () => {
-      if (mapRef.current) {
+      if (mapInstance) {
         try {
-          mapRef.current.remove();
+          mapInstance.remove();
         } catch  {}
-        mapRef.current = null;
+        if (mapRef.current === mapInstance) mapRef.current = null;
       }
-      if (mapContainerRef.current) {
-        mapContainerRef.current._leaflet_id = null;
-      }
+      container._leaflet_id = null;
     };
   }, [facility]);
 
@@ -181,7 +182,7 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
 
       // 2. Warehouses
       if (layers.warehouses) {
-        warehousesList.forEach(wh => {
+        WAREHOUSES_LIST.forEach(wh => {
           const whMarker = L.marker([wh.lat, wh.lng], { icon: createCustomIcon('WAREHOUSE') })
             .addTo(map)
             .bindPopup(`
@@ -297,7 +298,6 @@ const ProcessingMap = ({ facility, requests = [], onSelectBatch }) => {
 	facility,
 	onSelectBatch,
 	incomingBatches,
-	warehousesList,
 	outgoingBatches
 ]);
 

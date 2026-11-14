@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import LotQualityPanel from '../../components/LotQualityPanel';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import {
   COMMODITIES,
   COMMODITY_CATEGORIES,
@@ -45,6 +45,8 @@ import {
 } from 'lucide-react';
 import './Market.css';
 
+const VALID_MARKET_VIEWS = ['overview', 'discovery', 'trends', 'buyers', 'lots', 'offers', 'transactions', 'disputes'];
+
 export default function Market() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -53,7 +55,6 @@ export default function Market() {
 
   const {
     batches = [],
-    buyerDemands = [],
     marketOffers = [],
     marketTransactions = [],
     disputes = [],
@@ -64,8 +65,7 @@ export default function Market() {
     raiseTransactionDispute = () => {}
   } = useGlobalState();
 
-  const validViews = ['overview', 'discovery', 'trends', 'buyers', 'lots', 'offers', 'transactions', 'disputes'];
-  const routeTab = validViews.includes(routeView) ? routeView : null;
+  const routeTab = VALID_MARKET_VIEWS.includes(routeView) ? routeView : null;
   const [activeTab, setActiveTab] = useState(routeTab || searchParams.get('tab') || 'overview');
   const openTab = (tab) => {
     setActiveTab(tab);
@@ -89,15 +89,14 @@ export default function Market() {
 
   useEffect(() => {
     const legacyTab = searchParams.get('tab');
-    if (!routeTab && validViews.includes(legacyTab)) {
+    if (!routeTab && VALID_MARKET_VIEWS.includes(legacyTab)) {
       const crop = searchParams.get('crop') || 'WHEAT';
       navigate(`/farmer/market/${legacyTab}?crop=${crop}`, { replace: true });
     }
   }, [
 	navigate,
 	routeTab,
-	searchParams,
-	validViews
+	searchParams
 ]);
   
   // Commodity & Category Selector State
@@ -135,7 +134,12 @@ export default function Market() {
   const [marketplaceLots, setMarketplaceLots] = useState([]);
   const [marketplaceDemands, setMarketplaceDemands] = useState([]);
   const [marketplaceBids, setMarketplaceBids] = useState([]);
-  const refreshMarketplace = async () => {
+  const showToast = useCallback((msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 4000);
+  }, []);
+
+  const refreshMarketplace = useCallback(async () => {
     try {
       const [lots, demands] = await Promise.all([marketplaceApi.listLots(), marketplaceApi.listDemands()]);
       setMarketplaceLots(lots.filter(lot => lot.lotId && lot.cropId !== 'WOOL'));
@@ -144,12 +148,12 @@ export default function Market() {
       const bidGroups = await Promise.all(ownedLots.map(lot => marketplaceApi.listBids(lot.lotId).catch(() => [])));
       setMarketplaceBids(bidGroups.flat());
     } catch (error) { if (error.status !== 401) showToast(marketplaceErrorMessage(error)); }
-  };
+  }, [user?.id, showToast]);
   useEffect(() => {
     refreshMarketplace();
     const interval = window.setInterval(refreshMarketplace, 15000);
     return () => window.clearInterval(interval);
-  }, [user?.id, refreshMarketplace]);
+  }, [refreshMarketplace]);
   const [lotUnit, setLotUnit] = useState(selectedCommodityId === 'WHEAT' ? 'KG' : getCommodityById(selectedCommodityId).defaultUnit || 'KG');
   const [lotCropId, setLotCropId] = useState(selectedCommodityId);
   const lotCommodity = getCommodityById(lotCropId);
@@ -178,11 +182,6 @@ export default function Market() {
 	selectedCommodity.varieties,
 	selectedCommodity.varieties.length
 ]);
-
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 4000);
-  };
 
   const rawChannels = getMarketChannelsForCommodity(selectedCommodityId, selectedVariety, selectedGrade);
   const channelsComparison = rawChannels.map(ch => {

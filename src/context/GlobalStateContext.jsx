@@ -1,15 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchMarketRecords, upsertMarketRecord } from '../services/market/marketRecordsService.js';
 import { notificationService } from '../services/notificationService.js';
-
-const GlobalStateContext = createContext();
+import { GlobalStateContext } from './GlobalStateContextValue.js';
 
 const currentSessionUser = () => {
   try { return JSON.parse(localStorage.getItem('khetsetu_user') || localStorage.getItem('wooltrace_user') || 'null'); }
   catch { return null; }
 };
-
-export const useGlobalState = () => useContext(GlobalStateContext);
 
 const toNonNegativeNumber = (value, fallback = 0) => {
   const number = Number(value);

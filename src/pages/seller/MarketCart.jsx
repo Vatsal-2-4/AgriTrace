@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, Package } from 'lucide-react';
-import { useWoolKart } from '../../context/WoolKartContext';
-
+import { useWoolKart } from '../../context/useWoolKart.js';
 export default function MarketCart() {
   const navigate = useNavigate();
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useWoolKart();

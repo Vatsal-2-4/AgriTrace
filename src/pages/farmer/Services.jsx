@@ -1,8 +1,8 @@
-import { useGlobalState } from '../../context/GlobalStateContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck, Warehouse, Truck, Scissors, Star, MapPin,
-  ClipboardList, Navigation, Locate, Search, X, CheckCircle2
+  ClipboardList, Navigation, Locate, Search, X
 } from 'lucide-react';
 import './Services.css';
 import RealServiceMap from './components/ServiceMap';

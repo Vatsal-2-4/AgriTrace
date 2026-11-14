@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, ChevronDown, Check, LogOut, Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell, Gauge
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth.js';
 import './UserRoleDropdown.css';
 
 const ROLES_LIST = [

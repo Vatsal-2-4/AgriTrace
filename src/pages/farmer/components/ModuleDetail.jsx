@@ -12,9 +12,7 @@ import {
   ChevronRight,
   ChevronLeft,
   Star,
-  Share2,
-  Volume2,
-  FileCheck
+  Volume2
 } from 'lucide-react';
 import { moduleData } from './moduleData';
 import QuizModal from './QuizModal';

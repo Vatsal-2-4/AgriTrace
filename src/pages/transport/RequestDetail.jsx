@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Package, Truck, Check, X, FileText, IndianRupee } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Package, Check, X, FileText, IndianRupee } from 'lucide-react';
+import { useAuth } from '../../context/useAuth.js';
 import WoolCloudLoader from '../../components/WoolCloudLoader';
 
 const RequestDetail = () => {

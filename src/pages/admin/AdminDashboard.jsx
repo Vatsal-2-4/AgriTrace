@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, ArrowUpRight, Bell, Building2, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, FileText, Filter, LayoutDashboard, Leaf, MapPin, Menu, MoreHorizontal, RefreshCw, Search, Settings, ShieldCheck, ShoppingCart, Truck, Users, Warehouse, X } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import AdminSupplyChain from './AdminSupplyChain';
 import './AdminDashboard.css';
 

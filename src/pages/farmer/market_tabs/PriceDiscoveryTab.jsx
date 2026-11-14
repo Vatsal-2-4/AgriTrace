@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calculator, ArrowRight, Truck, Warehouse, ChevronRight } from 'lucide-react';
+import { Calculator, ArrowRight, Truck, Warehouse } from 'lucide-react';
 import { getCommodityById } from '../../../services/market/cropCommodityRegistry';
 import { DEMO_MARKET_CONTEXT } from '../../../services/market/marketContracts';
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
 import { Leaf, LayoutDashboard, Bell, Menu, X, LogOut, Factory, Truck, AlertTriangle, CheckCircle, Package } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth.js';
 import UserRoleDropdown from '../components/UserRoleDropdown';
 import './ProcessingLayout.css';
 

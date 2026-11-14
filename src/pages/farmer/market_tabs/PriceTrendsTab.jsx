@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { BarChart2, ShieldCheck } from 'lucide-react';
+import { BarChart2 } from 'lucide-react';
 import { getCommodityById } from '../../../services/market/cropCommodityRegistry';
 
 export default function PriceTrendsTab({

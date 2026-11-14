@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Search, Box, MapPin, QrCode, ExternalLink, 
-  ArrowRight, CheckCircle, Warehouse, X
+  ArrowRight, X
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
-import { useGlobalState } from '../../context/GlobalStateContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
 import TraceabilityTimeline from '../../components/TraceabilityTimeline';
 import './TrackWool.css';
 

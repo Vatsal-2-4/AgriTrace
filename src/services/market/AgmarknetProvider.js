@@ -32,7 +32,7 @@ export class AgmarknetProvider extends MarketDataProvider {
     };
   }
 
-  async getCurrentPrices({ variety = 'Medium', state, market } = {}) {
+  async getCurrentPrices() {
     // TODO: implement after API key is available
     // const res = await fetch(`${PROXY_BASE}/prices?commodity=Wool&variety=${variety}&state=${state || ''}`);
     // const data = await res.json();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, Globe, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 import { getRoleHome } from '../../utils/roleRoutes';
 import './Login.css';
 import { applyPageLanguage, getSavedLanguage, saveLanguage, SUPPORTED_LANGUAGES } from '../../utils/languagePreference';

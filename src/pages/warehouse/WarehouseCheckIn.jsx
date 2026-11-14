@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserQRCodeReader } from '@zxing/browser';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
-  QrCode, Search, CheckCircle2, Truck, Warehouse, ArrowRight, AlertCircle, MapPin, Check
+  QrCode, Search, CheckCircle2, ArrowRight, AlertCircle, Check
 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { notificationService } from '../../services/notificationService';
 import './WarehouseCheckIn.css';
 
 export default function WarehouseCheckIn() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { batches, certificates, transportJobs, warehouseBookings, checkInBatch, assignStorageLocation } = useGlobalState();
+  const { batches, certificates, warehouseBookings, checkInBatch, assignStorageLocation } = useGlobalState();
   const { user } = useAuth();
 
   const defaultId = searchParams.get('id') || 'WT-KA-2026-00130';
@@ -31,17 +31,7 @@ export default function WarehouseCheckIn() {
   const [section, setSection] = useState('04');
   const [position, setPosition] = useState('B');
 
-  useEffect(() => {
-    if (inputBatchId) {
-      handleLookup(inputBatchId);
-    }
-  }, [
-	inputBatchId,
-	batches,
-	handleLookup
-]);
-
-  const handleLookup = (id) => {
+  const handleLookup = useCallback((id) => {
     const normalizedId = String(id || '').trim().toLowerCase();
     const found = batches.find(b => 
       String(b.id || '').trim().toLowerCase() === normalizedId ||
@@ -49,7 +39,11 @@ export default function WarehouseCheckIn() {
     );
     setActiveBatch(found || null);
     setCheckInSuccess(false);
-  };
+  }, [batches]);
+
+  useEffect(() => {
+    if (inputBatchId) handleLookup(inputBatchId);
+  }, [inputBatchId, handleLookup]);
 
   const stopScanner = () => {
     scannerControlsRef.current?.stop?.();

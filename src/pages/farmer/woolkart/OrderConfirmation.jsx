@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
-import { useWoolKart } from '../../../context/WoolKartContext';
+import { useWoolKart } from '../../../context/useWoolKart.js';
 import './WoolKartStyles.css';
 
 const OrderConfirmation = () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building, MapPin, CheckCircle2, ArrowRight, Target } from 'lucide-react';
+import { Building, MapPin, ArrowRight, Target } from 'lucide-react';
 import { getCommodityById } from '../../../services/market/cropCommodityRegistry';
 
 export default function BuyerDiscoveryTab({

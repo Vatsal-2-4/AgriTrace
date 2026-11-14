@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import { 
   QrCode, ArrowLeft, CheckCircle, ShieldAlert, 
-  FileText, MapPin, Sparkles, Printer, Eye
+  FileText, Printer, Eye
 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import TraceabilityTimeline from '../../components/TraceabilityTimeline';
 import { qaService } from '../../services/qa/qaService';
 import './BatchDetail.css';

@@ -3,7 +3,7 @@ import {
   Sprout, ShieldCheck, Store, Truck, Warehouse, Cog,
   CheckCircle2, Clock, MapPin, User, QrCode
 } from 'lucide-react';
-import { useGlobalState } from '../context/GlobalStateContext';
+import { useGlobalState } from '../context/useGlobalState.js';
 import { qaService } from '../services/qa/qaService';
 import { buildWoolProvenanceEvents, getCurrentStageFromEvents } from '../services/traceability/woolProvenanceService';
 import './TraceabilityTimeline.css';

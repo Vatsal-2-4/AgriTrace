@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGlobalState } from '../../context/GlobalStateContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
 import TraceabilityTimeline from '../../components/TraceabilityTimeline';
 import { 
-  ArrowLeft, Play, ShieldAlert, Info, 
-  Clock, CheckCircle2
+  ArrowLeft, Play, ShieldAlert, CheckCircle2
 } from 'lucide-react';
 import './ProcessingBatchDetail.css';
 

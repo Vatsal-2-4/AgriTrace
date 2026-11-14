@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShieldCheck, ChevronDown, Check, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useWoolKart } from '../../context/WoolKartContext';
-import { useAuth } from '../../context/AuthContext';
-
+import { Search, ShieldCheck, Check, Layers, CheckCircle2 } from 'lucide-react';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useWoolKart } from '../../context/useWoolKart.js';
+import { useAuth } from '../../context/useAuth.js';
 export default function Marketplace() {
   const navigate = useNavigate();
   const { user } = useAuth();

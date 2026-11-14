@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, Lock } from 'lucide-react';
-import { useWoolKart } from '../../context/WoolKartContext';
-import { useGlobalState } from '../../context/GlobalStateContext';
-
+import { useWoolKart } from '../../context/useWoolKart.js';
+import { useGlobalState } from '../../context/useGlobalState.js';
 export default function MarketCheckout() {
   const navigate = useNavigate();
   const { cartItems, cartTotal, clearCart } = useWoolKart();

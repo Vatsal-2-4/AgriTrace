@@ -23,8 +23,8 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { useGlobalState } from '../../context/GlobalStateContext';
-import { useAuth } from '../../context/AuthContext';
+import { useGlobalState } from '../../context/useGlobalState.js';
+import { useAuth } from '../../context/useAuth.js';
 import { COMMODITIES, getCommodityById } from '../../services/market/cropCommodityRegistry';
 import { agmarknetService } from '../../services/market/agmarknetService';
 import './Dashboard.css';
@@ -32,7 +32,7 @@ import './Dashboard.css';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { batches = [], buyerDemands = [], marketOffers = [] } = useGlobalState();
+  const { batches = [], buyerDemands = [] } = useGlobalState();
   
   const [selectedCropId, setSelectedCropId] = useState('WHEAT');
   const [cropSearchQuery, setCropSearchQuery] = useState('');

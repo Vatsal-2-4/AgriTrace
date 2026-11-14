@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft } from 'lucide-react';
-import { useWoolKart } from '../../../context/WoolKartContext';
-import { useGlobalState } from '../../../context/GlobalStateContext';
-import { useAuth } from '../../../context/AuthContext';
+import { useWoolKart } from '../../../context/useWoolKart.js';
+import { useGlobalState } from '../../../context/useGlobalState.js';
+import { useAuth } from '../../../context/useAuth.js';
 import './WoolKartStyles.css';
 
 const Checkout = () => {

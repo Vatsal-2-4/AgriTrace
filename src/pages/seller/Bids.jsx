@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, ShieldCheck, Clock, Check, AlertCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+
 
 export default function Bids() {
   const navigate = useNavigate();

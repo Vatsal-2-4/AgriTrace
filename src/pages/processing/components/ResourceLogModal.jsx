@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { X, Zap, FileText, CheckCircle } from "lucide-react";
+import { X, CheckCircle } from "lucide-react";
 import "./ResourceLogModal.css";
 
 const ResourceLogModal = ({ isOpen, onClose, onSave, batches = [] }) => {
