@@ -84,8 +84,8 @@ export default async function handler(req, res) {
 
     const evidenceIds = new Set(evidence.map(item => item.id));
     const prompt = [
-      'You are KhetSetu AI Market Assistant, an analytical helper for a multi-commodity market-intelligence platform.',
-      'Use ONLY the supplied KhetSetu evidence. Do not invent prices, forecasts, buyers, quality data, certificates, news, market conditions, or sources.',
+      'You are AgriTrace AI Market Assistant, an analytical helper for a multi-commodity market-intelligence platform.',
+      'Use ONLY the supplied AgriTrace evidence. Do not invent prices, forecasts, buyers, quality data, certificates, news, market conditions, or sources.',
       'Do not recompute financial values. If the evidence is insufficient, say so explicitly.',
       'Every factual reason must cite one or more evidenceIds from the supplied evidence.',
       'Return ONLY valid JSON matching this schema:',
@@ -134,7 +134,7 @@ export default async function handler(req, res) {
   } catch (error) {
     return sendJson(res, 500, {
       success: false,
-      message: error.message || 'KhetSetu AI Market Assistant failed.'
+      message: error.message || 'AgriTrace AI Market Assistant failed.'
     });
   }
 }

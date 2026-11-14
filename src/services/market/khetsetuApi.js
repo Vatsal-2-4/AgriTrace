@@ -12,7 +12,7 @@ export async function getKhetSetuIntelligence() {
     const payload = await response.json();
     return { ...fallback, ...(payload.data || payload) };
   } catch (error) {
-    console.warn('KhetSetu market API unavailable; using cached intelligence', error);
+    console.warn('AgriTrace market API unavailable; using cached intelligence', error);
     return fallback;
   }
 }

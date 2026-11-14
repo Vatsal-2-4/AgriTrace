@@ -33,7 +33,7 @@ const SellerLayout = () => {
       <aside className="seller-sidebar">
         <div className="sidebar-header">
           <Link to="/buyer" className="logo">
-            KHET<span>SETU</span>
+            AGRI<span>TRACE</span>
           </Link>
           <div className="role-badge">Buyer workspace</div>
         </div>
@@ -89,7 +89,7 @@ const SellerLayout = () => {
             <div className="mobile-nav-content">
               <div className="mobile-nav-header">
                 <Link to="/buyer" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
-                  KHET<span>SETU</span>
+                  AGRI<span>TRACE</span>
                 </Link>
                 <button className="icon-btn" onClick={() => setIsMobileMenuOpen(false)}>
                   <X size={24} />

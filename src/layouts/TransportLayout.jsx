@@ -36,7 +36,7 @@ const TransportLayout = () => {
       <aside className="transport-sidebar">
         <div className="sidebar-header">
           <Link to="/logistics" className="logo">
-            KHET<span>SETU</span>
+            AGRI<span>TRACE</span>
           </Link>
           <div className="role-badge">Logistics partner</div>
         </div>
@@ -85,7 +85,7 @@ const TransportLayout = () => {
             <div className="mobile-nav-content">
               <div className="mobile-nav-header">
                 <Link to="/logistics" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
-                  KHET<span>SETU</span>
+                  AGRI<span>TRACE</span>
                 </Link>
                 <button className="icon-btn" onClick={() => setIsMobileMenuOpen(false)}>
                   <X size={24} />

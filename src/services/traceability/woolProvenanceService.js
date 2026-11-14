@@ -36,11 +36,11 @@ const isWoolBatch = (batch = {}) => (
 
 const publicActor = (stage) => {
   if (stage === 'QUALITY') return 'Quality Partner';
-  if (stage === 'MARKET') return 'KhetSetu Market';
+  if (stage === 'MARKET') return 'AgriTrace Market';
   if (stage === 'TRANSPORT') return 'Logistics Partner';
   if (stage === 'WAREHOUSE') return 'Storage Partner';
   if (stage === 'PROCESSING') return 'Processing Partner';
-  if (stage === 'DELIVERED') return 'KhetSetu Network';
+  if (stage === 'DELIVERED') return 'AgriTrace Network';
   return 'Registered Producer';
 };
 

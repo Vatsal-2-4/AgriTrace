@@ -1,6 +1,6 @@
-# KhetSetu
+# AgriTrace
 
-KhetSetu is a crop-market intelligence and transaction workspace for farmers, FPOs, buyers, quality partners, storage partners and logistics partners.
+AgriTrace is a crop-market intelligence and transaction workspace for farmers, FPOs, buyers, quality partners, storage partners and logistics partners.
 
 ## Run locally
 

@@ -218,7 +218,7 @@ export default function Market() {
       <div className="market-header-banner">
         <div className="header-left">
           <div className="sih-tag">Market intelligence workspace</div>
-          <h1 className="market-title">{routeTab ? pageTitle : 'KhetSetu Market & Trade Network'}</h1>
+          <h1 className="market-title">{routeTab ? pageTitle : 'AgriTrace Market & Trade Network'}</h1>
           <p className="market-subtitle">
             {routeTab ? pageDescription : 'One connected workflow for mandi prices, buyer demand, quality, logistics, offers, settlement, and resolution.'}
           </p>

@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const id = `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const vpa = process.env.UPI_COLLECT_VPA || 'khetsetu@upi';
     const reference = createReference();
-    const upiUri = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent('KhetSetu Trade Payment')}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent(transactionId)}&tr=${reference}`;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent('AgriTrace Trade Payment')}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent(transactionId)}&tr=${reference}`;
     const intent = { id, transactionId, amount: Number(amount), method, reference, merchantVpa: vpa, upiUri, gateway: process.env.PAYMENT_GATEWAY_PROVIDER || 'DIRECT_UPI', status: 'PENDING' };
     paymentStore.set(id, intent);
     return res.status(201).json({ success: true, payment: intent, mode: 'test' });

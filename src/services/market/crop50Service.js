@@ -1,6 +1,6 @@
 /**
  * CROP50 - National Crop Market Index Service
- * KhetSetu Flagship Market Intelligence Layer (SIH 2026 PS 26132)
+ * AgriTrace Flagship Market Intelligence Layer (SIH 2026 PS 26132)
  * 
  * Tracks national agricultural commodity price movement using CEDA / Agmarknet data.
  * Base Value: 1000 | Base Date: 8 Sep 2026 | Constituents: 50 | Total Weight: 100.00%
@@ -8,14 +8,14 @@
 
 export const CROP50_METADATA = {
   name: 'CROP50',
-  fullName: 'KhetSetu Crop Market Index',
+  fullName: 'AgriTrace Crop Market Index',
   ticker: 'CROP50',
   baseValue: 1000,
   baseDate: '2026-09-08',
   rebalanceFrequency: 'ANNUAL',
   methodologyVersion: 'v1.0 (Launch Weights)',
   attribution: 'Market price and arrival data: CEDA Agri Market Data / Agmarknet, Centre for Data Science and Analytics, Ashoka University.',
-  disclaimer: 'Constituent weights are KhetSetu launch weights designed to represent the relative importance of major Indian agricultural commodity markets. They are not official consumption shares or financial securities.'
+  disclaimer: 'Constituent weights are AgriTrace launch weights designed to represent the relative importance of major Indian agricultural commodity markets. They are not official consumption shares or financial securities.'
 };
 
 export const CROP50_CONSTITUENTS = [

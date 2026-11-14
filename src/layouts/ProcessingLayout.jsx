@@ -87,7 +87,7 @@ const ProcessingLayout = () => {
       <aside className="processing-sidebar">
         <div className="processing-sidebar-header">
           <Link to="/processor" className="processing-logo">
-            KHET<span>SETU</span>
+            AGRI<span>TRACE</span>
           </Link>
           <div className="processing-unit-badge">
             <Factory size={12} />

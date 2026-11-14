@@ -41,7 +41,7 @@ export default function WarehouseLayout() {
       <aside className="warehouse-sidebar">
         <div className="warehouse-sidebar-header">
           <Link to="/storage" className="warehouse-logo">
-            KHET<span>SETU</span>
+            AGRI<span>TRACE</span>
           </Link>
           <div className="warehouse-role-tag">
             Storage partner workspace
@@ -92,7 +92,7 @@ export default function WarehouseLayout() {
           <div className="mobile-nav-content" onClick={e => e.stopPropagation()}>
             <div className="mobile-nav-header">
               <Link to="/storage" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
-                KHET<span>SETU</span>
+                AGRI<span>TRACE</span>
               </Link>
               <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
                 <X size={24} color="#0B120D" />

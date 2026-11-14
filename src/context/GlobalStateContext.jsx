@@ -1879,7 +1879,7 @@ export const GlobalStateProvider = ({ children }) => {
         addTraceEvent(batchId, {
           stage: 'MARKET',
           title: 'Produce lot listed for buyer discovery',
-          location: newLot.currentLocation || 'KhetSetu Market Exchange',
+          location: newLot.currentLocation || 'AgriTrace Market Exchange',
           status: 'Active',
           actor: (newLot.sellerName || 'Farmer') + ' (Seller)',
           description: 'Created Lot #' + newLot.lotNumber + ' (' + newLot.totalQuantity + ' KG, Asking ₹' + newLot.askingPrice + '/KG). Verified quality attached.'

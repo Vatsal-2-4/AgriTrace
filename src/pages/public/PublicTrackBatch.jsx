@@ -58,7 +58,7 @@ export default function PublicTrackBatch() {
             Batch Verification Not Found
           </h2>
           <p style={{ color: '#666', marginBottom: '24px' }}>
-            The requested batch ID <strong>{batchId}</strong> does not exist in KhetSetu public traceability records.
+            The requested batch ID <strong>{batchId}</strong> does not exist in AgriTrace public traceability records.
           </p>
           <Link to="/" style={{ textDecoration: 'none', background: '#0B120D', color: '#DDFF86', padding: '10px 20px', borderRadius: '8px', fontWeight: '700' }}>
             Return to WoolTrace
@@ -68,7 +68,7 @@ export default function PublicTrackBatch() {
     );
   }
 
-  const maskedFarmer = 'Registered KhetSetu Producer';
+  const maskedFarmer = 'Registered AgriTrace Producer';
 
   return (
     <div className="public-track-page">
@@ -91,7 +91,7 @@ export default function PublicTrackBatch() {
               Batch {batch.id || batch.batchId}
             </div>
             <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', color: '#166534', fontWeight: '700', fontSize: '14px' }}>
-              <CheckCircle2 size={16} /> Verified through KhetSetu Traceability Records
+              <CheckCircle2 size={16} /> Verified through AgriTrace Traceability Records
             </div>
           </div>
 
@@ -127,7 +127,7 @@ export default function PublicTrackBatch() {
           <TraceabilityTimeline batchId={batch.id || batch.batchId} batchOverride={batch} publicView />
 
           <div style={{ textAlign: 'center', marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(11, 18, 13, 0.08)', fontSize: '12px', color: '#888' }}>
-            KhetSetu Traceability Passport - Public provenance is limited to safe production, quality, and movement records.
+            AgriTrace Traceability Passport - Public provenance is limited to safe production, quality, and movement records.
           </div>
         </div>
       </div>

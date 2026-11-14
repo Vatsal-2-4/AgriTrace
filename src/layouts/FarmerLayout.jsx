@@ -49,7 +49,7 @@ const FarmerLayout = () => {
       <aside className="farmer-sidebar">
         <div className="sidebar-header">
           <Link to="/farmer" className="logo">
-            KhetSetu
+            AgriTrace
           </Link>
           <div style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#166534', marginTop: '4px' }}>
             Farmer &amp; FPO workspace
@@ -113,7 +113,7 @@ const FarmerLayout = () => {
             <div className="mobile-nav-content">
               <div className="mobile-nav-header">
                 <Link to="/farmer" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
-                  KhetSetu
+                  AgriTrace
                 </Link>
                 <button className="icon-btn" onClick={() => setIsMobileMenuOpen(false)}>
                   <X size={24} />

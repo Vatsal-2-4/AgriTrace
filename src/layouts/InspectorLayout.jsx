@@ -15,7 +15,7 @@ const InspectorLayout = () => {
       <aside className="inspector-sidebar">
         <div className="sidebar-brand">
           <ShieldCheck size={24} color="#DDFF86" />
-          <span>KhetSetu Quality</span>
+          <span>AgriTrace Quality</span>
         </div>
         <nav className="sidebar-nav">
           <button 

@@ -11,6 +11,10 @@ import { authenticate, isBuyer, isSeller, ORGANIZATION_TYPES, UNITS, isStorageRe
 
 const makeId = prefix => `${prefix}-${randomUUID()}`;
 const now = () => new Date();
+function getMarketPath(req) {
+  const route = getApiRoute(req).split('?')[0];
+  return route.startsWith('/api/market/') ? route.slice('/api/market'.length) : route;
+}
 const getLocationFilter = (query, prefix = 'location') => {
   const filter = {};
   if (query.state) filter[`${prefix}.state`] = String(query.state).slice(0, 100);
@@ -232,7 +236,7 @@ async function priceRecommendation(req, res) {
 }
 
 async function handleMarketplace(req, res) {
-  const route = getApiRoute(req).split('?')[0].replace(/\/$/, '') || '/';
+  const route = getMarketPath(req).replace(/\/$/, '') || '/';
   const user = authenticate(req);
   if (route === '/lots' && req.method === 'GET') return listLots(req, res);
   if (route === '/lots' && req.method === 'POST') {
@@ -281,7 +285,7 @@ async function handleMarketplace(req, res) {
 export default async function handler(req, res) {
   if (handleCors(req, res)) return;
   try {
-    const url = getApiRoute(req).split('?')[0];
+    const url = getMarketPath(req);
     if (/^\/(lots|demands|quality-assessments|demand-forecast|price-recommendation|price-observations)(\/|$)/.test(url)) {
       await dbConnect();
       return await handleMarketplace(req, res);
@@ -303,7 +307,7 @@ export default async function handler(req, res) {
     }
     return res.status(404).json({ error: 'Not found' });
   } catch (error) {
-    if (/\/(lots|demands|quality-assessments|forecast|recommendation|price-observations)/.test(getApiRoute(req))) {
+    if (/\/(lots|demands|quality-assessments|forecast|recommendation|price-observations)/.test(getMarketPath(req))) {
       console.error('marketplace error', error);
       return sendError(res, 500, 'MARKETPLACE_ERROR', 'The marketplace request could not be completed');
     }
