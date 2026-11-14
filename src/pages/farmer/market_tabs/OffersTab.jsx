@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { FileText, TrendingUp, Check, X } from 'lucide-react';
+import { FileText, Check, X } from 'lucide-react';
 
 export default function OffersTab({
   marketOffers,
   onAcceptOffer,
   onRejectOffer,
-  onOpenCounter
+  onSendMessage
 }) {
   const [fulfilmentQuantities, setFulfilmentQuantities] = useState({});
+  const [messageDrafts, setMessageDrafts] = useState({});
   return (
     <div>
       <div className="panel-header-row">
@@ -73,6 +74,10 @@ export default function OffersTab({
             </div>
 
             <p style={{ fontSize: 12, color: '#64748B' }}>Offer total: ₹{Number(offer.totalGrossAmount || (offer.offeredPricePerKg || 0) * (offer.quantityKg || 0)).toLocaleString('en-IN')} · Closes: {new Date(offer.closesAt || offer.validUntil || offer.createdAt).toLocaleString('en-IN')}</p>
+            {offer.message && <p style={{ background: '#F8F8F3', padding: 10, borderRadius: 8 }}>Buyer message: {offer.message}</p>}
+            {(offer.messages || []).map((message, index) => <p key={`${offer.id}-${index}`}><strong>{message.senderId === offer.buyerId ? 'Buyer' : 'You'}:</strong> {message.body}</p>)}
+            {offer.counterparty && <p>Buyer contact: {offer.counterparty.name} · <a href={`mailto:${offer.counterparty.email}`}>{offer.counterparty.email}</a>{offer.counterparty.mobile && <> · <a href={`tel:${offer.counterparty.mobile}`}>{offer.counterparty.mobile}</a></>}</p>}
+            <div style={{ display: 'flex', gap: 8, margin: '10px 0' }}><input aria-label={`Message for bid ${offer.id}`} maxLength={500} value={messageDrafts[offer.id] || ''} onChange={event => setMessageDrafts(previous => ({ ...previous, [offer.id]: event.target.value }))} placeholder="Message this buyer"/><button type="button" className="btn-secondary" onClick={() => onSendMessage(offer, messageDrafts[offer.id], () => setMessageDrafts(previous => ({ ...previous, [offer.id]: '' })))}>Send</button></div>
 
             {offer.status === 'PENDING' && (
               <label style={{ display: 'block', margin: '10px 0' }}>Quantity to accept ({offer.unit || 'KG'})
@@ -85,10 +90,6 @@ export default function OffersTab({
                 <button className="btn-secondary" onClick={() => onRejectOffer(offer)}>
                   <X size={16} style={{ marginRight: '4px' }} />
                   Decline
-                </button>
-                <button className="btn-secondary" onClick={() => onOpenCounter(offer)}>
-                  <TrendingUp size={16} style={{ marginRight: '4px' }} />
-                  Counter-Offer
                 </button>
                 <button className="btn-primary" onClick={() => onAcceptOffer(offer, Number(fulfilmentQuantities[offer.id] ?? offer.quantityKg))}>
                   <Check size={16} style={{ marginRight: '4px' }} />

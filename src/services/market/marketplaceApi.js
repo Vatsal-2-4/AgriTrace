@@ -33,6 +33,8 @@ export const marketplaceApi = {
   listMatches: lotId => request(`/lots/${encodeURIComponent(lotId)}/matches`).then(result => result.matches || []),
   placeBid: (lotId, data) => request(`/lots/${encodeURIComponent(lotId)}/bids`, { method: 'POST', body: JSON.stringify(data) }),
   listBids: (lotId) => request(lotId ? `/lots/${encodeURIComponent(lotId)}/bids` : '/bids').then(result => result.items || []),
+  sendBidMessage: (bidId, message) => request(`/bids/${encodeURIComponent(bidId)}/messages`, { method: 'POST', body: JSON.stringify({ message }) }),
+  setContactConsent: marketContactConsent => request('/contact-consent', { method: 'PATCH', body: JSON.stringify({ marketContactConsent }) }),
   resolveBid: (lotId, bidId, data) => request(`/lots/${encodeURIComponent(lotId)}/bids/${encodeURIComponent(bidId)}`, { method: 'PATCH', body: JSON.stringify(data) }),
 };
 

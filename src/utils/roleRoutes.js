@@ -1,6 +1,10 @@
 export const ROLE_HOME = {
   FARMER: '/farmer',
   SELLER: '/buyer',
+  BUYER: '/buyer',
+  RETAILER: '/buyer',
+  WHOLESALER: '/buyer',
+  PROCESSOR: '/buyer',
   QUALITY_INSPECTOR: '/quality',
   WAREHOUSE: '/storage',
   TRANSPORT: '/logistics',

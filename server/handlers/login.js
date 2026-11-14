@@ -79,6 +79,7 @@ export default async function handler(req, res) {
         mobile: user.mobile,
         role,
         organizationType: user.organizationType || null,
+        marketContactConsent: user.marketContactConsent === true,
         state: user.state,
         preferredLanguage: user.preferredLanguage || 'en'
       }

@@ -24,6 +24,7 @@ import OffersTab from './market_tabs/OffersTab';
 import TransactionsTab from './market_tabs/TransactionsTab';
 import DisputesTab from './market_tabs/DisputesTab';
 import PaymentModal from './market_tabs/PaymentModal';
+import MarketplaceContactConsent from '../market/MarketplaceContactConsent';
 import { createUpiPayment } from '../../services/payment/paymentService';
 import { marketplaceApi, marketplaceErrorMessage } from '../../services/market/marketplaceApi';
 
@@ -141,7 +142,11 @@ export default function Market() {
       setMarketplaceBids(bidGroups.flat());
     } catch (error) { if (error.status !== 401) showToast(marketplaceErrorMessage(error)); }
   };
-  useEffect(() => { refreshMarketplace(); }, [user?.id]);
+  useEffect(() => {
+    refreshMarketplace();
+    const interval = window.setInterval(refreshMarketplace, 15000);
+    return () => window.clearInterval(interval);
+  }, [user?.id]);
   const [lotUnit, setLotUnit] = useState(selectedCommodityId === 'WHEAT' ? 'KG' : getCommodityById(selectedCommodityId).defaultUnit || 'KG');
   const [lotCropId, setLotCropId] = useState(selectedCommodityId);
   const lotCommodity = getCommodityById(lotCropId);
@@ -216,6 +221,7 @@ export default function Market() {
 
   return (
     <div className="farmer-market-page">
+      <MarketplaceContactConsent />
       {/* Toast Alert */}
       {toastMessage && (
         <div style={{
@@ -419,17 +425,15 @@ export default function Market() {
 
         {activeTab === 'offers' && (
           <OffersTab
-            marketOffers={marketplaceBids.map(bid => ({ ...bid, id: bid.bidId, lotNumber: bid.lotId, quantityKg: bid.quantity, offeredPricePerKg: bid.pricePerUnit, totalGrossAmount: bid.totalAmount, closesAt: bid.closingAt, status: bid.status, cropName: marketplaceLots.find(lot => lot.lotId === bid.lotId)?.cropName }))}
+            marketOffers={marketplaceBids.map(bid => ({ ...bid, id: bid.bidId, lotNumber: bid.lotId, quantityKg: bid.quantity, offeredPricePerKg: bid.pricePerUnit, totalGrossAmount: bid.totalAmount, closesAt: bid.closingAt, status: bid.status, buyerName: bid.counterparty?.name || bid.buyerId, cropName: marketplaceLots.find(lot => lot.lotId === bid.lotId)?.cropName }))}
             onAcceptOffer={(offer, fulfilledQuantity) => {
               marketplaceApi.resolveBid(offer.lotId, offer.id, { status: 'ACCEPTED', fulfilledQuantity }).then(() => { showToast(`Bid ${offer.id} accepted for ${fulfilledQuantity} ${offer.unit}; remaining stock was updated.`); refreshMarketplace(); }).catch(error => showToast(marketplaceErrorMessage(error)));
             }}
             onRejectOffer={(offer) => {
               marketplaceApi.resolveBid(offer.lotId, offer.id, { status: 'REJECTED' }).then(() => { showToast(`Bid ${offer.id} declined and reserved quantity released.`); refreshMarketplace(); }).catch(error => showToast(marketplaceErrorMessage(error)));
             }}
-            onOpenCounter={(offer) => {
-              setActiveOfferForCounter(offer);
-              setCounterPrice(offer.offeredPricePerKg + 1.5);
-              setShowCounterModal(true);
+            onSendMessage={(offer, message, clearDraft) => {
+              marketplaceApi.sendBidMessage(offer.id, message).then(() => { clearDraft(); refreshMarketplace(); }).catch(error => showToast(marketplaceErrorMessage(error)));
             }}
           />
         )}

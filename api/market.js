@@ -7,6 +7,7 @@ import ProduceLot from './_models/ProduceLot.js';
 import BuyerDemand from './_models/BuyerDemand.js';
 import BulkBid from './_models/BulkBid.js';
 import MarketIntelligence from './_models/MarketIntelligence.js';
+import User from './_models/User.js';
 import { authenticate, isBuyer, isSeller, ORGANIZATION_TYPES, UNITS, isStorageReference, sendError, sendSuccess, validPositive, validString } from './_utils/market.js';
 
 const makeId = prefix => `${prefix}-${randomUUID()}`;
@@ -151,7 +152,30 @@ async function listBids(req, res, user, lotId) {
     if (lot.sellerId !== user.id) return sendError(res, 403, 'NOT_OWNER', 'Only the lot owner can view its bids');
   }
   const items = await BulkBid.find(query).sort({ createdAt: -1 }).limit(100).lean();
-  return sendSuccess(res, { items });
+  const counterpartIds = [...new Set(items.filter(item => item.status === 'ACCEPTED').map(item => item.buyerId === user.id ? item.sellerId : item.buyerId))];
+  const contacts = counterpartIds.length ? await User.find({ _id: { $in: counterpartIds } }).select('name email mobile organizationType marketContactConsent').lean() : [];
+  const contactById = new Map(contacts.map(contact => [String(contact._id), contact.marketContactConsent ? { name: contact.name, email: contact.email, mobile: contact.mobile || null, organizationType: contact.organizationType || null } : null]));
+  return sendSuccess(res, { items: items.map(item => ({ ...item, counterparty: item.status === 'ACCEPTED' ? contactById.get(user.id === item.buyerId ? item.sellerId : item.buyerId) || null : null })) });
+}
+
+async function bidMessages(req, res, user, bidId) {
+  const bid = await BulkBid.findOne({ bidId });
+  if (!bid) return sendError(res, 404, 'BID_NOT_FOUND', 'Bid not found');
+  if (![bid.buyerId, bid.sellerId].includes(user.id)) return sendError(res, 403, 'BID_PARTICIPANT_REQUIRED', 'Only the buyer and seller on this bid can access its messages');
+  if (req.method === 'GET') return sendSuccess(res, { bidId, messages: bid.messages || [] });
+  const body = req.body?.message;
+  if (req.method !== 'POST') return sendError(res, 405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
+  if (!validString(body, 500)) return sendError(res, 400, 'INVALID_MESSAGE', 'A message from 1 to 500 characters is required');
+  bid.messages.push({ senderId: user.id, body: body.trim(), createdAt: now() });
+  await bid.save();
+  return sendSuccess(res, { bidId, messages: bid.messages }, 201);
+}
+
+async function updateMarketContactConsent(req, res, user) {
+  if (typeof req.body?.marketContactConsent !== 'boolean') return sendError(res, 400, 'INVALID_CONTACT_CONSENT', 'marketContactConsent must be true or false');
+  const account = await User.findByIdAndUpdate(user.id, { $set: { marketContactConsent: req.body.marketContactConsent } }, { new: true }).select('_id marketContactConsent');
+  if (!account) return sendError(res, 404, 'ACCOUNT_NOT_FOUND', 'Account not found');
+  return sendSuccess(res, { marketContactConsent: account.marketContactConsent });
 }
 
 async function resolveBulkBid(req, res, user, lotId, bidId) {
@@ -250,6 +274,10 @@ async function priceRecommendation(req, res) {
 async function handleMarketplace(req, res) {
   const route = getMarketPath(req).replace(/\/$/, '') || '/';
   const user = authenticate(req);
+  if (route === '/contact-consent' && req.method === 'PATCH') {
+    if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
+    return updateMarketContactConsent(req, res, user);
+  }
   if (route === '/lots' && req.method === 'GET') return listLots(req, res);
   if (route === '/lots' && req.method === 'POST') {
     if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
@@ -263,6 +291,11 @@ async function handleMarketplace(req, res) {
   const matchRoute = route.match(/^\/lots\/([^/]+)\/matches$/);
   if (matchRoute && req.method === 'GET') return listMatches(req, res, decodeURIComponent(matchRoute[1]));
   const bidRoute = route.match(/^\/lots\/([^/]+)\/bids$/);
+  const bidMessagesRoute = route.match(/^\/bids\/([^/]+)\/messages$/);
+  if (bidMessagesRoute && ['GET','POST'].includes(req.method)) {
+    if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
+    return bidMessages(req, res, user, decodeURIComponent(bidMessagesRoute[1]));
+  }
   if (route === '/bids' && req.method === 'GET') {
     if (!user) return sendError(res, 401, 'UNAUTHENTICATED', 'A valid bearer access token is required');
     return listBids(req, res, user);

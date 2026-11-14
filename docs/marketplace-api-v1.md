@@ -17,6 +17,9 @@ Both list endpoints return `{ items, pagination: { page, limit, total, pages } }
 
 - `GET /api/market/lots/:id/matches` returns ranked buyer demand with score breakdown and evidence warnings.
 - `POST /api/market/lots/:id/bids` accepts `pricePerUnit`, `quantity`, `unit`, and optional `message`. The server reserves quantity atomically, checks lot owner and closing time, and calculates `totalAmount`.
+- `GET /api/market/bids` lists the authenticated buyer's bids and seller's bids for their lots. Contact details are included only for accepted bids and only when the counterparty consented to marketplace contact sharing at registration.
+- `GET /api/market/lots/:id/bids` lists bids for a lot and is restricted to its authenticated owner.
+- `GET /api/market/bids/:bidId/messages` and `POST /api/market/bids/:bidId/messages` provide a persistent buyer-seller message thread. Only the buyer and seller on that bid can read or send messages; messages are limited to 500 characters.
 - `PATCH /api/market/lots/:id/bids/:bidId` lets the authenticated seller accept or reject a pending bid. An accepted bid may provide `fulfilledQuantity` to accept a smaller quantity; the server recalculates the fulfilled total and returns the unused quantity to the lot.
 - `POST /api/market/quality-assessments` accepts `lotId`, `cropId`, and approved `imageRefs[]`; it persists a `PENDING_INFERENCE` assessment with explicit insufficient-data status.
 - `GET /api/market/quality-assessments/:id` returns AI evidence and inspector verification separately.
@@ -33,3 +36,7 @@ The app has no image upload endpoint yet. Clients must pass storage references i
 Forecast and recommendation responses persist model version, evidence, source freshness, uncertainty, and status. They report `INSUFFICIENT_DATA` until an inference provider supplies a result; this backend does not train or run models.
 
 Existing CEDA routes, `/api/market-records`, `/api/bidding`, `/api/qa`, and wool batch records remain present during migration. Writes to legacy lot and demand market records now require a bearer token and are scoped to the authenticated owner.
+
+## Buyer account registration and contact consent
+
+Buyer registration requires an organization type (`retailer`, `wholesaler`, `processor`, or `other`) and persists it on the account. Registration returns a bearer token so the new account can immediately use authenticated marketplace endpoints. Marketplace participants must explicitly consent to sharing their name, email, and optional mobile with the other party after a bid is accepted. Existing accounts default to no contact sharing and can opt in or out through `PATCH /api/market/contact-consent` or the consent control in either marketplace workspace.

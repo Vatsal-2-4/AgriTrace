@@ -7,7 +7,7 @@ import './Login.css';
 
 const ROLES = [
   { id: 'FARMER', label: 'Farmer / FPO', desc: 'Discover markets and sell produce', icon: <Box size={24} /> },
-  { id: 'SELLER', label: 'Buyer', desc: 'Source produce at scale', icon: <Store size={24} /> },
+  { id: 'BUYER', label: 'Buyer organisation', desc: 'Register as a retailer, wholesaler, or processor', icon: <Store size={24} /> },
   { id: 'QUALITY_INSPECTOR', label: 'Quality partner', desc: 'Grade produce and issue certificates', icon: <ShieldCheck size={24} /> },
   { id: 'WAREHOUSE', label: 'Storage partner', desc: 'Offer storage capacity', icon: <Warehouse size={24} /> },
   { id: 'TRANSPORT', label: 'Logistics partner', desc: 'Coordinate farm-gate collection', icon: <Truck size={24} /> },
@@ -26,8 +26,12 @@ const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    mobile: '',
+    state: '',
     password: '',
-    preferredLanguage: 'en'
+    preferredLanguage: 'en',
+    organizationType: '',
+    marketContactConsent: false
   });
 
   const handleRegister = async (e) => {
@@ -154,6 +158,7 @@ const Register = () => {
               Registering as: <strong>{ROLES.find(r => r.id === selectedRole)?.label}</strong>
               <button type="button" onClick={() => setStep(1)} className="link-btn" style={{marginLeft: '8px'}}>Change</button>
             </div>
+            {['BUYER','FARMER','SELLER'].includes(selectedRole) && <label style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13 }}><input type="checkbox" required checked={formData.marketContactConsent} onChange={e => setFormData({ ...formData, marketContactConsent: e.target.checked })}/>I agree that my name, email, and mobile number (if provided) can be shared with the other party after a marketplace bid is accepted, to coordinate fulfilment.</label>}
 
             <div className="form-group">
               <label>Full Name / Company Name</label>
@@ -172,6 +177,24 @@ const Register = () => {
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
               />
+            </div>
+            {selectedRole === 'BUYER' && <div className="form-group">
+              <label>Buyer organization type</label>
+              <select required value={formData.organizationType} onChange={e => setFormData({ ...formData, organizationType: e.target.value })}>
+                <option value="">Select organization type</option>
+                <option value="retailer">Retailer</option>
+                <option value="wholesaler">Wholesaler</option>
+                <option value="processor">Food processor</option>
+                <option value="other">Other buyer</option>
+              </select>
+            </div>}
+            <div className="form-group">
+              <label>Mobile number</label>
+              <input type="tel" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label>State</label>
+              <input type="text" value={formData.state} onChange={e => setFormData({ ...formData, state: e.target.value })} />
             </div>
             <div className="form-group">
               <label>Preferred Language</label>

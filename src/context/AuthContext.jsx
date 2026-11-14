@@ -214,40 +214,18 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.user) {
+          if (data.accessToken) localStorage.setItem('agritrace_access_token', data.accessToken);
           setUser({ ...data.user, role: normalizeRole(data.user.role) });
           setTimeout(() => setIsLoading(false), 400);
           return { success: true, user: { ...data.user, role: normalizeRole(data.user.role) } };
         }
       }
-    } catch (error) {
-      console.warn('API register fetch bypassed, creating local user profile:', error);
-    }
-
-    try {
-      const { name, email, password, role, preferredLanguage } = userData;
-      const mockUser = {
-        id: `USR-${Date.now()}`,
-        name: name || 'User',
-        email: email,
-        role: role || 'FARMER',
-        preferredLanguage: preferredLanguage || 'en'
-      };
-
-      const usersList = JSON.parse(localStorage.getItem('wt_registered_users') || '[]');
-      const existing = usersList.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (existing) {
-        setIsLoading(false);
-        return { success: false, message: 'User with this email already exists' };
-      }
-
-      usersList.push({ ...mockUser, password });
-      localStorage.setItem('wt_registered_users', JSON.stringify(usersList));
-      setUser(mockUser);
-      setTimeout(() => setIsLoading(false), 400);
-      return { success: true, user: mockUser };
-    } catch (e) {
+      const errorData = await response.json().catch(() => ({}));
       setIsLoading(false);
-      return { success: false, message: 'Registration failed' };
+      return { success: false, message: errorData.error?.message || errorData.message || 'Account registration failed.' };
+    } catch (error) {
+      setIsLoading(false);
+      return { success: false, message: 'Account registration requires a connection to the AgriTrace account service.' };
     }
   };
 
@@ -279,6 +257,11 @@ export const AuthProvider = ({ children }) => {
     setUser({ ...user, preferredLanguage: language });
   };
 
+  const updateMarketContactConsent = (consent) => {
+    if (!user) return;
+    setUser({ ...user, marketContactConsent: consent === true });
+  };
+
   const hasRole = (allowedRoles) => {
     if (!user) return false;
     return allowedRoles.includes(user.role);
@@ -294,6 +277,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       switchRole,
       updatePreferredLanguage,
+      updateMarketContactConsent,
       hasRole
     }}>
       {(isLoading || isLoggingOut) && (

@@ -29,6 +29,7 @@ const UserSchema = new mongoose.Schema({
     enum: ['retailer', 'wholesaler', 'processor', 'other'],
     default: null,
   },
+  marketContactConsent: { type: Boolean, default: false },
   preferredLanguage: {
     type: String,
     default: 'en',
