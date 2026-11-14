@@ -4,6 +4,7 @@ import { getApiRoute, handleCors } from './_utils/http.js';
 import dbConnect from './_utils/db.js';
 import WoolBatch from './_models/WoolBatch.js';
 import ProduceLot from './_models/ProduceLot.js';
+import ProduceImage from './_models/ProduceImage.js';
 import BuyerDemand from './_models/BuyerDemand.js';
 import BulkBid from './_models/BulkBid.js';
 import MarketIntelligence from './_models/MarketIntelligence.js';
@@ -71,8 +72,32 @@ async function createLot(req, res, user) {
   if (body.closingAt !== undefined && (!Number.isFinite(closesAt.getTime()) || closesAt <= now())) return sendError(res, 400, 'INVALID_CLOSING_TIME', 'closingAt must be a future date');
   const harvestedAt = body.harvestedAt === undefined ? undefined : new Date(body.harvestedAt);
   if (harvestedAt && !Number.isFinite(harvestedAt.getTime())) return sendError(res, 400, 'INVALID_HARVEST_DATE', 'harvestedAt must be a valid date');
-  const lot = await ProduceLot.create({ lotId, sellerId: user.id, sellerType: user.role, cropId: body.cropId.trim(), cropName: body.cropName.trim(), variety: validString(body.variety, 120) ? body.variety.trim() : undefined, quantity: body.quantity, availableQuantity, unit: String(body.unit).toLowerCase(), harvestedAt, origin: validString(body.origin, 200) ? body.origin.trim() : undefined, location, imageRefs, askingPrice: body.askingPrice, priceUnit: body.priceUnit, marketClosesAt: closesAt, status: availableQuantity === 0 ? 'CLOSED' : 'OPEN', auditTrail: [{ event: 'LOT_CREATED', actorId: user.id, at: now() }] });
-  return sendSuccess(res, lot.toObject(), 201);
+  const assessmentIds = body.qualityAssessmentIds || [];
+  if (!Array.isArray(assessmentIds) || assessmentIds.length > 5 || !assessmentIds.every(id => typeof id === 'string' && /^QAS-[a-z0-9-]+$/i.test(id)) || new Set(assessmentIds).size !== assessmentIds.length) return sendError(res, 400, 'INVALID_ASSESSMENTS', 'Select up to five uploaded quality assessments');
+  const assessments = await MarketIntelligence.find({ recordId: { $in: assessmentIds }, kind: 'QUALITY_ASSESSMENT', evaluatorId: user.id, cropId: body.cropId, lotId: { $exists: false } }).lean();
+  const uploadedRefs = assessments.flatMap(item => item.imageRefs);
+  if (assessments.length !== assessmentIds.length || uploadedRefs.some(ref => !imageRefs.includes(ref)) || imageRefs.some(ref => ref.startsWith('storage://produce/') && !uploadedRefs.includes(ref))) return sendError(res, 400, 'INVALID_ASSESSMENTS', 'Photos must belong to this seller and crop and be unused');
+  if (uploadedRefs.length) {
+    const images = await ProduceImage.countDocuments({ ownerId: user.id, cropId: body.cropId, imageId: { $in: uploadedRefs.map(ref => ref.split('/').at(-1)) }, lotId: { $exists: false }, expiresAt: { $gt: now() } });
+    if (images !== uploadedRefs.length) return sendError(res, 400, 'EXPIRED_PHOTOS', 'An uploaded photo expired or is already used; upload it again');
+  }
+  const lot = new ProduceLot({ lotId, sellerId: user.id, sellerType: user.role, cropId: body.cropId.trim(), cropName: body.cropName.trim(), variety: validString(body.variety, 120) ? body.variety.trim() : undefined, quantity: body.quantity, availableQuantity, unit: String(body.unit).toLowerCase(), harvestedAt, origin: validString(body.origin, 200) ? body.origin.trim() : undefined, location, imageRefs, qualityAssessmentId: assessmentIds[0], qualityEstimates: assessments.map(item => ({ assessmentId: item.recordId, ...item.result })), askingPrice: body.askingPrice, priceUnit: body.priceUnit, marketClosesAt: closesAt, status: availableQuantity === 0 ? 'CLOSED' : 'OPEN', auditTrail: [{ event: 'LOT_CREATED', actorId: user.id, at: now() }] });
+  const session = await ProduceLot.startSession();
+  try {
+    await session.withTransaction(async () => {
+      await lot.save({ session });
+  if (assessmentIds.length) {
+    const claimed = await MarketIntelligence.updateMany({ recordId: { $in: assessmentIds }, evaluatorId: user.id, lotId: { $exists: false } }, { $set: { lotId } }, { session });
+    if (claimed.modifiedCount !== assessmentIds.length) throw Object.assign(new Error('Photo already used'), { code: 'PHOTOS_ALREADY_USED' });
+    const boundImages = await ProduceImage.updateMany({ ownerId: user.id, imageId: { $in: uploadedRefs.map(ref => ref.split('/').at(-1)) } }, { $set: { lotId }, $unset: { expiresAt: 1 } }, { session });
+    if (boundImages.modifiedCount !== uploadedRefs.length) throw Object.assign(new Error('Photo expired'), { code: 'PHOTOS_ALREADY_USED' });
+  }
+    });
+    return sendSuccess(res, lot.toObject(), 201);
+  } catch (error) {
+    if (error.code === 'PHOTOS_ALREADY_USED') return sendError(res, 409, error.code, 'An uploaded photo was already used or expired; upload again');
+    throw error;
+  } finally { await session.endSession(); }
 }
 
 async function listDemands(req, res) {
@@ -227,13 +252,31 @@ async function readAssessment(res, id) {
 
 async function verifyAssessment(req, res, user, id) {
   if (user.role !== 'QUALITY_INSPECTOR' && user.role !== 'INSPECTOR') return sendError(res, 403, 'INSPECTOR_REQUIRED', 'Inspector role is required to verify a grade');
-  const { verifiedGrade, notes } = req.body || {};
-  if (!validString(verifiedGrade, 60) || (notes !== undefined && (typeof notes !== 'string' || notes.length > 1000))) return sendError(res, 400, 'INVALID_VERIFICATION', 'verifiedGrade is required and notes must not exceed 1000 characters');
-  const verification = { verifiedGrade: verifiedGrade.trim(), inspectorId: user.id, verifiedAt: now(), notes: notes || '' };
-  const assessment = await MarketIntelligence.findOneAndUpdate({ kind: 'QUALITY_ASSESSMENT', recordId: id }, { $set: { inspectorVerification: verification }, $push: { verificationHistory: verification } }, { new: true }).lean();
-  if (!assessment) return sendError(res, 404, 'ASSESSMENT_NOT_FOUND', 'Quality assessment not found');
-  await ProduceLot.updateOne({ lotId: assessment.lotId }, { $set: { verifiedGrade: verifiedGrade.trim(), qualityVerifierId: user.id, qualityVerifiedAt: verification.verifiedAt }, $push: { auditTrail: { event: 'GRADE_VERIFIED', actorId: user.id, at: verification.verifiedAt, details: { assessmentId: id, verifiedGrade: verification.verifiedGrade } } } });
-  return sendSuccess(res, { ...assessment, inspectorVerification: { verifiedGrade: verifiedGrade.trim(), inspectorId: user.id, verifiedAt: assessment.inspectorVerification.verifiedAt, notes: notes || '' } });
+  const { verifiedGrade, notes, decision = 'CORRECTED', photosReviewed } = req.body || {};
+  if (photosReviewed !== true) return sendError(res, 400, 'REVIEW_CONFIRMATION_REQUIRED', 'Confirm that every lot photo was manually inspected');
+  if (!['A+', 'A', 'B', 'C', 'REJECT'].includes(verifiedGrade) || !['APPROVED', 'CORRECTED', 'REJECTED'].includes(decision) || !validString(notes, 1000)) return sendError(res, 400, 'INVALID_VERIFICATION', 'Choose a grade and decision and provide manual inspection notes');
+  if ((decision === 'REJECTED') !== (verifiedGrade === 'REJECT')) return sendError(res, 400, 'INVALID_VERIFICATION', 'Reject decision requires REJECT grade');
+  const assessment = await MarketIntelligence.findOne({ kind: 'QUALITY_ASSESSMENT', recordId: id }).lean();
+  if (!assessment?.lotId) return sendError(res, 404, 'ASSESSMENT_NOT_FOUND', 'Published lot assessment not found');
+  const lot = await ProduceLot.findOne({ lotId: assessment.lotId });
+  if (decision === 'APPROVED') {
+    const siblings = await MarketIntelligence.find({ kind: 'QUALITY_ASSESSMENT', lotId: assessment.lotId }).lean();
+    if (!siblings.every(item => item.result?.grade === verifiedGrade)) return sendError(res, 400, 'GRADE_MISMATCH', 'Use independent / corrected grade when the model grade is unavailable or differs');
+  }
+  if (!lot) return sendError(res, 404, 'LOT_NOT_FOUND', 'Lot not found');
+  const verification = { verifiedGrade, decision, inspectorId: user.id, verifiedAt: now(), notes: notes.trim(), method: 'MANUAL_PHOTO_REVIEW' };
+  const session = await ProduceLot.startSession();
+  try {
+    await session.withTransaction(async () => {
+  const lock = await ProduceLot.updateOne({ lotId: lot.lotId, qualityVerifiedAt: { $exists: false } }, { $set: { verifiedGrade, qualityVerifierId: user.id, qualityVerifiedAt: verification.verifiedAt, qualityReview: verification, ...(decision === 'REJECTED' ? { status: 'CANCELLED' } : {}) }, $push: { auditTrail: { event: 'GRADE_VERIFIED', actorId: user.id, at: verification.verifiedAt, details: verification } } }, { session });
+  if (!lock.modifiedCount) throw Object.assign(new Error('Already reviewed'), { code: 'ALREADY_REVIEWED' });
+  await MarketIntelligence.updateMany({ kind: 'QUALITY_ASSESSMENT', lotId: lot.lotId }, { $set: { inspectorVerification: verification, status: 'VERIFIED' }, $push: { verificationHistory: verification } }, { session });
+    });
+  } catch (error) {
+    if (error.code === 'ALREADY_REVIEWED') return sendError(res, 409, error.code, 'This lot has already been reviewed; refresh the queue');
+    throw error;
+  } finally { await session.endSession(); }
+  return sendSuccess(res, { ...assessment, inspectorVerification: verification });
 }
 
 async function demandForecast(req, res) {

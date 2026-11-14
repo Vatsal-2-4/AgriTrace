@@ -15,6 +15,7 @@ const produceLotSchema = new mongoose.Schema({
   harvestedAt: Date, origin: { type: String, maxlength: 200 }, location: { type: locationSchema, default: undefined },
   imageRefs: { type: [String], default: [], validate: value => value.length <= 20 },
   askingPrice: { type: Number, min: 0 }, priceUnit: { type: String, maxlength: 40 }, qualityAssessmentId: String,
+  qualityEstimates: { type: [mongoose.Schema.Types.Mixed], default: [] }, qualityReview: mongoose.Schema.Types.Mixed,
   verifiedGrade: { type: String, maxlength: 60 }, qualityVerifierId: String, qualityVerifiedAt: Date,
   marketClosesAt: Date,
   auditTrail: { type: [auditEntrySchema], default: [] },

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import LotQualityPanel from '../../components/LotQualityPanel';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useGlobalState } from '../../context/GlobalStateContext';
 import { useAuth } from '../../context/AuthContext';
@@ -13,7 +14,7 @@ import {
   generatePriceTrends
 } from '../../services/market/marketIntelligenceService';
 import { calculateMatchScore } from '../../services/market/matchingEngine';
-import { QUALITY_STATES, unitKgFactor } from '../../services/market/marketContracts';
+import { unitKgFactor } from '../../services/market/marketContracts';
 
 import MarketOverviewTab from './market_tabs/MarketOverviewTab';
 import PriceDiscoveryTab from './market_tabs/PriceDiscoveryTab';
@@ -127,8 +128,9 @@ export default function Market() {
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [paymentTransaction, setPaymentTransaction] = useState(null);
   const [lotPhotos, setLotPhotos] = useState([]);
-  const [photoError, setPhotoError] = useState('');
-  const [photoProgress, setPhotoProgress] = useState(0);
+  const [qualityError, setQualityError] = useState('');
+  const [qualityBusy, setQualityBusy] = useState(false);
+  const [publishingLot, setPublishingLot] = useState(false);
   const [marketplaceLots, setMarketplaceLots] = useState([]);
   const [marketplaceDemands, setMarketplaceDemands] = useState([]);
   const [marketplaceBids, setMarketplaceBids] = useState([]);
@@ -416,7 +418,7 @@ export default function Market() {
 
         {activeTab === 'lots' && (
           <MyLotsTab
-            woolLots={marketplaceLots.filter(lot => lot.sellerId === user?.id).map(lot => ({ ...lot, id: lot.lotId, lotNumber: lot.lotId, totalQuantity: lot.quantity, farmerName: user?.name, photoReferences: lot.imageRefs || [], qualityAssessment: { status: lot.verifiedGrade ? 'VERIFIED' : 'REVIEW_REQUIRED', verifiedGrade: lot.verifiedGrade } }))}
+            woolLots={marketplaceLots.filter(lot => lot.sellerId === user?.id).map(lot => ({ ...lot, id: lot.lotId, lotNumber: lot.lotId, totalQuantity: lot.quantity, farmerName: user?.name, photoReferences: lot.imageRefs || [], qualityAssessment: { status: lot.verifiedGrade ? 'VERIFIED' : 'REVIEW_REQUIRED', verifiedGrade: lot.verifiedGrade, provisionalGrade: lot.qualityEstimates?.map(item => item.grade).filter(Boolean).join(', '), warnings: lot.qualityEstimates?.map(item => item.reason), inspectorVerification: lot.qualityReview?.notes } }))}
             batches={batches}
             onOpenCreateLot={() => setShowCreateLotModal(true)}
             onOpenFpoAggregator={() => setShowFPOModal(true)}
@@ -470,10 +472,11 @@ export default function Market() {
           <div className="wt-modal-card">
             <div className="modal-header-row">
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>Create produce lot</h3>
-              <button type="button" className="btn-close-modal" aria-label="Close lot form" onClick={() => setShowCreateLotModal(false)}><X size={20}/></button>
+              <button type="button" className="btn-close-modal" aria-label="Close lot form" disabled={publishingLot} onClick={() => { setShowCreateLotModal(false); setQualityError(''); }}><X size={20}/></button>
             </div>
             <form onSubmit={async (e) => {
               e.preventDefault();
+              if (qualityBusy || publishingLot || qualityError) { showToast(qualityError || 'Wait for the photo assessment to finish.'); return; }
               const form = e.target;
               const crop = getCommodityById(form.cropId.value);
               const quantity = Number(form.quantity.value);
@@ -482,33 +485,42 @@ export default function Market() {
                 showToast('Enter a crop, a quantity above zero, and a valid asking price.');
                 return;
               }
+              const requestedUnit = form.unit.value.toLowerCase();
+              const convertPackToKg = !['kg', 'quintal', 'tonne'].includes(requestedUnit);
+              const packFactor = unitKgFactor(form.unit.value);
+              const apiQuantity = convertPackToKg ? quantity * packFactor : quantity;
+              const apiAskingPrice = convertPackToKg ? askingPrice / packFactor : askingPrice;
+              const apiUnit = convertPackToKg ? 'kg' : requestedUnit;
+              setPublishingLot(true);
               try {
               const locationParts = String(form.origin.value).split(',').map(part => part.trim());
               await marketplaceApi.createLot({
+                imageRefs: lotPhotos.map(photo => photo.imageRef),
+                qualityAssessmentIds: lotPhotos.map(photo => photo.assessmentId),
                 cropId: crop.id,
                 cropName: crop.name,
                 variety: form.variety.value,
-                quantity,
-                unit: form.unit.value.toLowerCase(),
+                quantity: apiQuantity,
+                unit: apiUnit,
                 harvestedAt: form.harvestDate.value || undefined,
-                availableQuantity: quantity,
-                askingPrice,
-                priceUnit: `INR/${form.unit.value.toLowerCase()}`,
+                availableQuantity: apiQuantity,
+                askingPrice: apiAskingPrice,
+                priceUnit: `INR/${apiUnit}`,
                 origin: form.origin.value,
                 location: { district: locationParts[0], state: locationParts.length > 1 ? locationParts.slice(1).join(', ') : user?.state || locationParts[0] }
               });
               await refreshMarketplace();
               setLotPhotos([]);
-              setPhotoProgress(0);
+              setQualityError('');
               setShowCreateLotModal(false);
               showToast('Produce lot published to the marketplace. Buyers can now discover it.');
               openTab('lots');
-              } catch (error) { showToast(marketplaceErrorMessage(error)); }
+              } catch (error) { showToast(marketplaceErrorMessage(error)); } finally { setPublishingLot(false); }
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
                   <label htmlFor="lot-crop" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Crop</label>
-                  <select id="lot-crop" name="cropId" value={lotCropId} onChange={event => { setLotCropId(event.target.value); setLotUnit(getCommodityById(event.target.value).defaultUnit || 'KG'); }} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }}>
+                  <select id="lot-crop" name="cropId" value={lotCropId} disabled={qualityBusy || publishingLot} onChange={event => { setLotPhotos([]); setQualityError(''); setLotCropId(event.target.value); setLotUnit(getCommodityById(event.target.value).defaultUnit || 'KG'); }} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }}>
                     {COMMODITIES.filter(c => c.id !== 'WOOL' && c.category !== 'FIBER').map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
@@ -533,46 +545,21 @@ export default function Market() {
                   </div>
                   <div>
                     <label htmlFor="lot-asking-price" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Asking price (₹/{lotUnit})</label>
-                    <input key={`${lotCropId}-${lotUnit}`} id="lot-asking-price" name="askingPrice" type="number" min="0.01" step="0.01" defaultValue={lotCommodity.basePricePerKg * unitKgFactor(lotUnit)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
+                    <input key={`${lotCropId}-${lotUnit}`} id="lot-asking-price" name="askingPrice" type="number" min="0.01" step="0.01" defaultValue="" placeholder="Enter price or use live reference" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
                     <label htmlFor="lot-origin" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Farm location</label>
-                    <input id="lot-origin" name="origin" defaultValue="Punjab / Karnataka Farm" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
+                    <input id="lot-origin" name="origin" placeholder="District, State" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CCC' }} required />
                   </div>
                 </div>
-                <section aria-labelledby="lot-photos-title">
-                  <label id="lot-photos-title" htmlFor="lot-photos" style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Crop photos (up to 5, 8 MB each)</label>
-                  <p style={{ margin: '4px 0 8px', fontSize: 12, color: '#64748B' }}>Use daylight, show the full produce and a close-up. Photos are previewed locally; demo mode does not upload files.</p>
-                  <input id="lot-photos" type="file" accept="image/*" capture="environment" multiple onChange={(event) => {
-                    const files = Array.from(event.target.files || []);
-                    const invalid = files.find(file => !file.type.startsWith('image/') || file.size > 8 * 1024 * 1024);
-                    if (invalid) { setPhotoError(`${invalid.name}: choose an image under 8 MB.`); event.target.value = ''; return; }
-                    const remaining = Math.max(0, 5 - lotPhotos.length);
-                    const chosen = files.slice(0, remaining);
-                    setPhotoError(files.length > remaining ? 'Only five photos can be attached.' : '');
-                    if (!chosen.length) return;
-                    setPhotoProgress(0);
-                    const previews = chosen.map(file => ({ name: file.name, url: URL.createObjectURL(file) }));
-                    setLotPhotos(previous => [...previous, ...previews]);
-                    setPhotoProgress(100);
-                    event.target.value = '';
-                  }} />
-                  {photoProgress > 0 && <p role="status" style={{ fontSize: 12 }}>Preparing previews: {photoProgress}% (local demo)</p>}
-                  {photoError && <p role="alert" style={{ color: '#B42318', fontSize: 12 }}>{photoError}</p>}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-                    {lotPhotos.map((photo, index) => <div key={`${photo.name}-${index}`} style={{ position: 'relative' }}>
-                      <img src={photo.url} alt={`Produce photo ${index + 1}: ${photo.name}`} style={{ width: 82, height: 72, objectFit: 'cover', borderRadius: 8 }} />
-                      <button type="button" aria-label={`Remove ${photo.name}`} onClick={() => { URL.revokeObjectURL(photo.url); setLotPhotos(previous => previous.filter((_, itemIndex) => itemIndex !== index)); }}>Remove</button>
-                    </div>)}
-                  </div>
-                </section>
-                <p style={{ margin: 0, fontSize: 12, color: '#475569' }}>Quality: <strong>{lotPhotos.length ? QUALITY_STATES.REVIEW_REQUIRED : QUALITY_STATES.UNAVAILABLE}</strong>. This demo cannot assess images or verify a grade.</p>
+                <LotQualityPanel key={lotCropId} cropId={lotCropId} photos={lotPhotos} onChange={setLotPhotos} onBusy={setQualityBusy} onError={setQualityError}
+                  onApplyPrice={price => { const field = document.getElementById('lot-asking-price'); if (field) field.value = (price * unitKgFactor(lotUnit)).toFixed(2); }} />
               </div>
               <div className="modal-action-row">
-                <button type="button" className="btn-secondary" onClick={() => setShowCreateLotModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">Publish Lot</button>
+                <button type="button" className="btn-secondary" disabled={publishingLot} onClick={() => { setShowCreateLotModal(false); setQualityError(''); }}>Cancel</button>
+                <button type="submit" className="btn-primary" disabled={qualityBusy || publishingLot || !!qualityError}>{publishingLot ? 'Publishing…' : 'Publish Lot'}</button>
               </div>
             </form>
           </div>

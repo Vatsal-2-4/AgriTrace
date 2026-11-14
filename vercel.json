@@ -5,7 +5,8 @@
   "devCommand": "npm run dev -- --host 127.0.0.1 --port %PORT%",
   "outputDirectory": "dist",
   "functions": {
-    "api/ai/mandi-forecast.py": { "runtime": "python3.12" }
+    "api/produce-quality.js": { "maxDuration": 120 },
+    "api/ai/mandi-forecast.py": { "runtime": "python3.12", "includeFiles": "model/**", "maxDuration": 60 }
   },
   "rewrites": [
     { "source": "/api/health", "destination": "/api/core?handler=health" },

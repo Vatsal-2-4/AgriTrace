@@ -74,6 +74,8 @@ export default function UserRoleDropdown() {
   const { user, switchRole, logout } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [switching, setSwitching] = useState(false);
+  const [switchError, setSwitchError] = useState('');
   const dropdownRef = useRef(null);
 
   // Close when clicking outside
@@ -90,10 +92,18 @@ export default function UserRoleDropdown() {
   const currentRoleConfig = user?.role === 'ADMIN' ? ADMIN_PORTAL : ROLES_LIST.find(r => r.role === user?.role) || ROLES_LIST[0];
   const hasAdminAccess = user?.role === 'ADMIN';
 
-  const handleRoleSelect = (targetRole) => {
-    switchRole(targetRole.role);
-    setIsOpen(false);
-    navigate(targetRole.path);
+  const handleRoleSelect = async (targetRole) => {
+    setSwitching(true); setSwitchError('');
+    try {
+      const result = await switchRole(targetRole.role);
+      if (result.requiresLogin) {
+        setIsOpen(false);
+        navigate('/login', { state: { workspaceRole: targetRole.role } });
+      } else if (result.success) {
+        setIsOpen(false);
+        navigate(targetRole.path);
+      } else setSwitchError(result.message || 'Workspace sign-in failed. Please try again.');
+    } finally { setSwitching(false); }
   };
 
   return (
@@ -138,9 +148,10 @@ export default function UserRoleDropdown() {
 
           {/* Role Switcher Section */}
           <div className="role-section-label">
-            Switch workspace preview
+            {switching ? 'Signing in to workspace…' : 'Switch workspace account'}
           </div>
 
+          {switchError && <p role="alert" style={{ padding: 12, color: '#8a3025' }}>{switchError}</p>}
           <div className="roles-list-group">
             {ROLES_LIST.map((r) => {
               const isSelected = (user?.role || 'FARMER') === r.role;
@@ -149,6 +160,7 @@ export default function UserRoleDropdown() {
               return (
                 <button
                   key={r.role}
+                  disabled={switching}
                   type="button"
                   className={`role-option-item ${isSelected ? 'active-role' : ''}`}
                   onClick={() => handleRoleSelect(r)}

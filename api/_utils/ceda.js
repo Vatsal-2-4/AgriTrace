@@ -1,6 +1,11 @@
+import { dailyCedaSnapshot } from './cedaDailyCache.js';
 const CEDA_BASE_URL = 'https://api.ceda.ashoka.edu.in/v1/agmarknet';
 
 export async function fetchCedaApi(endpoint, options = {}) {
+  return dailyCedaSnapshot(endpoint, options, () => requestCedaApi(endpoint, { ...options }));
+}
+
+async function requestCedaApi(endpoint, options = {}) {
   const token = process.env.CEDA_API_TOKEN;
   if (!token) {
     throw new Error('CEDA_API_TOKEN is not configured in the environment.');
@@ -19,13 +24,14 @@ export async function fetchCedaApi(endpoint, options = {}) {
 
   const response = await fetch(`${CEDA_BASE_URL}${endpoint}`, {
     ...options,
+    signal: AbortSignal.timeout(60000),
     headers
   });
 
   let data;
   try {
     data = await response.json();
-  } catch (err) {
+  } catch {
     const text = await response.text().catch(() => '');
     const error = new Error(`CEDA API returned non-JSON response: ${text.substring(0, 100)}`);
     error.status = response.status;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ProduceQualityReview from '../../components/ProduceQualityReview';
 import { useNavigate } from 'react-router-dom';
 import { qaService } from '../../services/qa/qaService';
 import { ClipboardList, CheckCircle, Clock, FileText, XCircle } from 'lucide-react';
@@ -48,6 +49,7 @@ export default function InspectorDashboard() {
 
   return (
     <div>
+      <ProduceQualityReview />
       <div className="inspector-page-header">
         <h1>Inspection Requests</h1>
         <p>Manage and process agricultural produce quality inspection requests.</p>

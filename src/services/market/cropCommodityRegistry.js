@@ -79,6 +79,16 @@ export const COMMODITIES = [
     description: 'High export and domestic demand from modern rice shellers in Punjab, Haryana, and Western UP.'
   },
   {
+    id: 'POTATO', name: 'Potato', category: 'VEGETABLE', hindiName: 'आलू',
+    defaultUnit: 'KG', supportedUnits: ['KG', 'Quintal', 'Tonne'],
+    basePricePerKg: 0, mandiPricePerKg: 0, processorQuotePerKg: 0, institutionalQuotePerKg: 0,
+    priceChange30d: 0, demandLevel: 'UNKNOWN', demandVolumeKg: 0, supplyVolumeKg: 0,
+    varieties: ['Standard', 'Kufri Jyoti', 'Kufri Pukhraj', 'Processing potato'],
+    qualitySchema: [], storageCharacteristics: { type: 'Confirm storage requirements with your quality partner', monthlyRatePerKg: 0, shelfLifeDays: 0, tempGuideline: 'Not assessed', lossRisk: 'Not assessed' },
+    processingStages: ['SORTING', 'GRADING', 'PACKAGING'],
+    description: 'Use live mandi evidence for pricing; photo quality requires partner review with the currently supplied weights.'
+  },
+  {
     id: 'TOMATO',
     name: 'Tomato',
     category: 'VEGETABLE',

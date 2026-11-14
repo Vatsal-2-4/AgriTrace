@@ -721,6 +721,7 @@ export default function MarketIntelligence() {
             trendPct: Number(trendPct) >= 0 ? '+' + trendPct + '%' : trendPct + '%',
             isPositive: Number(trendPct) >= 0,
             marketName: latest.market_name || (selectedDistrict + ' Mandi'),
+            modelFeatures: latest.modelFeatures || null,
             history: records
           });
           setDataSource(records.source === 'ceda' ? 'CEDA / Agmarknet API' : 'AgriTrace demo dataset');
@@ -738,22 +739,14 @@ export default function MarketIntelligence() {
   // Use the exported notebook model for the visible forecast when the backend
   // has enough chronological observations. Gemini remains the explanation layer.
   useEffect(() => {
-    const history = livePriceData?.history;
-    if (!Array.isArray(history) || history.length < 31) { setTrainedModelForecast(null); return undefined; }
+    const features = livePriceData?.modelFeatures;
+    if (!features) { setTrainedModelForecast(null); return undefined; }
     let active = true;
-    const observations = history.map((row, index) => ({
-      state: row.state || selectedState,
-      district_name: row.district_name || selectedDistrict,
-      market_name: row.market_name || livePriceData.marketName || `${selectedDistrict} Mandi`,
-      commodity: row.commodity || commodity.name,
-      variety: row.variety || commodity.varieties?.[0] || commodity.name,
-      grade: row.grade || 'A',
-      min_price: row.min_price ?? row.minPrice,
-      max_price: row.max_price ?? row.maxPrice,
-      modal_price: row.modal_price ?? row.modalPrice,
-      price_date: row.price_date || row.priceDate || new Date(Date.now() - (history.length - index) * 86400000).toISOString().slice(0, 10)
-    }));
-    getMandiForecast(observations).then(result => { if (active) setTrainedModelForecast(result); }).catch(() => { if (active) setTrainedModelForecast(null); });
+    setTrainedModelForecast(null);
+    getMandiForecast(features, {
+      state: selectedState, district: selectedDistrict, commodity: commodity.name,
+      observations: livePriceData?.history || []
+    }).then(result => { if (active) setTrainedModelForecast(result); }).catch(() => { if (active) setTrainedModelForecast(null); });
     return () => { active = false; };
   }, [livePriceData, selectedState, selectedDistrict, commodity]);
 
@@ -1258,13 +1251,31 @@ export default function MarketIntelligence() {
     setAiAssistantLoading(true);
 
     try {
-      let trainedModelForecast = null;
-      try { trainedModelForecast = await getMandiForecast(livePriceData?.history || []); } catch (_) { /* model is optional when the serverless Python runtime is unavailable */ }
-      const aiEvidence = trainedModelForecast ? [...evidence, {
-        id: 'trained-mandi-model', type: 'ml_forecast', label: 'Trained mandi forecast',
-        value: `Predicted next reported modal price Rs ${trainedModelForecast.predictedNextModalPrice}/quintal (delta ${trainedModelForecast.predictedDelta >= 0 ? '+' : ''}${trainedModelForecast.predictedDelta})`,
-        source: `${trainedModelForecast.modelVersion} trained on AGMARKNET historical observations`
-      }] : evidence;
+      const modelResult = await getMandiForecast(livePriceData?.modelFeatures, {
+        commodityId: selectedCrop, commodityName: commodity.name,
+        state: selectedState, district: selectedDistrict, evidence,
+        observations: livePriceData?.history || []
+      });
+      setTrainedModelForecast(modelResult);
+      if (modelResult) {
+        if (!modelResult.advisory) {
+          throw new Error(`Model direction: ${modelResult.direction}. Advisory withheld: ${modelResult.review.rationale || modelResult.review.reason}`);
+        }
+        setAiAssistantResult({ ...modelResult.advisory, confidence: 'Not calibrated', reasons: [
+          { text: modelResult.review.rationale, evidenceIds: ['trained-mandi-model'] }
+        ] });
+        setAiAssistantEvidence([...evidence, {
+          id: 'trained-mandi-model', type: 'ml_forecast', label: 'LightGBM direction and review',
+          value: JSON.stringify({ direction: modelResult.direction, probabilities: modelResult.classProbabilities, review: modelResult.review }),
+          source: modelResult.modelVersion
+        }]);
+        return;
+      }
+      const aiEvidence = [...evidence, {
+        id: 'model-inputs-unavailable', type: 'model_status', label: 'Trained model unavailable',
+        value: 'Complete engineered model inputs are unavailable. This advisory uses supplied market evidence only; no LightGBM prediction was reviewed.',
+        source: 'AgriTrace model input validation'
+      }];
       setAiAssistantEvidence(aiEvidence);
       const response = await fetch('/api/ai/market-advisor', {
         method: 'POST',
@@ -2022,8 +2033,8 @@ export default function MarketIntelligence() {
               <div className="ks-forecast-metrics">
                 {trainedModelForecast && <div className="ks-model-forecast-result">
                   <span>Trained mandi model</span>
-                  <b>₹{Number(trainedModelForecast.predictedNextModalPrice).toLocaleString('en-IN')} / qtl</b>
-                  <small>{trainedModelForecast.predictedDelta >= 0 ? '+' : ''}{trainedModelForecast.predictedDelta} delta · {trainedModelForecast.modelVersion}</small>
+                  <b>{trainedModelForecast.direction}</b>
+                  <small>{trainedModelForecast.review.status} · {trainedModelForecast.modelVersion}</small>
                 </div>}
                 <div>
                   <span>{t.expectedRangeLabel}</span>

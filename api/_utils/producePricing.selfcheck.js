@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { summarizePrices } from './producePricing.js';
+const today = new Date('2026-11-15T12:00:00Z');
+const rows = [1000, 2000, 3000, 4000, 5000].map((modal_price, i) => ({date:`2026-11-${10+i}`,modal_price}));
+const result = summarizePrices(rows, 2, today);
+assert.equal(result.mandiMedian, 30);
+assert.deepEqual(result.farmGateRange, {low:18,high:38});
+assert.equal(summarizePrices([],0,today).status,'INSUFFICIENT_DATA');
+assert.equal(summarizePrices([{date:'2025-01-01',modal_price:1000}],0,today).status,'STALE_DATA');
+assert.equal(summarizePrices([{date:'2027-01-01',modal_price:1000}],0,today).status,'INSUFFICIENT_DATA');
+console.log('Quality pricing: quartiles, quintal/kg conversion, transport deduction, empty, stale and future-data cases passed.');

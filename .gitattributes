@@ -1,0 +1,3 @@
+
+# LightGBM tree offsets require byte-stable model weights.
+model/lgbm_final.txt -text

@@ -1,7 +1,7 @@
 import { handleCors } from '../_utils/http.js';
 
-const GEMINI_MODEL = 'gemini-2.5-flash';
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GROQ_MODEL = 'qwen/qwen3.8-27b';
+const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
 const VALID_RECOMMENDATIONS = new Set(['SELL', 'HOLD', 'CONSIDER_ALTERNATIVE', 'INSUFFICIENT_DATA']);
 const VALID_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
@@ -19,29 +19,29 @@ function isEvidenceItem(item) {
     typeof item.source === 'string';
 }
 
-function parseGeminiJson(text = '') {
+function parseGroqJson(text = '') {
   const trimmed = text.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
   return JSON.parse(trimmed);
 }
 
 function validateAssistantOutput(output, evidenceIds) {
-  if (!output || typeof output !== 'object') throw new Error('Gemini response was not an object');
-  if (!VALID_RECOMMENDATIONS.has(output.recommendation)) throw new Error('Invalid recommendation in Gemini response');
-  if (!VALID_CONFIDENCE.has(output.confidence)) throw new Error('Invalid confidence in Gemini response');
-  if (typeof output.summary !== 'string') throw new Error('Missing summary in Gemini response');
-  if (!Array.isArray(output.reasons)) throw new Error('Missing reasons in Gemini response');
-  if (typeof output.suggestedAction !== 'string') throw new Error('Missing suggestedAction in Gemini response');
-  if (!Array.isArray(output.limitations)) throw new Error('Missing limitations in Gemini response');
+  if (!output || typeof output !== 'object') throw new Error('Groq response was not an object');
+  if (!VALID_RECOMMENDATIONS.has(output.recommendation)) throw new Error('Invalid recommendation in Groq response');
+  if (!VALID_CONFIDENCE.has(output.confidence)) throw new Error('Invalid confidence in Groq response');
+  if (typeof output.summary !== 'string') throw new Error('Missing summary in Groq response');
+  if (!Array.isArray(output.reasons)) throw new Error('Missing reasons in Groq response');
+  if (typeof output.suggestedAction !== 'string') throw new Error('Missing suggestedAction in Groq response');
+  if (!Array.isArray(output.limitations)) throw new Error('Missing limitations in Groq response');
 
   output.reasons.forEach((reason) => {
     if (!reason || typeof reason.text !== 'string' || !Array.isArray(reason.evidenceIds)) {
-      throw new Error('Invalid reason in Gemini response');
+      throw new Error('Invalid reason in Groq response');
     }
     if (reason.evidenceIds.length === 0) {
       throw new Error('Every reason must reference at least one evidence ID');
     }
     reason.evidenceIds.forEach((id) => {
-      if (!evidenceIds.has(id)) throw new Error(`Gemini referenced unknown evidence ID: ${id}`);
+      if (!evidenceIds.has(id)) throw new Error(`Groq referenced unknown evidence ID: ${id}`);
     });
   });
 
@@ -65,12 +65,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return sendJson(res, 503, {
         success: false,
-        message: 'Gemini API key is not configured.',
-        code: 'GEMINI_UNAVAILABLE'
+        message: 'Groq API key is not configured.',
+        code: 'GROQ_UNAVAILABLE'
       });
     }
 
@@ -95,40 +95,41 @@ export default async function handler(req, res) {
       `Evidence: ${JSON.stringify(evidence)}`
     ].join('\n');
 
-    const geminiResponse = await fetch(GEMINI_ENDPOINT, {
+    const groqResponse = await fetch(GROQ_ENDPOINT, {
+      signal: AbortSignal.timeout(25000),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
+        Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: 'application/json',
-          temperature: 0.2
-        }
+        model: GROQ_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.2,
+        max_completion_tokens: 4096
       })
     });
 
-    const geminiPayload = await geminiResponse.json().catch(() => null);
-    if (!geminiResponse.ok) {
+    const groqPayload = await groqResponse.json().catch(() => null);
+    if (!groqResponse.ok) {
       return sendJson(res, 502, {
         success: false,
-        message: geminiPayload?.error?.message || `Gemini API returned ${geminiResponse.status}`,
-        code: 'GEMINI_UNAVAILABLE'
+        message: groqPayload?.error?.message || `Groq API returned ${groqResponse.status}`,
+        code: 'GROQ_UNAVAILABLE'
       });
     }
 
-    const text = geminiPayload?.candidates?.[0]?.content?.parts?.map(part => part.text).join('') || '';
+    const text = groqPayload?.choices?.[0]?.message?.content || '';
     if (!text) {
       return sendJson(res, 502, {
         success: false,
-        message: 'Gemini returned an empty response.',
-        code: 'GEMINI_EMPTY_RESPONSE'
+        message: 'Groq returned an empty response.',
+        code: 'GROQ_EMPTY_RESPONSE'
       });
     }
 
-    const parsed = parseGeminiJson(text);
+    const parsed = parseGroqJson(text);
     const data = validateAssistantOutput(parsed, evidenceIds);
     return sendJson(res, 200, { success: true, data, evidence });
   } catch (error) {

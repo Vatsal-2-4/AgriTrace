@@ -3,7 +3,7 @@ import WoolCloudLoader from '../components/WoolCloudLoader';
 import { applyPageLanguage, getSavedLanguage, saveLanguage } from '../utils/languagePreference';
 
 const AuthContext = createContext();
-const normalizeRole = (role) => role === 'PROCESSING_UNIT' ? 'SELLER' : role;
+import { authenticateAccount, restoreAuthenticatedUser, DEMO_WORKSPACES, normalizeWorkspaceRole as normalizeRole } from '../utils/accountSession';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -13,75 +13,8 @@ export const useAuth = () => {
   return context;
 };
 
-// Local fallback profiles. The API is the primary source of authentication.
-const DEMO_USERS = {
-  'farmer@khetsetu.in': {
-    id: 'FARMER-01',
-    name: 'Rajesh Gowda',
-    email: 'farmer@khetsetu.in',
-    mobile: '9845012345',
-    role: 'FARMER',
-    state: 'Karnataka',
-    preferredLanguage: 'en'
-  },
-  'buyer@khetsetu.in': {
-    id: 'SELLER-01',
-    name: 'Anand Kumar',
-    email: 'buyer@khetsetu.in',
-    mobile: '9845098765',
-    role: 'SELLER',
-    state: 'Karnataka',
-    preferredLanguage: 'en'
-  },
-  'quality@khetsetu.in': {
-    id: 'INS-01',
-    name: 'Suresh Verma',
-    email: 'quality@khetsetu.in',
-    mobile: '9811223344',
-    role: 'QUALITY_INSPECTOR',
-    state: 'Karnataka',
-    preferredLanguage: 'en'
-  },
-  'storage@khetsetu.in': {
-    id: 'WH-01',
-    name: 'Mysuru Produce Storage Centre',
-    email: 'storage@khetsetu.in',
-    mobile: '9855667788',
-    role: 'WAREHOUSE',
-    state: 'Karnataka',
-    preferredLanguage: 'en'
-  },
-  'logistics@khetsetu.in': {
-    id: 'TR-01',
-    name: 'Rapid Farm Logistics',
-    email: 'logistics@khetsetu.in',
-    mobile: '9877889900',
-    role: 'TRANSPORT',
-    state: 'Karnataka',
-    preferredLanguage: 'en'
-  },
-  'facilitator@khetsetu.in': {
-    id: 'EDU-01',
-    name: 'AgriTrace Market Facilitator',
-    email: 'facilitator@khetsetu.in',
-    mobile: '9800011122',
-    role: 'EDUCATOR',
-    state: 'All India',
-    preferredLanguage: 'en'
-  },
-  'processor@khetsetu.in': { id: 'BUYER-02', name: 'Kota Agro Foods', email: 'processor@khetsetu.in', mobile: '9866778899', role: 'SELLER', state: 'Karnataka', preferredLanguage: 'en' }
-};
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    try {
-      const stored = localStorage.getItem('khetsetu_user') || localStorage.getItem('wooltrace_user');
-      const parsed = stored ? JSON.parse(stored) : null;
-      return parsed ? { ...parsed, role: normalizeRole(parsed.role) } : null;
-    } catch (e) {
-      return null;
-    }
-  });
+  const [user, setUser] = useState(() => restoreAuthenticatedUser(localStorage));
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -94,109 +27,27 @@ export const AuthProvider = ({ children }) => {
       applyPageLanguage(user.preferredLanguage || 'en');
     } else {
       localStorage.removeItem('khetsetu_user');
+      localStorage.removeItem('wooltrace_user');
+      localStorage.removeItem('agritrace_access_token');
     }
   }, [user]);
 
-  const login = async (identifier, password) => {
+  const login = async (identifier, password, expectedRole) => {
     setIsLoading(true);
     setLoadingText('Authenticating AgriTrace credentials...');
     const cleanId = (identifier || '').trim().toLowerCase();
-    const accountLanguage = getSavedLanguage(cleanId, 'en');
-
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ identifier: cleanId, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.user) {
-          if (data.accessToken) localStorage.setItem('agritrace_access_token', data.accessToken);
-          data.user.preferredLanguage = accountLanguage || data.user.preferredLanguage || 'en';
-          setUser({ ...data.user, role: normalizeRole(data.user.role) });
-          setTimeout(() => setIsLoading(false), 400);
-          return { success: true, user: { ...data.user, role: normalizeRole(data.user.role) } };
-        }
-      }
+      const session = await authenticateAccount(cleanId, password, expectedRole);
+      const nextUser = { ...session.user, preferredLanguage: getSavedLanguage(cleanId, session.user.preferredLanguage || 'en') };
+      // Store both before navigating so requests on the next workspace use the new token.
+      localStorage.setItem('agritrace_access_token', session.accessToken);
+      localStorage.setItem('khetsetu_user', JSON.stringify(nextUser));
+      localStorage.removeItem('wooltrace_user');
+      setUser(nextUser);
+      return { success: true, user: nextUser };
     } catch (error) {
-      console.warn('API login fetch bypassed, attempting demo/client authentication:', error);
-    }
-
-    try {
-      const usersList = JSON.parse(localStorage.getItem('wt_registered_users') || '[]');
-      const found = usersList.find(u => 
-        u.email.toLowerCase() === cleanId || 
-        (u.mobile && u.mobile === cleanId)
-      );
-
-      if (found) {
-        if (found.password === password) {
-          const userObj = { id: found.id, name: found.name, email: found.email, role: normalizeRole(found.role), preferredLanguage: accountLanguage || found.preferredLanguage || 'en' };
-          setUser(userObj);
-          setTimeout(() => setIsLoading(false), 400);
-          return { success: true, user: userObj };
-        } else {
-          setIsLoading(false);
-          return { success: false, message: 'Incorrect password.' };
-        }
-      }
-
-      if (DEMO_USERS[cleanId]) {
-        const demoUser = { ...DEMO_USERS[cleanId], preferredLanguage: accountLanguage };
-        setUser(demoUser);
-        setTimeout(() => setIsLoading(false), 400);
-        return { success: true, user: demoUser };
-      }
-
-      if (cleanId.endsWith('@khetsetu.in')) {
-        let role = 'FARMER';
-        if (cleanId.includes('seller')) role = 'SELLER';
-        if (cleanId.includes('inspector') || cleanId.includes('quality')) role = 'QUALITY_INSPECTOR';
-        if (cleanId.includes('warehouse') || cleanId.includes('storage')) role = 'WAREHOUSE';
-        if (cleanId.includes('transport') || cleanId.includes('logistics')) role = 'TRANSPORT';
-        if (cleanId.includes('processing') || cleanId.includes('processor')) role = 'SELLER';
-        if (cleanId.includes('educator') || cleanId.includes('teacher')) role = 'EDUCATOR';
-
-        const demoUser = {
-          id: `DEMO-${Date.now()}`,
-          name: cleanId.split('@')[0].toUpperCase(),
-          email: cleanId,
-          role: role,
-          preferredLanguage: 'en'
-        };
-        setUser(demoUser);
-        setTimeout(() => setIsLoading(false), 400);
-        return { success: true, user: demoUser };
-      }
-
-      let inferredRole = 'FARMER';
-      if (cleanId.includes('warehouse') || cleanId.includes('storage')) inferredRole = 'WAREHOUSE';
-      else if (cleanId.includes('inspector') || cleanId.includes('qa') || cleanId.includes('quality')) inferredRole = 'QUALITY_INSPECTOR';
-      else if (cleanId.includes('seller') || cleanId.includes('buyer')) inferredRole = 'SELLER';
-      else if (cleanId.includes('transport') || cleanId.includes('logistics')) inferredRole = 'TRANSPORT';
-      else if (cleanId.includes('processing') || cleanId.includes('processor')) inferredRole = 'SELLER';
-      else if (cleanId.includes('educator') || cleanId.includes('teacher')) inferredRole = 'EDUCATOR';
-
-      const fallbackUser = {
-        id: `USER-${Date.now().toString().slice(-4)}`,
-        name: cleanId.split('@')[0].toUpperCase(),
-        email: cleanId.includes('@') ? cleanId : `${cleanId}@khetsetu.in`,
-        role: inferredRole,
-        state: 'Karnataka',
-        preferredLanguage: 'en'
-      };
-
-      setUser(fallbackUser);
-      setTimeout(() => setIsLoading(false), 400);
-      return { success: true, user: fallbackUser };
-    } catch (e) {
-      setIsLoading(false);
-      return { success: false, message: 'Login error' };
-    }
+      return { success: false, message: error.message || 'Sign-in requires a connection to the account service.' };
+    } finally { setIsLoading(false); }
   };
 
   const register = async (userData) => {
@@ -244,10 +95,14 @@ export const AuthProvider = ({ children }) => {
     }, 750);
   };
 
-  const switchRole = (newRole) => {
-    if (user) {
-      setUser({ ...user, role: newRole });
+  const switchRole = async (newRole) => {
+    const identifier = DEMO_WORKSPACES[newRole];
+    if (!identifier) return { success: false, message: 'Unknown workspace.' };
+    if (!user?.email?.endsWith('@khetsetu.in')) {
+      return { success: false, requiresLogin: true, message: 'Sign in with an account authorized for that workspace.' };
     }
+    // Use the existing demo-account sign-in, never a client-only role change.
+    return login(identifier, 'password123', newRole);
   };
 
   const updatePreferredLanguage = (language) => {

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { restoreAuthenticatedUser, authenticateAccount } from './accountSession.js';
+const claims = { sub: 'farmer-id', role: 'FARMER', exp: Date.now()/1000 + 3600 };
+const token = 'header.' + Buffer.from(JSON.stringify(claims)).toString('base64url') + '.signature';
+const values = new Map([['khetsetu_user',JSON.stringify({id:'farmer-id',name:'Farmer',role:'QUALITY_INSPECTOR'})],['agritrace_access_token',token]]);
+const storage = {getItem:key=>values.get(key)};
+assert.equal(restoreAuthenticatedUser(storage).role,'FARMER','A preview role must not override the signed role');
+values.set('khetsetu_user',JSON.stringify({id:'different-account',role:'QUALITY_INSPECTOR'}));
+assert.equal(restoreAuthenticatedUser(storage),null);
+values.delete('agritrace_access_token');
+assert.equal(restoreAuthenticatedUser(storage),null);
+const response = data => async()=>({ok:true,json:async()=>data});
+const session = await authenticateAccount('quality@khetsetu.in','password123','QUALITY_INSPECTOR',response({user:{id:'quality-id',role:'QUALITY_INSPECTOR'},accessToken:'new-token'}));
+assert.equal(session.accessToken,'new-token');
+await assert.rejects(authenticateAccount('quality@khetsetu.in','password123','QUALITY_INSPECTOR',response({user:{id:'farmer-id',role:'FARMER'},accessToken:token})),/access/);
+await assert.rejects(authenticateAccount('quality@khetsetu.in','password123',undefined,response({user:{id:'quality-id',role:'QUALITY_INSPECTOR'}})),/server session/);
+await assert.rejects(authenticateAccount('quality@khetsetu.in','password123',undefined,async()=>({ok:false,json:async()=>({message:'Incorrect password'})})),/Incorrect password/);
+console.log('Account session checks passed: stale role repair, identity mismatch, missing tokens, fresh sign-in, wrong-role rejection and no fallback on failed credentials.');

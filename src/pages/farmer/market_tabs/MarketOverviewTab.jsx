@@ -1,15 +1,17 @@
 import React from 'react';
+import PredictionAdvisory from '../../../components/PredictionAdvisory';
 import {
-  TrendingUp, Activity, Users, Clock, Sparkles, Warehouse, Scale, CheckCircle2, Target
+  TrendingUp, Activity, Users, Clock, Scale, CheckCircle2, Target
 } from 'lucide-react';
 import { getCommodityById } from '../../../services/market/cropCommodityRegistry';
 
-export default function MarketOverviewTab({ selectedCommodityId = 'WHEAT', saleWindowAdvisory, marketTransactions = [], onLaunchDiscovery }) {
+export default function MarketOverviewTab({ selectedCommodityId = 'WHEAT', marketTransactions = [], onLaunchDiscovery }) {
   const commodity = getCommodityById(selectedCommodityId);
   const base = commodity.basePricePerKg;
 
   return (
     <div>
+      <PredictionAdvisory key={selectedCommodityId} selectedCommodityId={selectedCommodityId} />
       <div className="market-metric-grid">
         <div className="market-card lime">
           <div className="metric-top-row">
@@ -46,45 +48,20 @@ export default function MarketOverviewTab({ selectedCommodityId = 'WHEAT', saleW
 
         <div className="market-card">
           <div className="metric-top-row">
-            <span className="metric-title">Recommended Sale Window</span>
+            <span className="metric-title">Sale advisory</span>
             <Clock size={18} color="#0B120D" />
           </div>
           <div className="metric-number" style={{ fontSize: '20px', color: '#0B120D' }}>
-            {saleWindowAdvisory?.action || 'SELL NOW'}
+            Review your inputs
           </div>
           <div className="metric-subtitle">
-            <span>{saleWindowAdvisory?.recommendedWindow || 'Next 3 - 7 Days'} · {saleWindowAdvisory?.confidence || 'High'}</span>
+            <span>Use the crop prediction and review panel above.</span>
           </div>
         </div>
       </div>
 
       <div className="section-two-column">
         <div>
-          <div className="market-card" style={{ marginBottom: '24px', borderLeft: '4px solid #0B120D' }}>
-            <div className="panel-header-row">
-              <h3 className="panel-title">
-                <Sparkles size={20} color="#0B120D" />
-                <span>Market Advisory: {saleWindowAdvisory?.title || ('Market Window for ' + commodity.name)}</span>
-              </h3>
-              <span style={{
-                background: saleWindowAdvisory?.badgeBg || '#DDFF86', color: saleWindowAdvisory?.badgeColor || '#0B120D',
-                padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '800'
-              }}>
-                {saleWindowAdvisory?.action || 'SELL NOW'}
-              </span>
-            </div>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#334155', margin: '0 0 12px 0' }}>
-              {saleWindowAdvisory?.reason}
-            </p>
-            <div style={{
-              background: '#F8F8F3', padding: '12px 16px', borderRadius: '8px',
-              fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px'
-            }}>
-              <Warehouse size={16} />
-              <span><strong>Storage Economics:</strong> {saleWindowAdvisory?.storageAdvice}</span>
-            </div>
-          </div>
-
           <div className="market-card">
             <div className="panel-header-row">
               <h3 className="panel-title">

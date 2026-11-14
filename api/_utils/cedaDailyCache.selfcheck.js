@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { dailyCedaSnapshot } from './cedaDailyCache.js';
+const endpoint = `/__cache_selfcheck__/${Date.now()}`;
+let calls = 0;
+const fetchData = async () => { calls++; await new Promise(resolve => setTimeout(resolve, 20)); return { data: [{ price: 23 }] }; };
+const options = { method: 'POST', body: { crop: 78, state: 8 } };
+const results = await Promise.all(Array.from({ length: 8 }, () => dailyCedaSnapshot(endpoint, options, fetchData)));
+assert.equal(calls, 1);
+assert.deepEqual(results[0], { data: [{ price: 23 }] });
+await dailyCedaSnapshot(endpoint, { method: 'POST', body: { state: 8, crop: 78 } }, fetchData);
+assert.equal(calls, 1, 'Disk snapshot must survive completed requests and reordered keys');
+let failures = 0;
+const fail = async () => { failures++; throw new Error('Simulated provider outage'); };
+await assert.rejects(dailyCedaSnapshot(endpoint + '/failure', {}, fail));
+await assert.rejects(dailyCedaSnapshot(endpoint + '/failure', {}, fail));
+assert.equal(failures, 1);
+console.log('CEDA daily cache: concurrency, persistent reuse, query normalization and failed-refresh suppression passed; no external API calls.');

@@ -1,0 +1,20 @@
+.produce-quality{border-top:1px solid #dce2d8;border-bottom:1px solid #dce2d8;padding:18px 0;color:#172c20;font-size:13px;line-height:1.6}
+.produce-quality h4{margin:0 0 8px;font-size:16px}.produce-quality h4:not(:first-child){margin-top:24px}
+.produce-quality p{margin:6px 0 10px;max-width:72ch}.produce-quality small{display:block;color:#526057}
+.produce-quality label{display:flex;flex-direction:column;gap:6px;font-weight:600}
+.produce-quality input,.produce-quality select,.produce-quality textarea{width:100%;min-width:0;box-sizing:border-box;padding:10px;border:1px solid #9ca99f;border-radius:6px;background:#fff;color:#172c20;font:inherit}
+.produce-quality button{border:1px solid #a1b1a5;background:#f5f7ef;color:#172c20;border-radius:6px;padding:8px 12px;font:inherit;cursor:pointer;margin-top:8px}
+.produce-quality button:hover{background:#e7efda}.produce-quality button:disabled{opacity:.6;cursor:wait}
+.produce-quality :focus-visible{outline:2px solid #245538;outline-offset:3px}.produce-quality input::placeholder{color:#526057}
+.produce-quality-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.produce-photo-list article{display:flex;align-items:flex-start;gap:14px;border-top:1px solid #dce2d8;padding:14px 0;margin-top:10px;overflow-wrap:anywhere}
+.produce-photo-list img{width:110px;height:110px;object-fit:contain;background:#f8f8f3;border-radius:6px;flex-shrink:0}
+.produce-quality-note{background:#f1f5e9;border:1px solid #d6e0cb;border-radius:6px;padding:12px;margin:12px 0}
+.produce-quality-error{color:#8a3025;background:#fff3ed;border:1px solid #deb9ad;padding:10px;border-radius:6px}
+.produce-review{padding:20px;background:#fff;border:1px solid #dce2d8;border-radius:10px;margin-bottom:24px;color:#172c20}
+.produce-review h2{margin:0 0 8px;font-size:21px}.produce-review article{border-top:1px solid #dce2d8;padding-top:18px;margin-top:18px}
+.produce-review-images{display:flex;flex-wrap:wrap;gap:12px}.produce-review-images img{width:180px;height:160px;object-fit:contain;background:#f5f7f1}.produce-review-images a{display:inline-block}
+@media(max-width:520px){.produce-quality-fields{grid-template-columns:1fr}.produce-photo-list article{flex-direction:column}.produce-photo-list img{width:100%;height:180px}.produce-review-images img{width:100%;height:220px}}
+
+/* Keep the lot workflow above the floating assistant on narrow screens. */
+.wt-modal-overlay:has(.produce-quality){z-index:10001}
