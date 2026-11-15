@@ -139,3 +139,16 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Reuse the validated advisor contract without an external HTTP round trip.
+export async function reviewMarketEvidence(context, evidence) {
+  let status = 200, payload;
+  const response = {
+    setHeader() {},
+    status(value) { status = value; return this; },
+    json(value) { payload = value; return this; }
+  };
+  await handler({ method: 'POST', headers: {}, body: { context, evidence } }, response);
+  if (status !== 200 || !payload?.success) throw new Error('Qwen review unavailable; market evidence remains available.');
+  return payload.data;
+}

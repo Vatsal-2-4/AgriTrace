@@ -1,4 +1,7 @@
 import { handleCors } from '../_utils/http.js';
+import { getCropMarketIntelligence, validateMarketRequest } from '../_utils/cropMarketIntelligence.js';
+import { authenticate } from '../_utils/market.js';
+import dbConnect from '../_utils/db.js';
 
 const DEMAND_MODEL_VERSION = 'regional-demand-heuristic-v1';
 const PRICE_MODEL_VERSION = 'market-price-heuristic-v1';
@@ -147,7 +150,18 @@ export default function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Method not allowed' });
   const kind = String(req.query?.kind || req.body?.kind || '').toLowerCase();
   const body = req.body || {};
+  if (kind === 'market') return cropMarketRequest(req, res, body);
   const result = kind === 'demand' ? demandForecast(body) : kind === 'price' ? priceRecommendation(body) : { error: 'kind must be demand or price' };
   if (result.error) return res.status(400).json({ success: false, message: result.error });
   return res.status(200).json({ success: true, data: result.data });
+}
+
+async function cropMarketRequest(req, res, body) {
+  const actor = authenticate(req);
+  if (!actor) return res.status(401).json({ success: false, message: 'Sign in to request crop market intelligence.' });
+  try { validateMarketRequest(body); } catch (error) { return res.status(400).json({ success: false, message: error.message }); }
+  try {
+    await dbConnect();
+    return res.status(200).json({ success: true, data: await getCropMarketIntelligence(body, actor.id) });
+  } catch { return res.status(503).json({ success: false, message: 'Market evidence is unavailable. Daily CEDA requests are not retried until the next India calendar day.' }); }
 }

@@ -1,0 +1,8 @@
+**
+!services/
+!services/quality/
+!services/quality/infer.py
+!services/quality/requirements.txt
+!yolo_best_weights/
+!yolo_best_weights/detector_yolo26s_best.pt
+!yolo_best_weights/ripeness_yolo26s-cls_best.pt

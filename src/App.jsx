@@ -41,7 +41,6 @@ const Certificates = React.lazy(() => import('./pages/inspector/Certificates'));
 const InspectionDetail = React.lazy(() => import('./pages/inspector/InspectionDetail'));
 const NotificationsSettings = React.lazy(() => import('./pages/settings/NotificationsSettings'));
 const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
-const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
 
 function RoleHomeRedirect() {
   const { user } = useAuth();
@@ -52,7 +51,7 @@ const secure = (roles, element) => <ProtectedRoute allowedRoles={roles}>{element
 
 function AdminOnly({ children }) {
   const { user } = useAuth();
-  return user?.role === 'ADMIN' ? children : <Navigate to="/admin/login" replace />;
+  return user?.role === 'ADMIN' ? children : <Navigate to="/login" replace />;
 }
 
 function App() {
@@ -61,7 +60,7 @@ function App() {
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/platform" element={<RoleHomeRedirect />} />
-    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/admin/login" element={<Navigate to="/login" replace />} />
     <Route path="/admin" element={<AdminOnly><AdminDashboard /></AdminOnly>} />
     <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
     <Route path="/track/:batchId" element={<PublicTrackBatch />} />

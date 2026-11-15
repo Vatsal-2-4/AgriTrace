@@ -7,11 +7,13 @@
 /dist-ssr
 /build
 /out
+/output/
 /artifacts/
 /.vite
 /.cache
 /.vercel
 /.vercel-cli-data
+/api/_native/
 
 # Environment and secrets (never commit these)
 .env
@@ -41,3 +43,5 @@ tmp/
 temp/
 __pycache__/
 *.pyc
+.vercel
+.env*

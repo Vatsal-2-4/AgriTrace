@@ -95,6 +95,30 @@ It is kept in ignored `artifacts/quality/` solely for testing, not shipped as a
 farmer photo. The model's mixed ripe/raw output on this sample is an inference
 result, not an accuracy or grading validation claim.
 
+## Hugging Face Docker deployment
+
+`services/quality/Dockerfile` builds a CPU-only PyTorch image containing the two
+tomato weights. It runs as a non-root user, binds to `0.0.0.0:7860`, warms the
+models before serving, and exposes `GET /health`. Inference requires the shared
+`QUALITY_SERVICE_TOKEN`. The normal local CLI behavior and localhost bind are
+preserved outside the container.
+
+On an account eligible for Docker Spaces, add a write-scoped `HF_TOKEN` to the
+ignored local `.env` file. Do not commit it. Install `huggingface_hub` in the local
+Python environment, then run `node scripts/deploy-quality-space.mjs`.
+
+The deployment uploads only the Dockerfile, Space README, inference code,
+requirements and two tomato weights to `<account>/agritrace-quality`. It configures
+the service secret, waits for model readiness, and tests the public reference
+tomato image. Only after that test succeeds does it set Vercel's production
+`QUALITY_INFERENCE_URL` and matching secret and redeploy the web app. No farmer
+photos or database credentials are uploaded to the Space.
+
+The shared service secret is retained in ignored
+`artifacts/quality/hosted-inference-config.json` for deployment continuity. Do not
+publish that local file. Photos are processed in memory by the inference service;
+the marketplace remains responsible for storing and protecting lot photos.
+
 Repeat the isolated live API check with `node scripts/check_produce_quality.mjs
 <tomato-photo.jpg>`. It requires the local server and MongoDB; its own temporary
 records are removed in a finally block. No CEDA calls are made by this check.

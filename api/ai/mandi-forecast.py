@@ -11,6 +11,9 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 import joblib
+if os.environ.get('VERCEL'):
+    import ctypes
+    ctypes.CDLL(str(Path(__file__).resolve().parents[1] / '_native' / 'libgomp.so.1'), mode=ctypes.RTLD_GLOBAL)
 import lightgbm as lgb
 import numpy as np
 import pandas as pd

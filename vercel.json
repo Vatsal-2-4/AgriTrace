@@ -1,14 +1,18 @@
 {
   "framework": "vite",
   "installCommand": "npm install",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build && node scripts/prepare-vercel-native.mjs",
   "devCommand": "npm run dev -- --host 127.0.0.1 --port %PORT%",
   "outputDirectory": "dist",
   "functions": {
     "api/produce-quality.js": { "maxDuration": 120 },
-    "api/ai/mandi-forecast.py": { "runtime": "python3.12", "includeFiles": "model/**", "maxDuration": 60 }
+    "api/ai/mandi-forecast.py": { "includeFiles": "{model/**,api/_native/**}", "maxDuration": 60 }
   },
   "rewrites": [
+    { "source": "/api/admin/users", "destination": "/api/core?handler=admin" },
+    { "source": "/api/admin/tracking", "destination": "/api/core?handler=admin-tracking" },
+    { "source": "/api/ai/chat", "destination": "/api/core?handler=chat" },
+    { "source": "/api/ai/market-advisor", "destination": "/api/core?handler=market-advisor" },
     { "source": "/api/health", "destination": "/api/core?handler=health" },
     { "source": "/api/crop50", "destination": "/api/core?handler=crop50" },
     { "source": "/api/khetsetu", "destination": "/api/core?handler=khetsetu" },
@@ -23,9 +27,10 @@
     { "source": "/api/processing/:route*", "destination": "/api/processing?route=:route*" },
     { "source": "/api/qa/:route*",      "destination": "/api/qa?route=:route*"      },
     { "source": "/api/ai/mandi-forecast", "destination": "/api/ai/mandi-forecast.py" },
-    { "source": "/api/ai/intelligence/:kind", "destination": "/api/ai/intelligence?kind=:kind" },
+    { "source": "/api/ai/intelligence/:kind", "destination": "/api/core?handler=intelligence&kind=:kind" },
     { "source": "/api/transport/:route*", "destination": "/api/transport?route=:route*" },
     { "source": "/api/warehouse/:route*", "destination": "/api/warehouse?route=:route*" },
-    { "source": "/api/notifications/:route*", "destination": "/api/notifications?route=:route*" }
+    { "source": "/api/notifications/:route*", "destination": "/api/notifications?route=:route*" },
+    { "source": "/((?!api(?:/|$)).*)", "destination": "/index.html" }
   ]
 }

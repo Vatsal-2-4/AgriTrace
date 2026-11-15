@@ -1,7 +1,7 @@
-import dbConnect from './_utils/db.js';
-import { authenticate, sendError, sendSuccess } from './_utils/market.js';
-import User from './_models/User.js';
-import { handleCors } from './_utils/http.js';
+import dbConnect from '../_utils/db.js';
+import { authenticate, sendError, sendSuccess } from '../_utils/market.js';
+import User from '../_models/User.js';
+import { handleCors } from '../_utils/http.js';
 
 export default async function handler(req, res) {
   if (handleCors(req, res)) return;

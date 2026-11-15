@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import handler from './intelligence.js';
+import handler from '../_handlers/intelligence.js';
 
 function request(kind, body) {
   const req = { method: 'POST', query: { kind }, body, headers: {} };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, Globe, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { ArrowRight, Globe, AlertCircle, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/useAuth.js';
 import { getRoleHome } from '../../utils/roleRoutes';
 import './Login.css';
@@ -14,9 +14,13 @@ const DEMO_BUTTONS = [
   { label: 'Logistics Partner', email: 'logistics@khetsetu.in', role: 'TRANSPORT', color: '#92400E', bg: '#FEF3C7' },
 ];
 
+const MOCK_ADMIN = { email: 'admin@demo.agritrace.local', password: 'AgriTraceDemo!2026' };
+
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { login, isLoading } = useAuth();
+  const adminMode = searchParams.get('admin') === '1';
   const [identifier, setIdentifier] = useState('farmer@khetsetu.in');
   const [password, setPassword] = useState('password123');
   const [errorMessage, setErrorMessage] = useState('');
@@ -35,9 +39,13 @@ const Login = () => {
 
   const executeLogin = async (idToUse, passToUse) => {
     setErrorMessage('');
-    const result = await login(idToUse, passToUse);
+    const result = await login(idToUse, passToUse, adminMode ? 'ADMIN' : undefined);
     if (result.success) {
-      navigate(getRoleHome(result.user?.role));
+      if (adminMode && result.user?.role !== 'ADMIN') {
+        setErrorMessage('Use the mock administrator account shown below.');
+        return;
+      }
+      navigate(getRoleHome(result.user?.role), { replace: true });
     } else {
       setErrorMessage(result.message || 'Login failed. Please check your credentials.');
     }
@@ -52,6 +60,20 @@ const Login = () => {
     setIdentifier(demo.email);
     setPassword('password123');
     await executeLogin(demo.email, 'password123');
+  };
+
+  const openAdminSignIn = () => {
+    setIdentifier(MOCK_ADMIN.email);
+    setPassword(MOCK_ADMIN.password);
+    setErrorMessage('');
+    setSearchParams({ admin: '1' });
+  };
+
+  const closeAdminSignIn = () => {
+    setIdentifier('farmer@khetsetu.in');
+    setPassword('password123');
+    setErrorMessage('');
+    setSearchParams({});
   };
 
   return (
@@ -74,8 +96,8 @@ const Login = () => {
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="logo">AGRI<span>TRACE</span></div>
           </Link>
-          <h2 style={{marginTop: '8px', fontSize: '20px'}}>One market. Every decision connected.</h2>
-          <p>Sign in to your AgriTrace market workspace.</p>
+          <h2 style={{marginTop: '8px', fontSize: '20px'}}>{adminMode ? 'Administrator access' : 'One market. Every decision connected.'}</h2>
+          <p>{adminMode ? 'Sign in with the mock administrator account.' : 'Sign in to your AgriTrace market workspace.'}</p>
         </div>
 
         {errorMessage && (
@@ -98,10 +120,10 @@ const Login = () => {
 
         <form className="login-form" onSubmit={handleLogin}>
           <div className="form-group">
-            <label>Email / Mobile Number</label>
+            <label>{adminMode ? 'Admin email' : 'Email / Mobile Number'}</label>
             <input 
               type="text" 
-              placeholder="e.g. farmer@khetsetu.in" 
+              placeholder={adminMode ? MOCK_ADMIN.email : 'e.g. farmer@khetsetu.in'}
               value={identifier}
               onChange={e => setIdentifier(e.target.value)}
               required 
@@ -147,21 +169,25 @@ const Login = () => {
               <input type="checkbox" defaultChecked />
               <span>Remember me</span>
             </label>
-            <a href="#" className="forgot-password">Forgot password?</a>
+            {!adminMode && <a href="#" className="forgot-password">Forgot password?</a>}
           </div>
 
           <button type="submit" className="btn-primary" disabled={isLoading}>
-            {isLoading ? 'SIGNING IN...' : 'LOGIN'} <ArrowRight size={18} />
+            {isLoading ? 'SIGNING IN...' : adminMode ? 'OPEN ADMIN PORTAL' : 'LOGIN'} <ArrowRight size={18} />
           </button>
           
           <div className="form-footer">
-            <p>Don't have an account? <Link to="/register" className="link-btn">CREATE ACCOUNT</Link></p>
+            {adminMode ? (
+              <><div className="admin-demo-details"><ShieldCheck size={16}/><span><b>Mock admin</b><code>{MOCK_ADMIN.email}</code><code>{MOCK_ADMIN.password}</code></span></div><button type="button" className="admin-signin-link" onClick={closeAdminSignIn}>Back to workspace sign in</button></>
+            ) : (
+              <><p>Don't have an account? <Link to="/register" className="link-btn">CREATE ACCOUNT</Link></p><button type="button" className="admin-signin-link" onClick={openAdminSignIn}><ShieldCheck size={14}/> Sign in as admin</button></>
+            )}
           </div>
           
         </form>
       </div>
 
-      <aside className="workspace-previews">
+      {!adminMode && <aside className="workspace-previews">
         <span className="workspace-previews-label">Preview a workspace</span>
         <div className="workspace-preview-links">
           {DEMO_BUTTONS.map((demo) => (
@@ -170,7 +196,7 @@ const Login = () => {
             </button>
           ))}
         </div>
-      </aside>
+      </aside>}
     </div>
   );
 };

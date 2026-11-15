@@ -3,7 +3,7 @@ const endpoint = kind => `/api/ai/intelligence/${kind}`;
 async function postIntelligence(kind, input) {
   const response = await fetch(endpoint(kind), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('agritrace_access_token') || ''}` },
     body: JSON.stringify(input)
   });
   const payload = await response.json().catch(() => ({}));
@@ -22,4 +22,8 @@ export function getRegionalDemandForecast(input) {
 
 export function getMarketPriceRecommendation(input) {
   return postIntelligence('price', input);
+}
+
+export function getCropMarketIntelligence(input) {
+  return postIntelligence('market', input);
 }

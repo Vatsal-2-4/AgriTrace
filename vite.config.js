@@ -5,10 +5,10 @@ import mandiForecastHandler from './server/handlers/mandi-forecast.js';
 import loginHandler from './server/handlers/login.js';
 import registerHandler from './server/handlers/register.js';
 import marketHandler from './api/market.js';
-import marketAdvisorHandler from './api/ai/market-advisor.js';
+import marketAdvisorHandler from './api/_handlers/market-advisor.js';
 import paymentsHandler from './server/handlers/payments.js';
 import marketRecordsHandler from './server/handlers/market-records.js';
-import chatHandler from './api/ai/chat.js';
+import chatHandler from './api/_handlers/chat.js';
 import notificationsHandler from './api/notifications.js';
 import biddingHandler from './api/bidding.js';
 import qaHandler from './api/qa.js';
@@ -17,14 +17,16 @@ import transportHandler from './api/transport.js';
 import warehouseHandler from './api/warehouse.js';
 import coreHandler from './api/core.js';
 import batchesHandler from './api/batches.js';
-import adminHandler from './api/admin.js';
-import adminTrackingHandler from './api/admin/tracking.js';
+import adminHandler from './api/_handlers/admin.js';
+import adminTrackingHandler from './api/_handlers/admin-tracking.js';
+import intelligenceHandler from './api/_handlers/intelligence.js';
 
 const LOCAL_HANDLERS = [
   ['/api/produce-quality', produceQualityHandler],
   ['/api/ai/mandi-forecast', mandiForecastHandler],
   ['/api/ai/market-advisor', marketAdvisorHandler],
   ['/api/ai/chat', chatHandler],
+  ['/api/ai/intelligence', intelligenceHandler],
   ['/api/login', loginHandler],
   ['/api/register', registerHandler],
   ['/api/payments', paymentsHandler],
@@ -69,6 +71,7 @@ function localApiBridge() {
 
         try {
           req.query = Object.fromEntries(url.searchParams.entries());
+          if (url.pathname.startsWith('/api/ai/intelligence/')) req.query.kind = url.pathname.split('/').at(-1);
           if (alias) req.query.handler = alias;
           req.body = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method || '') ? await readBody(req) : {};
           res.status = function status(code) { this.statusCode = code; return this; };

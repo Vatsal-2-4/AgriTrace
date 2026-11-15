@@ -13,13 +13,13 @@ export default async function handler(req, res) {
   try {
     await connectToDatabase();
 
-    const { identifier, password } = req.body;
+    const { identifier, password, expectedRole } = req.body;
 
     if (!identifier || !password) {
       return res.status(400).json({ message: 'Missing identifier or password' });
     }
 
-    if (process.env.NODE_ENV === 'development' && identifier.trim().toLowerCase() === DEMO_ADMIN_EMAIL) {
+    if (expectedRole === 'ADMIN' && identifier.trim().toLowerCase() === DEMO_ADMIN_EMAIL) {
       let demoAdmin = await User.findOne({ email: DEMO_ADMIN_EMAIL });
       if (!demoAdmin) {
         demoAdmin = await User.create({ name: 'AgriTrace Demo Admin', email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD, role: 'ADMIN' });
@@ -73,6 +73,10 @@ export default async function handler(req, res) {
 
     if (!user) {
       return res.status(401).json({ message: 'Account not found. Please register first.' });
+    }
+
+    if (user.role === 'ADMIN') {
+      return res.status(401).json({ message: 'Administrators must use the mock admin sign-in.' });
     }
 
     if (user.password !== password) {

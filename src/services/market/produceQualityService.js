@@ -18,7 +18,7 @@ export async function preparePhoto(file) {
     return data;
   } finally { image.close(); }
 }
-export const CEDA_STATES = { 'Rajasthan': 8, 'Maharashtra': 27, 'Karnataka': 29, 'Uttar Pradesh': 9, 'Madhya Pradesh': 23, 'Punjab': 3, 'Gujarat': 24, 'Tamil Nadu': 33, 'Andhra Pradesh': 28, 'West Bengal': 19, 'Haryana': 6, 'Bihar': 10, 'Odisha': 21, 'Telangana': 36 };
+export { CEDA_STATES } from '../../../shared/marketCrops.js';
 
 export function qualitySampleSummary(result) {
   const samples = result.samples || [];

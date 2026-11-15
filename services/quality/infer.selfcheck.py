@@ -2,6 +2,12 @@ import base64
 import importlib.util
 import io
 import unittest
+import os
+import json
+import threading
+from unittest.mock import patch
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from pathlib import Path
 from PIL import Image
 
@@ -54,6 +60,36 @@ class SampleAggregationChecks(unittest.TestCase):
         result = quality.summarize_samples([])
         self.assertIsNone(result['grade'])
         self.assertIn('No tomatoes detected', result['reason'])
+
+class HttpServiceChecks(unittest.TestCase):
+    def setUp(self):
+        self.token = patch.dict(os.environ, {'QUALITY_SERVICE_TOKEN': 'test-service-secret'})
+        self.token.start()
+        self.server = quality.HTTPServer(('127.0.0.1', 0), quality.Handler)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.url = f'http://127.0.0.1:{self.server.server_port}'
+
+    def tearDown(self):
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join()
+        self.token.stop()
+
+    def test_health_does_not_require_token(self):
+        with urlopen(self.url + '/health') as response:
+            self.assertEqual(json.load(response)['status'], 'ok')
+
+    def test_inference_requires_service_token(self):
+        request = Request(self.url, data=b'{}', method='POST')
+        with self.assertRaises(HTTPError) as caught:
+            urlopen(request)
+        self.assertEqual(caught.exception.code, 401)
+
+    def test_authenticated_photo_validation(self):
+        request = Request(self.url, data=json.dumps({'cropId': 'TOMATO', 'imageBase64': 'bad-photo'}).encode(), headers={'Authorization': 'Bearer test-service-secret'}, method='POST')
+        with urlopen(request) as response:
+            self.assertFalse(json.load(response)['success'])
 
 if __name__ == '__main__':
     unittest.main()

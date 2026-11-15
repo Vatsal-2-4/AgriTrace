@@ -95,11 +95,21 @@ def run(packet):
         return {'success': False, 'message': str(error)[:240]}
 
 class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path != '/health':
+            self.send_error(404); return
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json'); self.end_headers()
+        self.wfile.write(json.dumps({'status': 'ok', 'modelsLoaded': model.cache_info().currsize >= 2}).encode())
+
     def do_POST(self):
         token = os.environ.get('QUALITY_SERVICE_TOKEN', '')
         if not token or not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):
             self.send_error(401); return
-        size = int(self.headers.get('Content-Length', 0))
+        try:
+            size = int(self.headers.get('Content-Length', 0))
+        except ValueError:
+            self.send_error(400); return
         if size <= 0 or size > 3000000:
             self.send_error(413); return
         try:
@@ -112,7 +122,12 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     if '--serve' in sys.argv:
-        HTTPServer(('127.0.0.1', int(os.environ.get('QUALITY_PORT', '8091'))), Handler).serve_forever()
+        if not os.environ.get('QUALITY_SERVICE_TOKEN'):
+            raise RuntimeError('QUALITY_SERVICE_TOKEN must be configured before starting the server')
+        if os.environ.get('QUALITY_WARMUP') == '1':
+            model('detector_yolo26s_best.pt')
+            model('ripeness_yolo26s-cls_best.pt')
+        HTTPServer((os.environ.get('QUALITY_HOST', '127.0.0.1'), int(os.environ.get('PORT', os.environ.get('QUALITY_PORT', '8091')))), Handler).serve_forever()
     else:
         # Libraries may print startup information; JSON alone belongs on stdout.
         from contextlib import redirect_stdout

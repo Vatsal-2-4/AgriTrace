@@ -1,0 +1,17 @@
+node_modules/
+artifacts/
+output/
+tmp/
+scratch/
+.env
+.env.*
+!.env.example
+.git/
+yolo_best_weights/
+model/*.ipynb
+model/master_dataset.csv
+model/*.webp
+model/*.csv.bak
+**/*.selfcheck.*
+**/__pycache__/
+**/*.pyc

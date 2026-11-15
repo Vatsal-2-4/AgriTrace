@@ -20,7 +20,7 @@ export function restoreAuthenticatedUser(storage) {
 export async function authenticateAccount(identifier, password, expectedRole, fetcher = fetch) {
   const response = await fetcher('/api/login', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ identifier, password })
+    body: JSON.stringify({ identifier, password, expectedRole })
   });
   const data = await response.json();
   if (!response.ok || !data.user || !data.accessToken) throw new Error(data.message || 'Sign-in failed. A valid server session is required.');

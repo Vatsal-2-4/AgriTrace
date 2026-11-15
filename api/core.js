@@ -7,9 +7,14 @@ import register from '../server/handlers/register.js';
 import marketRecords from '../server/handlers/market-records.js';
 import payments from '../server/handlers/payments.js';
 import seedDemo from '../server/handlers/seed-demo.js';
+import admin from './_handlers/admin.js';
+import adminTracking from './_handlers/admin-tracking.js';
+import chat from './_handlers/chat.js';
+import marketAdvisor from './_handlers/market-advisor.js';
+import intelligence from './_handlers/intelligence.js';
 import { handleCors } from './_utils/http.js';
 
-const handlers = { health, crop50, khetsetu, 'learning-resources': learningResources, login, register, 'market-records': marketRecords, payments, 'seed-demo': seedDemo };
+const handlers = { health, crop50, khetsetu, 'learning-resources': learningResources, login, register, 'market-records': marketRecords, payments, 'seed-demo': seedDemo, admin, 'admin-tracking': adminTracking, chat, 'market-advisor': marketAdvisor, intelligence };
 
 export default async function handler(req, res) {
   if (handleCors(req, res)) return;

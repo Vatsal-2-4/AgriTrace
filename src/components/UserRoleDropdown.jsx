@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  User, ChevronDown, Check, LogOut, Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell, Gauge
+  User, ChevronDown, Check, LogOut,
+  Warehouse, ShieldCheck, ShoppingCart, Truck, Sprout, Bell
 } from 'lucide-react';
 import { useAuth } from '../context/useAuth.js';
 import './UserRoleDropdown.css';
@@ -64,11 +65,6 @@ const ROLES_LIST = [
   }
 ];
 
-const ADMIN_PORTAL = {
-  role: 'ADMIN', label: 'Admin Portal', sub: 'Platform users and analytics', path: '/admin',
-  icon: Gauge, badgeColor: '#17623b', badgeBg: '#DDF6E5'
-};
-
 export default function UserRoleDropdown() {
   const { user, switchRole, logout } = useAuth();
   const navigate = useNavigate();
@@ -88,8 +84,7 @@ export default function UserRoleDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentRoleConfig = user?.role === 'ADMIN' ? ADMIN_PORTAL : ROLES_LIST.find(r => r.role === user?.role) || ROLES_LIST[0];
-  const hasAdminAccess = user?.role === 'ADMIN';
+  const currentRoleConfig = ROLES_LIST.find(r => r.role === user?.role) || ROLES_LIST[0];
 
   const handleRoleSelect = async (targetRole) => {
     setSwitching(true); setSwitchError('');
@@ -178,26 +173,6 @@ export default function UserRoleDropdown() {
                 </button>
               );
             })}
-          </div>
-
-          <div className="dropdown-divider" />
-
-          <div className="admin-portal-link-wrap">
-            <button
-              type="button"
-              className="admin-portal-link"
-              title={hasAdminAccess ? 'Open the admin portal' : 'Open a sample admin portal preview'}
-              onClick={() => {
-                setIsOpen(false);
-                navigate(hasAdminAccess ? ADMIN_PORTAL.path : '/admin/login');
-              }}
-            >
-              <span className="admin-portal-icon" style={{ background: ADMIN_PORTAL.badgeBg, color: ADMIN_PORTAL.badgeColor }}>
-                <ADMIN_PORTAL.icon size={16} />
-              </span>
-              <span className="admin-portal-copy"><b>{ADMIN_PORTAL.label}</b><small>{hasAdminAccess ? ADMIN_PORTAL.sub : 'Administrator sign in required'}</small></span>
-              {!hasAdminAccess && <span className="admin-portal-demo-tag">SECURE</span>}
-            </button>
           </div>
 
           <div className="dropdown-divider" />

@@ -259,6 +259,40 @@
   text-decoration: underline;
 }
 
+.admin-signin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: #555;
+  font: 700 12px inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.admin-signin-link:hover { color: #0B120D; }
+.admin-signin-link:focus-visible { outline: 2px solid #0B120D; outline-offset: 3px; }
+
+.admin-demo-details {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e0e3df;
+  border-radius: 8px;
+  background: #f6f7f4;
+  text-align: left;
+}
+
+.admin-demo-details > svg { flex: none; margin-top: 2px; }
+.admin-demo-details span { display: grid; gap: 3px; min-width: 0; }
+.admin-demo-details b { font-size: 12px; }
+.admin-demo-details code { overflow-wrap: anywhere; color: #555; font-size: 11px; }
+
 @media (max-width: 640px) {
   .login-page {
     justify-content: flex-start;
